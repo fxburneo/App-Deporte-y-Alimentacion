@@ -1,0 +1,366 @@
+<title>Blueprint Fondo y Plato</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: columna de lectura de 760px; bloques de proceso numerados; maquetas de iPhone en fila que pasa a una columna en el celular */
+:root{
+  --bg:#f5f6f2; --surface:#ffffff; --fg:#1b2420; --muted:#5d6b64; --line:#d9dfd9;
+  --accent:#1d6b52; --accent-soft:#e1efe8;
+  --carb:#c47a12; --carb-soft:#fbefd9;
+  --prot:#2c62b8; --prot-soft:#e3ecfa;
+  --fat:#8a5aa8; --fat-soft:#f1e7f7;
+  --ok:#1f8a4c; --warn:#b97a0b; --bad:#c0392b;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121815; --surface:#1a221e; --fg:#e6ece8; --muted:#9aaba2; --line:#2c3832;
+  --accent:#5cc49c; --accent-soft:#1d3329;
+  --carb:#e9a645; --carb-soft:#3a2b14;
+  --prot:#7aa6ec; --prot-soft:#1c2a42;
+  --fat:#c39ade; --fat-soft:#2f2238;
+  --ok:#53c27f; --warn:#e3b04a; --bad:#ec7a6c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121815; --surface:#1a221e; --fg:#e6ece8; --muted:#9aaba2; --line:#2c3832;
+  --accent:#5cc49c; --accent-soft:#1d3329;
+  --carb:#e9a645; --carb-soft:#3a2b14;
+  --prot:#7aa6ec; --prot-soft:#1c2a42;
+  --fat:#c39ade; --fat-soft:#2f2238;
+  --ok:#53c27f; --warn:#e3b04a; --bad:#ec7a6c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.1;margin:0}
+h1{font-size:clamp(40px,8vw,60px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:32px;font-weight:700;display:flex;gap:12px;align-items:baseline}
+h2 .n{font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:500}
+h3{font-size:22px;font-weight:600}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:18px;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:600}
+ul,ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.note{border-left:3px solid var(--warn);background:var(--surface);padding:12px 16px;border-radius:0 8px 8px 0;font-size:15px}
+.note.ok{border-color:var(--accent)}
+.note.bad{border-color:var(--bad)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:13px;white-space:nowrap}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.c-carb{background:var(--carb-soft);color:var(--carb)}
+.c-prot{background:var(--prot-soft);color:var(--prot)}
+.c-fat{background:var(--fat-soft);color:var(--fat)}
+.c-acc{background:var(--accent-soft);color:var(--accent)}
+.flow{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.step{display:grid;grid-template-columns:84px 1fr;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step .t{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500;padding-top:2px}
+.step b{display:block}
+.step span{color:var(--muted);font-size:15px}
+.phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.phone{border:1px solid var(--line);border-radius:28px;background:var(--surface);padding:18px 14px 14px;display:flex;flex-direction:column;gap:10px;font-size:13px;min-width:0}
+.phone .cap{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em}
+.ph-h{font-family:var(--display);font-size:22px;font-weight:700}
+.card{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.btn{border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-weight:600}
+.btn.p{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.small{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.box{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.box h3{font-size:20px}
+.mono{font-family:var(--mono);font-size:13px}
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow-x:auto;margin:0}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="eyebrow">Blueprint v1 · 15-oct-2026 · antes de programar</div>
+  <h1>Fondo y Plato</h1>
+  <p class="lead">App personal que lee tus entrenamientos y tu recuperación, calcula cuánto y qué comer cada día según la carga, registra lo que comes con foto o texto, y te explica en lenguaje simple cómo va tu forma física.</p>
+  <div class="meta"><span>Usuario: <b>solo Francisco</b></span><span>Dispositivo: <b>iPhone (app instalable)</b></span><span>Objetivo: <b>bajar 0,3–0,5 kg/semana sin perder rendimiento</b></span></div>
+  <p class="small">"Fondo y Plato" es un nombre de trabajo; se cambia cuando quieras.</p>
+</header>
+
+<section>
+  <h2><span class="n">01</span>Decisiones tomadas</h2>
+  <div class="tbl"><table>
+    <tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr>
+    <tr><td>Datos de Garmin</td><td><b>Intervals.icu</b> como puente, con plan B manual</td><td>Garmin no da API a personas. Intervals se conecta oficialmente a Garmin y tiene API con llave simple.</td></tr>
+    <tr><td>Entrenos planificados</td><td><b>Calendario iCal de TrainingPeaks</b> (Premium, desde el 1-nov)</td><td>TrainingPeaks no da API a personas; el calendario exportable es oficial y muestra 14 días hacia adelante.</td></tr>
+    <tr><td>Base de datos</td><td><b>Proyecto Supabase nuevo</b>, separado de finanzas</td><td>Si algo falla en uno, no afecta al otro. El plan gratis permite 2 proyectos.</td></tr>
+    <tr><td>App</td><td>Next.js en Vercel, instalada como PWA en el iPhone</td><td>Mismo stack que finanzas: ya sabes cómo se publica y se prueba.</td></tr>
+    <tr><td>Registro de comidas</td><td>Foto o texto libre, la IA calcula y tú confirmas</td><td>Rápido. La foto tiene un error de ±20–30 % en calorías; sirve para ver tendencias, no para contar gramo a gramo.</td></tr>
+    <tr><td>Menú</td><td>Rotativo semanal hecho por IA, con lista de compras; puedes mantener el anterior o proponer cambios y la app valida si cumplen</td><td>Variedad sin perder control del objetivo.</td></tr>
+    <tr><td>Rol de coach</td><td>Segunda opinión en lenguaje simple; no modifica el plan de tu entrenador</td><td>Evita contradecir al coach; te da temas concretos para hablar con él.</td></tr>
+    <tr><td>Análisis</td><td>Corto cada mañana y un informe semanal el domingo</td><td>Pediste ambos.</td></tr>
+    <tr><td>Avisos</td><td>Peso los viernes, plan de comidas de mañana, registrar comidas, alertas de fatiga</td><td>Web Push en iPhone (iOS 16.4+, con la app en la pantalla de inicio). Sin costo.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">02</span>Lecciones de la app de finanzas que aplico aquí</h2>
+  <ul>
+    <li><b>Todo se construye en la nube.</b> La PC de la oficina no te deja instalar Node.js; nunca vas a necesitar instalar nada.</li>
+    <li><b>Las conexiones salen desde servidores</b> (Supabase y Vercel), no desde tu PC ni tu celular. Los bloqueos de la red de la oficina no afectan a la app.</li>
+    <li><b>Procesos programados en Supabase</b>, no en Vercel: el plan gratis de Vercel solo permite 1 tarea programada al día y aquí hay varias.</li>
+    <li><b>El login real lo pruebas tú</b> en el enlace de vista previa de Vercel; desde mi entorno no se puede probar la sesión.</li>
+    <li><b>Los cambios a la base de datos</b> te los entrego como script SQL con instructivo paso a paso en español para que los corras en Supabase.</li>
+    <li><b>Ninguna llave en el repositorio</b> (Intervals, TrainingPeaks, Claude): van como variables privadas en Vercel y Supabase.</li>
+    <li><b>Maqueta aprobada antes de cada pantalla</b>, publicada como página. Este blueprint define el qué; las maquetas detalladas se hacen en cada etapa.</li>
+    <li><b>Supabase gratis se pausa tras 7 días sin uso.</b> Con el sincronizado diario no debería pasar, pero queda como riesgo conocido.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">03</span>De dónde salen los datos</h2>
+  <pre class="mermaid">
+flowchart LR
+  G[Reloj Garmin] --> GC[Garmin Connect]
+  GC --> IV[Intervals.icu]
+  TP[TrainingPeaks<br/>tu coach] -- calendario iCal --> APP
+  TP --> GC
+  IV -- API con llave --> APP[(Fondo y Plato<br/>Supabase)]
+  M[Plan B: subes archivo<br/>o captura] -.-> APP
+  F[Tus fotos y textos<br/>de comida] --> IA[IA Claude] --> APP
+  APP --> PH[iPhone: pantallas<br/>y avisos]
+  </pre>
+  <div class="grid2">
+    <div class="box"><h3>Desde Intervals.icu</h3><ul>
+      <li>Actividades: deporte, duración, distancia, desnivel, FC, potencia (rodillo), carga</li>
+      <li>Bienestar diario: sueño, HRV, FC en reposo, peso</li>
+      <li>Forma, cansancio y frescura (Intervals ya los calcula)</li>
+    </ul></div>
+    <div class="box"><h3>Desde TrainingPeaks</h3><ul>
+      <li>Entrenos de los próximos 14 días: deporte, duración, descripción del coach</li>
+      <li>Carreras cuando las cargues</li>
+      <li>Retraso de hasta 24 h si el coach cambia algo</li>
+    </ul></div>
+  </div>
+  <div class="note bad"><b>Riesgo activo.</b> El 9-oct-2026 Intervals.icu avisó que Garmin cambió sus términos y que probablemente bloqueará los datos de Garmin en su API, sin fecha. Garmin dice que reabrirá su programa de desarrolladores con un camino más fácil para personas. Por eso la app se arma con una <b>capa de fuentes intercambiable</b>: si Intervals deja de entregar datos de Garmin, cambiamos a la API nueva de Garmin o a carga manual sin tocar nutrición ni análisis. Mientras tanto, la app avisa si pasan 48 h sin datos nuevos.</div>
+</section>
+
+<section>
+  <h2><span class="n">04</span>Cómo calcula la nutrición</h2>
+  <p>El principio es <b>"comer para el trabajo que vas a hacer"</b>. La proteína y la grasa son casi fijas todos los días; lo que sube y baja es el carbohidrato, según el entreno de hoy y el de mañana. El déficit para bajar de peso se aplica en los días suaves y se reduce en los días duros, para no llegar vacío a las sesiones clave.</p>
+
+  <h3>Paso 1 · Gasto del día</h3>
+  <ul>
+    <li><b>Metabolismo en reposo</b> con la fórmula Mifflin-St Jeor (edad, estatura, peso). Si cargas % de grasa, se usa Katch-McArdle, que es más precisa.</li>
+    <li><b>Vida diaria</b> (oficina, familia): factor 1,3–1,4 sobre el metabolismo, sin contar el entreno.</li>
+    <li><b>Entreno:</b> en rodillo con potencia se usan los kilojulios (≈ kcal gastadas). Con solo frecuencia cardíaca, la app descuenta un 15 % a la estimación de Garmin porque tiende a sobreestimar.</li>
+  </ul>
+
+  <h3>Paso 2 · Tipo de día y carbohidratos</h3>
+  <div class="tbl"><table>
+    <tr><th>Tipo de día</th><th>Ejemplo</th><th>Carbohidratos</th><th>Déficit</th></tr>
+    <tr><td><span class="chip c-acc">Descanso / fuerza</span></td><td>Gimnasio o nada</td><td class="num">2,5–3,5 g/kg</td><td class="num">−400 a −500 kcal</td></tr>
+    <tr><td><span class="chip c-acc">Suave</span></td><td>Rodaje o rodillo &lt;60 min, zona 1-2</td><td class="num">3,5–4,5 g/kg</td><td class="num">−300 a −400 kcal</td></tr>
+    <tr><td><span class="chip c-carb">Moderado</span></td><td>60–90 min o intervalos</td><td class="num">5–6 g/kg</td><td class="num">−200 a −300 kcal</td></tr>
+    <tr><td><span class="chip c-carb">Duro / largo</span></td><td>Fondo de 2–3 h o sesión intensa</td><td class="num">6–8 g/kg</td><td class="num">0 a −150 kcal</td></tr>
+    <tr><td><span class="chip c-carb">Muy largo / carrera</span></td><td>Más de 3 h, trail largo</td><td class="num">8–10 g/kg</td><td class="num">Sin déficit</td></tr>
+  </table></div>
+  <p class="small">Rangos ajustados a la baja respecto a las guías del ACSM y la ISSN porque el objetivo incluye perder grasa. La cena del día anterior a un entreno duro sube un nivel.</p>
+
+  <h3>Paso 3 · Proteína y grasa</h3>
+  <ul>
+    <li><span class="chip c-prot">Proteína</span> 1,8–2,2 g/kg todos los días, repartida en 4–5 tomas de unos 0,3–0,4 g/kg. Es lo que protege el músculo mientras bajas de peso.</li>
+    <li><span class="chip c-fat">Grasa</span> 0,8–1,0 g/kg, nunca menos de 0,6 g/kg (hormonas y vitaminas).</li>
+  </ul>
+
+  <h3>Paso 4 · Ajuste semanal (domingo)</h3>
+  <ul>
+    <li>Se compara el peso promedio de la semana contra la anterior.</li>
+    <li>Bajaste menos de 0,2 kg dos semanas seguidas: se quitan 100–150 kcal/día.</li>
+    <li>Bajaste más de 0,7 kg o hay alertas de fatiga: se suman 100–150 kcal/día.</li>
+    <li>Si la energía que queda después de entrenar baja de cierto umbral (señal de "energía disponible baja"), la app te alerta: es la principal causa de lesiones y caída de rendimiento en deportistas que hacen dieta.</li>
+  </ul>
+
+  <h3>Paso 5 · Antes, durante y después de salidas largas</h3>
+  <div class="tbl"><table>
+    <tr><th>Duración</th><th>Carbohidrato por hora</th><th>Líquido por hora</th></tr>
+    <tr><td>Menos de 60 min</td><td class="num">0 (solo agua)</td><td class="num">400–600 ml</td></tr>
+    <tr><td>60–90 min</td><td class="num">30 g</td><td class="num">500–750 ml</td></tr>
+    <tr><td>90 min – 2,5 h</td><td class="num">60 g</td><td class="num">500–800 ml + sodio</td></tr>
+    <tr><td>Más de 2,5 h</td><td class="num">60–90 g</td><td class="num">500–800 ml + sodio</td></tr>
+  </table></div>
+  <ul>
+    <li><b>Antes:</b> 1–2 g/kg de carbohidrato 2–3 h antes, o 30–60 g si sales en menos de 1 h.</li>
+    <li><b>Validación de lo que llevas:</b> escribes "2 geles de 25 g, caramañola con isotónico, 1 banano" y la app suma los gramos por hora contra lo recomendado y te dice si te falta, si te sobra o si está bien.</li>
+    <li><b>Después:</b> comida con 25–40 g de proteína y carbohidrato según el tipo de día, idealmente en las 2 h siguientes.</li>
+    <li>Más de 60 g/h necesita mezclar glucosa y fructosa y acostumbrar el estómago en los entrenos; la app te lo recuerda.</li>
+  </ul>
+
+  <h3>Peso objetivo</h3>
+  <p>Como no sabes cuál es, la app propone un <b>rango</b>, no un número: con % de grasa apunta a 12–16 % (rango saludable y de buen rendimiento para un hombre adulto que hace endurance); sin % de grasa usa IMC 22–24 como referencia inicial. El rango se revisa cada 4 semanas según cómo responda tu rendimiento.</p>
+
+  <div class="note"><b>Crítica sobre el peso semanal.</b> Pesarte solo el viernes da un dato muy ruidoso: el peso varía ±1 kg de un día a otro por agua y glucógeno, sobre todo después de días altos en carbohidratos. Recomiendo pesarte <b>lunes, miércoles y viernes</b> en ayunas y usar el promedio. El aviso del viernes se mantiene; los otros dos son opcionales. Si solo te pesas el viernes, la app funciona igual pero los ajustes semanales serán menos confiables.</div>
+  <div class="note ok"><b>Límite de la app.</b> Esto es planificación nutricional deportiva para una persona sana. Si tienes una condición médica (colesterol, presión, glucosa) o tomas medicación, la app no la reemplaza: lo conversas con tu médico.</div>
+</section>
+
+<section>
+  <h2><span class="n">05</span>Cómo te analiza como entrenador</h2>
+  <p>Sin tecnicismos. Cada número técnico tiene una traducción y siempre va acompañado de qué significa para ti.</p>
+  <div class="tbl"><table>
+    <tr><th>Lo que se mide</th><th>Cómo te lo digo</th><th>Ejemplo</th></tr>
+    <tr><td>Forma (CTL)</td><td>"Tu base física acumulada"</td><td>"Estás un 8 % más en forma que hace 6 semanas."</td></tr>
+    <tr><td>Fatiga (ATL)</td><td>"El cansancio de los últimos días"</td><td>"Esta semana cargaste más que tu promedio."</td></tr>
+    <tr><td>Frescura (TSB)</td><td>"Qué tan descansado llegas"</td><td>"Llegas cansado al fondo del sábado; prioriza dormir."</td></tr>
+    <tr><td>HRV, FC en reposo, sueño</td><td>Semáforo "listo / con cuidado / descansa"</td><td>"Tu pulso en reposo está 6 latidos arriba de lo normal: posible estrés o inicio de resfrío."</td></tr>
+    <tr><td>Planificado vs hecho</td><td>"Cumplimiento del plan"</td><td>"Hiciste 4 de 5 sesiones; la que faltó fue la de fuerza."</td></tr>
+    <tr><td>Distribución de intensidad</td><td>"¿Entrenas suave lo suave y fuerte lo fuerte?"</td><td>"El 35 % de tu tiempo fue en zona media: ni suave ni fuerte."</td></tr>
+    <tr><td>Eficiencia</td><td>"¿Te cuesta menos lo mismo?"</td><td>"En rodillo, a la misma potencia tu pulso bajó 5 latidos en un mes."</td></tr>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><h3>Cada mañana</h3><p>2–3 líneas: cómo dormiste, si estás listo para el entreno de hoy y qué ajustar en la comida.</p></div>
+    <div class="box"><h3>Cada domingo</h3><p>Qué mejoró, qué falta, cómo se conecta la nutrición con tu rendimiento, y <b>2–3 temas para conversar con tu coach</b>. Nunca cambia el plan del coach.</p></div>
+  </div>
+  <p class="small">Limitación: en ciclismo exterior y trail no tienes potenciómetro, así que la carga se estima por frecuencia cardíaca y ritmo; es menos precisa que en rodillo. En trail se usa el ritmo ajustado por pendiente.</p>
+</section>
+
+<section>
+  <h2><span class="n">06</span>Procesos: un día y una semana</h2>
+  <div class="flow">
+    <div class="step"><div class="t">05:00</div><div><b>Sincronización automática</b><span>Trae actividades, sueño, HRV, FC en reposo y peso de Intervals, y los entrenos de los próximos 14 días de TrainingPeaks.</span></div></div>
+    <div class="step"><div class="t">05:05</div><div><b>Cálculo del día</b><span>Semáforo de recuperación + entreno de hoy y mañana → tipo de día → calorías y macros → menú del día ajustado.</span></div></div>
+    <div class="step"><div class="t">06:30</div><div><b>Aviso de la mañana</b><span>Mensaje corto del coach y el plan de comidas de hoy.</span></div></div>
+    <div class="step"><div class="t">Durante el día</div><div><b>Registro de comidas</b><span>Foto, texto o "comí lo del plan". La barra del día se actualiza.</span></div></div>
+    <div class="step"><div class="t">15:00</div><div><b>Aviso si no registraste nada</b><span>Configurable. No se envía si ya hay registros.</span></div></div>
+    <div class="step"><div class="t">Antes de salir</div><div><b>Salida larga</b><span>Abres "Voy a salir", la app propone carbohidrato y líquido por hora, tú escribes lo que llevas y te lo valida.</span></div></div>
+    <div class="step"><div class="t">20:00</div><div><b>Plan de mañana</b><span>Comidas de mañana según el entreno planificado, para dejar listo lo necesario.</span></div></div>
+    <div class="step"><div class="t">Viernes 07:00</div><div><b>Peso</b><span>Si Garmin ya trajo el peso de hoy, solo pide confirmarlo. Si no, lo ingresas en la app.</span></div></div>
+    <div class="step"><div class="t">Domingo 18:00</div><div><b>Cierre semanal</b><span>Informe del coach, cumplimiento nutricional, ajuste de calorías y propuesta de menú de la semana siguiente con lista de compras.</span></div></div>
+  </div>
+  <div class="note ok"><b>Alerta de fatiga:</b> se envía en el momento en que el semáforo pasa a "descansa" (sueño malo + HRV bajo + pulso en reposo alto). Sugiere hablar con el coach, no cancela nada.</div>
+</section>
+
+<section>
+  <h2><span class="n">07</span>Pantallas</h2>
+  <p>Barra inferior con cinco botones: <b>Hoy · Comidas · + · Entreno · Más</b>. Abajo, bocetos de baja fidelidad de las 3 pantallas principales con datos de ejemplo; las maquetas finales se aprueban en cada etapa.</p>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="cap">Hoy</div>
+      <div class="ph-h">Jueves 16</div>
+      <div class="card"><div class="row"><span><span class="dot" style="background:var(--ok)"></span> Listo para entrenar</span><span class="small">HRV normal</span></div><span class="small">Dormiste 7 h 10. Hoy rodillo de intervalos: llega con el almuerzo completo.</span></div>
+      <div class="card"><div class="row"><b>Rodillo 75 min</b><span class="chip c-carb">Moderado</span></div><span class="small">4 × 8 min en zona 4 (TrainingPeaks)</span></div>
+      <div class="card">
+        <div class="row"><b>2.450 kcal</b><span class="small">van 1.380</span></div>
+        <div class="row small"><span>Carbohidratos 340 g</span><span>190</span></div><div class="bar"><i style="width:56%;background:var(--carb)"></i></div>
+        <div class="row small"><span>Proteína 160 g</span><span>95</span></div><div class="bar"><i style="width:59%;background:var(--prot)"></i></div>
+        <div class="row small"><span>Grasa 70 g</span><span>48</span></div><div class="bar"><i style="width:68%;background:var(--fat)"></i></div>
+      </div>
+      <div class="card"><div class="row"><span>Desayuno</span><span class="small">hecho</span></div><div class="row"><span>Media mañana</span><span class="small">hecho</span></div><div class="row"><span>Almuerzo</span><span class="small">pendiente</span></div></div>
+    </div>
+
+    <div class="phone">
+      <div class="cap">Registrar (+)</div>
+      <div class="ph-h">Almuerzo</div>
+      <div class="row" style="gap:6px"><div class="btn" style="flex:1">Foto</div><div class="btn" style="flex:1">Texto</div><div class="btn" style="flex:1">Del plan</div></div>
+      <div class="card"><span class="small">Escribiste:</span><span>"pollo a la plancha, 1 taza de arroz, ensalada con aguacate, jugo de mora"</span></div>
+      <div class="card">
+        <div class="row"><span>Pollo 150 g</span><span class="small">45 P</span></div>
+        <div class="row"><span>Arroz 1 taza</span><span class="small">45 C</span></div>
+        <div class="row"><span>Ensalada + ½ aguacate</span><span class="small">12 G</span></div>
+        <div class="row"><span>Jugo de mora con azúcar</span><span class="small">30 C</span></div>
+      </div>
+      <div class="card" style="border-color:var(--warn)"><span class="small"><b>Ojo:</b> el jugo suma 30 g de azúcar. Hoy te sirve por el rodillo; en día de descanso, cámbialo por agua.</span></div>
+      <div class="btn p">Guardar almuerzo</div>
+    </div>
+
+    <div class="phone">
+      <div class="cap">Salida larga</div>
+      <div class="ph-h">Fondo MTB 3 h</div>
+      <div class="card"><div class="row"><span>Objetivo</span><b>60 g/h · 650 ml/h</b></div><span class="small">Total: 180 g de carbohidrato y ~2 L de líquido con sodio.</span></div>
+      <div class="card"><span class="small">Lo que llevas:</span><span>"3 geles de 25 g, 2 caramañolas de isotónico, 1 barra"</span></div>
+      <div class="card">
+        <div class="row"><span>Geles</span><span class="small">75 g</span></div>
+        <div class="row"><span>Isotónico 1,5 L</span><span class="small">60 g</span></div>
+        <div class="row"><span>Barra</span><span class="small">25 g</span></div>
+        <div class="row"><b>Total</b><b>160 g · 53 g/h</b></div>
+      </div>
+      <div class="card" style="border-color:var(--warn)"><span class="small"><b>Te faltan ~20 g:</b> suma 1 gel o 1 banano. Líquido: 1,5 L es poco para 3 h; planifica dónde recargar.</span></div>
+    </div>
+  </div>
+
+  <div class="tbl"><table>
+    <tr><th>Pantalla</th><th>Qué hace</th></tr>
+    <tr><td><b>Hoy</b></td><td>Semáforo de recuperación, entreno del día, objetivo de calorías y macros con avance, comidas del plan con su estado, mensaje del coach.</td></tr>
+    <tr><td><b>Registrar (+)</b></td><td>Foto, texto o "comí lo del plan". La IA desglosa en alimentos y gramos; tú corriges antes de guardar. Si algo no se ve en la foto, pregunta en vez de adivinar.</td></tr>
+    <tr><td><b>Comidas</b></td><td>Día y semana: objetivo contra lo real por macro, dónde te pasas o te quedas corto, y qué comidas lo explican.</td></tr>
+    <tr><td><b>Menú semanal</b></td><td>Propuesta de la IA por día y comida, con la porción de carbohidrato ajustada a cada tipo de día. Botones: Aceptar · Mantener el de la semana pasada · Pedir cambio (texto libre, la app valida si cumple el objetivo). Lista de compras agrupada por sección.</td></tr>
+    <tr><td><b>Salida larga</b></td><td>Plan antes, durante y después, y validación de lo que llevas.</td></tr>
+    <tr><td><b>Entreno</b></td><td>Semana planificada vs hecha, forma, cansancio y frescura en lenguaje simple, gráfico de 12 semanas, informes semanales guardados.</td></tr>
+    <tr><td><b>Peso</b></td><td>Gráfico con promedio de 7 días, rango objetivo y fecha estimada para llegar.</td></tr>
+    <tr><td><b>Más · Perfil y ajustes</b></td><td>Edad, estatura, % de grasa, alimentos que no te gustan, horarios de comida, conexiones (Intervals, TrainingPeaks), avisos y su hora.</td></tr>
+    <tr><td><b>Primer uso</b></td><td>Asistente de 4 pasos: datos personales, alimentos que no te gustan, conectar Intervals, activar avisos.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">08</span>Qué se guarda</h2>
+  <p>Tablas de la base de datos, en lenguaje simple. El detalle técnico va en el script de cada etapa.</p>
+  <div class="tbl"><table>
+    <tr><th>Tabla</th><th>Contenido</th></tr>
+    <tr><td class="mono">perfil</td><td>Datos personales, preferencias, alimentos que no te gustan, horarios</td></tr>
+    <tr><td class="mono">pesos</td><td>Cada pesaje con su origen (Garmin o manual)</td></tr>
+    <tr><td class="mono">actividades</td><td>Entrenos hechos, con carga y origen</td></tr>
+    <tr><td class="mono">bienestar_diario</td><td>Sueño, HRV, FC en reposo, semáforo calculado</td></tr>
+    <tr><td class="mono">entrenos_planificados</td><td>Lo que viene de TrainingPeaks</td></tr>
+    <tr><td class="mono">objetivos_diarios</td><td>Tipo de día, calorías y macros objetivo, con la regla que los generó</td></tr>
+    <tr><td class="mono">menus / menu_items</td><td>Menú de cada semana, estado (propuesto, aceptado) y versión</td></tr>
+    <tr><td class="mono">comidas_registradas</td><td>Lo que comiste, con foto o texto original y alimentos desglosados</td></tr>
+    <tr><td class="mono">salidas_largas</td><td>Plan de hidratación, lo que llevaste y lo que realmente consumiste</td></tr>
+    <tr><td class="mono">analisis_coach</td><td>Mensajes diarios e informes semanales</td></tr>
+    <tr><td class="mono">sincronizaciones</td><td>Registro de cada lectura de Intervals y TrainingPeaks: si funcionó o falló</td></tr>
+    <tr><td class="mono">avisos</td><td>Suscripción del iPhone y configuración de cada aviso</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">09</span>Plan de construcción</h2>
+  <p>Cada etapa termina con algo que puedes usar en el celular. Antes de cada pantalla: maqueta y tu aprobación.</p>
+  <div class="tbl"><table>
+    <tr><th>Etapa</th><th>Entrega</th><th>Qué haces tú</th></tr>
+    <tr><td>0 · Preparación</td><td>Repo, proyecto Next.js, pruebas automáticas, enlace a Vercel</td><td>Crear el proyecto Supabase y conectar Vercel (con instructivo)</td></tr>
+    <tr><td>1 · Perfil y motor</td><td>Perfil, peso manual, cálculo de calorías y macros con pruebas, pantalla Hoy con entreno ingresado a mano</td><td>Cargar tus datos y revisar si los números tienen sentido</td></tr>
+    <tr><td>2 · Intervals.icu</td><td>Lectura automática de actividades, bienestar y peso; aviso si pasan 48 h sin datos</td><td>Crear cuenta en Intervals, conectar Garmin y copiar la llave de API</td></tr>
+    <tr><td>3 · Registro de comidas</td><td>Foto y texto con IA, pantalla Comidas</td><td>Probar una semana de registros reales</td></tr>
+    <tr><td>4 · TrainingPeaks</td><td>Entrenos planificados, tipo de día automático, salida larga (después del 1-nov)</td><td>Reactivar Premium y copiar el enlace del calendario</td></tr>
+    <tr><td>5 · Menú semanal</td><td>Menú rotativo, aceptar / mantener / pedir cambio, lista de compras</td><td>Aprobar la primera semana</td></tr>
+    <tr><td>6 · Coach</td><td>Análisis diario y semanal, pantallas Entreno y Peso</td><td>Validar que el lenguaje se entiende</td></tr>
+    <tr><td>7 · Avisos</td><td>Los 5 avisos en el iPhone</td><td>Instalar la app en la pantalla de inicio y aceptar avisos</td></tr>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><h3>Costo mensual estimado</h3><p>Supabase, Vercel e Intervals: <b>$0</b> en planes gratis. IA de Claude: <b>~$3–6</b> según cuántas fotos registres (estimación, se mide en la etapa 3). TrainingPeaks Premium ya lo pagas.</p></div>
+    <div class="box"><h3>Sugerencia a futuro</h3><p>La lista de compras puede pasar directo a tu carrito de Tipti (Megamaxi/Supermaxi), que ya usas. Queda fuera de esta versión.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">10</span>Pendiente de ti</h2>
+  <ul>
+    <li>Edad, estatura, peso actual y, si tienes, % de grasa (de báscula de bioimpedancia o estudio).</li>
+    <li>Alimentos que no te gustan (en la pregunta no alcanzaste a escribirlos).</li>
+    <li>Horario típico de comidas y de entrenos entre semana y fin de semana.</li>
+    <li>Ciudad donde entrenas: la altura y el calor cambian la recomendación de hidratación.</li>
+    <li>Confirmar si aceptas pesarte 3 veces por semana o solo el viernes.</li>
+    <li>Aprobar este blueprint o decirme qué cambiar.</li>
+  </ul>
+</section>
+
+<footer>Fuentes del riesgo de Garmin: the5krunner (14-oct-2026), foro de Intervals.icu (9 y 14-oct-2026). Calendario de TrainingPeaks: centro de ayuda de TrainingPeaks. Rangos nutricionales basados en guías del ACSM e ISSN para deportistas de endurance, ajustados para pérdida de grasa.</footer>
+</div>
