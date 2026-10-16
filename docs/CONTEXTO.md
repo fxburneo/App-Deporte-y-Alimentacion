@@ -39,8 +39,20 @@ Blueprint publicado: https://claude.ai/artifact/K5mr2PvweSDvwdkMrSh3hL (`docs/bl
   Análisis diario corto + informe semanal (domingo).
 - Avisos: viernes peso, plan de comidas de mañana, recordar registrar comidas, alertas de fatiga.
 
+## Perfil (16-oct-2026)
+
+- Nació el 5-jul-1984 (42 años), 181 cm, 76 kg, IMC 23,2. Sin % de grasa.
+- Objetivo elegido: 72–73 kg (IMC ~22). Piso: no bajar de 72 kg sin medir % de grasa. Se le señaló que ya está en rango saludable.
+- Metabolismo en reposo ~1.690 kcal (Mifflin-St Jeor); ~2.280 kcal sin entreno con factor 1,35.
+- No come: pescado, mariscos, vísceras.
+- Quito (~2.800 m): hidratación por reloj, no por sed.
+- Entreno L-V 05:00–06:30 (a veces 19:00). Sábado MTB/ruta ~4 h desde 06:30; domingo trail ~2 h desde 06:30; desayuna antes en ambos.
+- Comidas L-V: desayuno 06:45, almuerzo 13:00, cena 19:00 (+ 2 snacks, horas supuestas ~10:00 y ~16:00).
+- Pesaje lunes, miércoles y viernes (aviso principal el viernes).
+- Procesos ajustados: cálculo del día la noche anterior; sincronización 06:35 con reintentos 07:30 y 12:00; aviso de la mañana 06:40;
+  plan de mañana 19:30. Sin semáforo antes del entreno de las 05:00 (el reloj puede no haber sincronizado).
+
 ## Pendiente de Francisco
 
-- Edad, estatura, peso, % grasa; alimentos que no le gustan; horarios; ciudad de entreno.
-- Decidir pesaje 3 veces por semana (recomendado) o solo viernes.
-- Aprobar el blueprint.
+- Aprobar el blueprint v2.
+- Instalar la app de Claude en GitHub para este repo (el push dio 403 el 15-oct).

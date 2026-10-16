@@ -88,12 +88,35 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 <div class="wrap">
 
 <header style="display:flex;flex-direction:column;gap:14px">
-  <div class="eyebrow">Blueprint v1 · 15-oct-2026 · antes de programar</div>
+  <div class="eyebrow">Blueprint v2 · 16-oct-2026 · antes de programar</div>
   <h1>Fondo y Plato</h1>
   <p class="lead">App personal que lee tus entrenamientos y tu recuperación, calcula cuánto y qué comer cada día según la carga, registra lo que comes con foto o texto, y te explica en lenguaje simple cómo va tu forma física.</p>
-  <div class="meta"><span>Usuario: <b>solo Francisco</b></span><span>Dispositivo: <b>iPhone (app instalable)</b></span><span>Objetivo: <b>bajar 0,3–0,5 kg/semana sin perder rendimiento</b></span></div>
+  <div class="meta"><span>Usuario: <b>solo Francisco</b></span><span>Dispositivo: <b>iPhone (app instalable)</b></span><span>Objetivo: <b>76 → 72–73 kg a 0,3–0,5 kg/semana sin perder rendimiento</b></span></div>
   <p class="small">"Fondo y Plato" es un nombre de trabajo; se cambia cuando quieras.</p>
 </header>
+
+<section>
+  <h2><span class="n">00</span>Tu perfil</h2>
+  <div class="tbl"><table>
+    <tr><th>Dato</th><th>Valor</th><th>Qué significa para la app</th></tr>
+    <tr><td>Edad</td><td class="num">42 años</td><td>Nacido el 5-jul-1984; la app la recalcula sola.</td></tr>
+    <tr><td>Estatura · peso</td><td class="num">181 cm · 76 kg</td><td>IMC 23,2: ya estás en rango saludable.</td></tr>
+    <tr><td>Metabolismo en reposo</td><td class="num">~1.690 kcal</td><td>Mifflin-St Jeor. Con vida de oficina: ~2.280 kcal sin contar el entreno.</td></tr>
+    <tr><td>Peso objetivo</td><td class="num">72–73 kg</td><td>IMC ~22. A 0,3–0,5 kg/semana: 8 a 12 semanas, entre mediados de diciembre y mediados de enero.</td></tr>
+    <tr><td>Proteína diaria</td><td class="num">~140–165 g</td><td>1,8–2,2 g/kg, en 5 tomas de ~30 g.</td></tr>
+    <tr><td>Ciudad</td><td>Quito (~2.800 m)</td><td>En altura se pierde más líquido al respirar y se siente menos sed: la hidratación se pauta por reloj, no por sed.</td></tr>
+    <tr><td>No incluir</td><td>Pescado, mariscos, vísceras</td><td>Proteína del menú: pollo, res, cerdo, huevo, lácteos, legumbres.</td></tr>
+    <tr><td>Pesaje</td><td>Lunes, miércoles y viernes</td><td>Aviso principal el viernes; la app usa el promedio.</td></tr>
+  </table></div>
+  <div class="tbl"><table>
+    <tr><th>Día</th><th>Entreno típico</th><th>Comidas</th></tr>
+    <tr><td>Lunes a viernes</td><td>05:00–06:30 (a veces 19:00)</td><td>Desayuno 06:45 · media mañana ~10:00 · almuerzo 13:00 · media tarde ~16:00 · cena 19:00</td></tr>
+    <tr><td>Sábado</td><td>MTB o ruta ~4 h desde 06:30</td><td>Desayuno antes de salir (~05:30), comida durante la salida, almuerzo de recuperación</td></tr>
+    <tr><td>Domingo</td><td>Trail ~2 h desde 06:30</td><td>Desayuno antes de salir, almuerzo de recuperación</td></tr>
+  </table></div>
+  <div class="note"><b>Crítica sobre el objetivo.</b> Con IMC 23,2 no tienes sobrepeso. Bajar a 72–73 kg es razonable para un ciclista y trail runner (cada kilo menos se nota en las subidas), pero hay un piso: <b>no se baja de 72 kg sin medir el % de grasa</b>. Por debajo de ese peso es más probable perder músculo que grasa, y eso empeora el rendimiento. Una medición de bioimpedancia (~$10–20) en diciembre confirmaría si vale la pena seguir.</div>
+  <div class="note ok"><b>Entrenos a las 05:00.</b> El desayuno de las 06:45 es tu comida de recuperación: la más importante del día. Antes de sesiones intensas o de más de 75 min conviene un snack pequeño al levantarte (banano, tostada con miel: 20–30 g de carbohidrato). Las sesiones suaves de menos de 60 min se pueden hacer en ayunas.</div>
+</section>
 
 <section>
   <h2><span class="n">01</span>Decisiones tomadas</h2>
@@ -205,9 +228,9 @@ flowchart LR
   </ul>
 
   <h3>Peso objetivo</h3>
-  <p>Como no sabes cuál es, la app propone un <b>rango</b>, no un número: con % de grasa apunta a 12–16 % (rango saludable y de buen rendimiento para un hombre adulto que hace endurance); sin % de grasa usa IMC 22–24 como referencia inicial. El rango se revisa cada 4 semanas según cómo responda tu rendimiento.</p>
+  <p>Elegiste <b>72–73 kg</b>. La app lo revisa cada 4 semanas: si el rendimiento cae, la FC en reposo sube o el sueño empeora mientras bajas, frena el déficit. Si algún día mides el % de grasa, el objetivo pasa a definirse por grasa (12–16 %, rango saludable y de buen rendimiento para un hombre adulto que hace endurance) en vez de por peso.</p>
 
-  <div class="note"><b>Crítica sobre el peso semanal.</b> Pesarte solo el viernes da un dato muy ruidoso: el peso varía ±1 kg de un día a otro por agua y glucógeno, sobre todo después de días altos en carbohidratos. Recomiendo pesarte <b>lunes, miércoles y viernes</b> en ayunas y usar el promedio. El aviso del viernes se mantiene; los otros dos son opcionales. Si solo te pesas el viernes, la app funciona igual pero los ajustes semanales serán menos confiables.</div>
+  <div class="note ok"><b>Pesaje:</b> lunes, miércoles y viernes, en ayunas y después del baño. El peso del lunes sale alto después del fondo del sábado (más glucógeno y agua); por eso se usa el promedio y no cada dato suelto.</div>
   <div class="note ok"><b>Límite de la app.</b> Esto es planificación nutricional deportiva para una persona sana. Si tienes una condición médica (colesterol, presión, glucosa) o tomas medicación, la app no la reemplaza: lo conversas con tu médico.</div>
 </section>
 
@@ -234,16 +257,17 @@ flowchart LR
 <section>
   <h2><span class="n">06</span>Procesos: un día y una semana</h2>
   <div class="flow">
-    <div class="step"><div class="t">05:00</div><div><b>Sincronización automática</b><span>Trae actividades, sueño, HRV, FC en reposo y peso de Intervals, y los entrenos de los próximos 14 días de TrainingPeaks.</span></div></div>
-    <div class="step"><div class="t">05:05</div><div><b>Cálculo del día</b><span>Semáforo de recuperación + entreno de hoy y mañana → tipo de día → calorías y macros → menú del día ajustado.</span></div></div>
-    <div class="step"><div class="t">06:30</div><div><b>Aviso de la mañana</b><span>Mensaje corto del coach y el plan de comidas de hoy.</span></div></div>
+    <div class="step"><div class="t">Noche anterior</div><div><b>Cálculo del día siguiente</b><span>Entreno planificado de mañana → tipo de día → calorías y macros → menú ajustado, incluido el snack previo si el entreno de las 05:00 es intenso.</span></div></div>
+    <div class="step"><div class="t">06:35</div><div><b>Sincronización automática</b><span>Trae el entreno recién hecho, sueño, HRV, FC en reposo y peso de Intervals, y los entrenos de los próximos 14 días de TrainingPeaks. Se reintenta a las 07:30 y a las 12:00 si el reloj aún no sincronizó.</span></div></div>
+    <div class="step"><div class="t">06:40</div><div><b>Aviso de la mañana</b><span>Cómo dormiste, cómo te fue en el entreno, desayuno de recuperación y plan del día. Si el entreno real fue distinto al planificado, recalcula.</span></div></div>
     <div class="step"><div class="t">Durante el día</div><div><b>Registro de comidas</b><span>Foto, texto o "comí lo del plan". La barra del día se actualiza.</span></div></div>
     <div class="step"><div class="t">15:00</div><div><b>Aviso si no registraste nada</b><span>Configurable. No se envía si ya hay registros.</span></div></div>
     <div class="step"><div class="t">Antes de salir</div><div><b>Salida larga</b><span>Abres "Voy a salir", la app propone carbohidrato y líquido por hora, tú escribes lo que llevas y te lo valida.</span></div></div>
-    <div class="step"><div class="t">20:00</div><div><b>Plan de mañana</b><span>Comidas de mañana según el entreno planificado, para dejar listo lo necesario.</span></div></div>
-    <div class="step"><div class="t">Viernes 07:00</div><div><b>Peso</b><span>Si Garmin ya trajo el peso de hoy, solo pide confirmarlo. Si no, lo ingresas en la app.</span></div></div>
+    <div class="step"><div class="t">19:30</div><div><b>Plan de mañana</b><span>Comidas de mañana y snack de las 04:45 si hace falta, para dejarlo listo antes de dormir. Viernes y sábado incluye el desayuno previo a la salida y el plan de hidratación.</span></div></div>
+    <div class="step"><div class="t">L · M · V 06:40</div><div><b>Peso</b><span>Va dentro del aviso de la mañana; el viernes es obligatorio. Si Garmin ya trajo el peso de hoy, solo pide confirmarlo.</span></div></div>
     <div class="step"><div class="t">Domingo 18:00</div><div><b>Cierre semanal</b><span>Informe del coach, cumplimiento nutricional, ajuste de calorías y propuesta de menú de la semana siguiente con lista de compras.</span></div></div>
   </div>
+  <div class="note"><b>Por qué no hay mensaje antes del entreno de las 05:00:</b> los datos de sueño y HRV llegan cuando el reloj sincroniza con el celular, y no hay garantía de que pase antes de salir. Un semáforo con datos de ayer sería engañoso. La lectura de recuperación llega con el aviso de las 06:40.</div>
   <div class="note ok"><b>Alerta de fatiga:</b> se envía en el momento en que el semáforo pasa a "descansa" (sueño malo + HRV bajo + pulso en reposo alto). Sugiere hablar con el coach, no cancela nada.</div>
 </section>
 
@@ -255,15 +279,15 @@ flowchart LR
     <div class="phone">
       <div class="cap">Hoy</div>
       <div class="ph-h">Jueves 16</div>
-      <div class="card"><div class="row"><span><span class="dot" style="background:var(--ok)"></span> Listo para entrenar</span><span class="small">HRV normal</span></div><span class="small">Dormiste 7 h 10. Hoy rodillo de intervalos: llega con el almuerzo completo.</span></div>
-      <div class="card"><div class="row"><b>Rodillo 75 min</b><span class="chip c-carb">Moderado</span></div><span class="small">4 × 8 min en zona 4 (TrainingPeaks)</span></div>
+      <div class="card"><div class="row"><span><span class="dot" style="background:var(--ok)"></span> Listo para entrenar</span><span class="small">HRV normal</span></div><span class="small">Dormiste 6 h 40. Rodillo hecho: potencia media 5 % arriba de hace un mes con el mismo pulso.</span></div>
+      <div class="card"><div class="row"><b>Rodillo 75 min</b><span class="chip c-carb">Moderado</span></div><span class="small">4 × 8 min en zona 4 · hecho 05:00</span></div>
       <div class="card">
-        <div class="row"><b>2.450 kcal</b><span class="small">van 1.380</span></div>
-        <div class="row small"><span>Carbohidratos 340 g</span><span>190</span></div><div class="bar"><i style="width:56%;background:var(--carb)"></i></div>
-        <div class="row small"><span>Proteína 160 g</span><span>95</span></div><div class="bar"><i style="width:59%;background:var(--prot)"></i></div>
+        <div class="row"><b>2.600 kcal</b><span class="small">van 1.380</span></div>
+        <div class="row small"><span>Carbohidratos 380 g</span><span>190</span></div><div class="bar"><i style="width:56%;background:var(--carb)"></i></div>
+        <div class="row small"><span>Proteína 150 g</span><span>95</span></div><div class="bar"><i style="width:59%;background:var(--prot)"></i></div>
         <div class="row small"><span>Grasa 70 g</span><span>48</span></div><div class="bar"><i style="width:68%;background:var(--fat)"></i></div>
       </div>
-      <div class="card"><div class="row"><span>Desayuno</span><span class="small">hecho</span></div><div class="row"><span>Media mañana</span><span class="small">hecho</span></div><div class="row"><span>Almuerzo</span><span class="small">pendiente</span></div></div>
+      <div class="card"><div class="row"><span>Desayuno 06:45</span><span class="small">hecho</span></div><div class="row"><span>Media mañana</span><span class="small">hecho</span></div><div class="row"><span>Almuerzo 13:00</span><span class="small">pendiente</span></div></div>
     </div>
 
     <div class="phone">
@@ -283,16 +307,17 @@ flowchart LR
 
     <div class="phone">
       <div class="cap">Salida larga</div>
-      <div class="ph-h">Fondo MTB 3 h</div>
-      <div class="card"><div class="row"><span>Objetivo</span><b>60 g/h · 650 ml/h</b></div><span class="small">Total: 180 g de carbohidrato y ~2 L de líquido con sodio.</span></div>
-      <div class="card"><span class="small">Lo que llevas:</span><span>"3 geles de 25 g, 2 caramañolas de isotónico, 1 barra"</span></div>
+      <div class="ph-h">Sábado MTB 4 h</div>
+      <div class="card"><div class="row"><span>Objetivo</span><b>60–70 g/h · 600 ml/h</b></div><span class="small">Total: ~260 g de carbohidrato y ~2,4 L de líquido con sodio. Desayuno 05:30: ~75 g de carbohidrato.</span></div>
+      <div class="card"><span class="small">Lo que llevas:</span><span>"4 geles de 25 g, 2 caramañolas de isotónico, 2 barras, 1 sánduche"</span></div>
       <div class="card">
-        <div class="row"><span>Geles</span><span class="small">75 g</span></div>
+        <div class="row"><span>Geles</span><span class="small">100 g</span></div>
         <div class="row"><span>Isotónico 1,5 L</span><span class="small">60 g</span></div>
-        <div class="row"><span>Barra</span><span class="small">25 g</span></div>
-        <div class="row"><b>Total</b><b>160 g · 53 g/h</b></div>
+        <div class="row"><span>Barras</span><span class="small">50 g</span></div>
+        <div class="row"><span>Sánduche</span><span class="small">35 g</span></div>
+        <div class="row"><b>Total</b><b>245 g · 61 g/h</b></div>
       </div>
-      <div class="card" style="border-color:var(--warn)"><span class="small"><b>Te faltan ~20 g:</b> suma 1 gel o 1 banano. Líquido: 1,5 L es poco para 3 h; planifica dónde recargar.</span></div>
+      <div class="card" style="border-color:var(--warn)"><span class="small"><b>Carbohidrato bien.</b> Líquido: 1,5 L es poco para 4 h en altura; planifica una recarga de ~1 L a mitad de ruta.</span></div>
     </div>
   </div>
 
@@ -353,12 +378,9 @@ flowchart LR
 <section>
   <h2><span class="n">10</span>Pendiente de ti</h2>
   <ul>
-    <li>Edad, estatura, peso actual y, si tienes, % de grasa (de báscula de bioimpedancia o estudio).</li>
-    <li>Alimentos que no te gustan (en la pregunta no alcanzaste a escribirlos).</li>
-    <li>Horario típico de comidas y de entrenos entre semana y fin de semana.</li>
-    <li>Ciudad donde entrenas: la altura y el calor cambian la recomendación de hidratación.</li>
-    <li>Confirmar si aceptas pesarte 3 veces por semana o solo el viernes.</li>
     <li>Aprobar este blueprint o decirme qué cambiar.</li>
+    <li>Opcional: medir el % de grasa (bioimpedancia) antes de llegar a 72 kg.</li>
+    <li>Instalar la app de Claude en GitHub para el repo de esta app (para guardar los avances).</li>
   </ul>
 </section>
 
