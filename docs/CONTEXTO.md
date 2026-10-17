@@ -52,6 +52,16 @@ Blueprint publicado: https://claude.ai/artifact/K5mr2PvweSDvwdkMrSh3hL (`docs/bl
 - Procesos ajustados: cálculo del día la noche anterior; sincronización 06:35 con reintentos 07:30 y 12:00; aviso de la mañana 06:40;
   plan de mañana 19:30. Sin semáforo antes del entreno de las 05:00 (el reloj puede no haber sincronizado).
 
+## Flujo de datos y funciones extra (17-oct-2026)
+
+- Todo nace en el reloj Garmin → Garmin Connect, que envía lo hecho a TrainingPeaks (coach) y a Intervals.icu.
+  TrainingPeaks manda lo planificado al reloj. La app lee lo planificado del iCal de TP y lo hecho + bienestar de Intervals.
+- Sensaciones (esfuerzo percibido y "cómo te sentiste") las carga en el reloj: leerlas desde Intervals, no pedirlas en la app.
+- Versión 1 incluye: hora de dormir (aviso 21:00, acostarse 21:30, cruce sueño-rendimiento), test de sudoración,
+  resumen semanal para el coach, menú pensado para cocina por lotes el domingo (propuesta el sábado), modo enfermo/pausa.
+- Descartado en v1: modo comer fuera, entrenar el estómago, lista a Tipti.
+- Después de v1: plan de carrera, exámenes de sangre (ferritina, vit. D, hemoglobina), alcohol y café.
+
 ## Pendiente de Francisco
 
 - Aprobar el blueprint v2.

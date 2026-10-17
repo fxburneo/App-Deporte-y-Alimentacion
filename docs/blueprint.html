@@ -88,7 +88,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 <div class="wrap">
 
 <header style="display:flex;flex-direction:column;gap:14px">
-  <div class="eyebrow">Blueprint v2 · 16-oct-2026 · antes de programar</div>
+  <div class="eyebrow">Blueprint v3 · 17-oct-2026 · antes de programar</div>
   <h1>Fondo y Plato</h1>
   <p class="lead">App personal que lee tus entrenamientos y tu recuperación, calcula cuánto y qué comer cada día según la carga, registra lo que comes con foto o texto, y te explica en lenguaje simple cómo va tu forma física.</p>
   <div class="meta"><span>Usuario: <b>solo Francisco</b></span><span>Dispositivo: <b>iPhone (app instalable)</b></span><span>Objetivo: <b>76 → 72–73 kg a 0,3–0,5 kg/semana sin perder rendimiento</b></span></div>
@@ -152,20 +152,23 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <h2><span class="n">03</span>De dónde salen los datos</h2>
   <pre class="mermaid">
 flowchart LR
-  G[Reloj Garmin] --> GC[Garmin Connect]
-  GC --> IV[Intervals.icu]
-  TP[TrainingPeaks<br/>tu coach] -- calendario iCal --> APP
-  TP --> GC
-  IV -- API con llave --> APP[(Fondo y Plato<br/>Supabase)]
+  G[Reloj Garmin<br/>entreno, sueño, HRV,<br/>sensaciones] --> GC[Garmin Connect]
+  GC -- entrenos hechos --> TP[TrainingPeaks<br/>tu coach]
+  TP -- entrenos planificados --> GC
+  GC -- entrenos y bienestar --> IV[Intervals.icu]
+  TP -- calendario iCal:<br/>lo planificado --> APP
+  IV -- API con llave:<br/>lo hecho y la recuperación --> APP[(Fondo y Plato<br/>Supabase)]
   M[Plan B: subes archivo<br/>o captura] -.-> APP
   F[Tus fotos y textos<br/>de comida] --> IA[IA Claude] --> APP
   APP --> PH[iPhone: pantallas<br/>y avisos]
   </pre>
+  <p>Todo nace en tu reloj. Garmin Connect reparte los datos: los entrenos hechos van a TrainingPeaks (para tu coach) y a Intervals.icu. TrainingPeaks no deja que una app personal lea lo que tiene, salvo el calendario de lo planificado. Por eso la app lee <b>lo planificado desde TrainingPeaks</b> y <b>lo hecho más la recuperación desde Intervals.icu</b>, que recibe lo mismo que tu coach ve, más sueño y HRV.</p>
   <div class="grid2">
     <div class="box"><h3>Desde Intervals.icu</h3><ul>
       <li>Actividades: deporte, duración, distancia, desnivel, FC, potencia (rodillo), carga</li>
       <li>Bienestar diario: sueño, HRV, FC en reposo, peso</li>
       <li>Forma, cansancio y frescura (Intervals ya los calcula)</li>
+      <li>Esfuerzo percibido y "cómo te sentiste", que cargas en el reloj al terminar (no se cargan dos veces)</li>
     </ul></div>
     <div class="box"><h3>Desde TrainingPeaks</h3><ul>
       <li>Entrenos de los próximos 14 días: deporte, duración, descripción del coach</li>
@@ -255,6 +258,23 @@ flowchart LR
 </section>
 
 <section>
+  <h2><span class="n">05b</span>Funciones adicionales de la versión 1</h2>
+  <div class="grid2">
+    <div class="box"><h3>Hora de dormir</h3><p>Te levantas ~04:30: para dormir 7 h necesitas estar acostado a las 21:30. Aviso a las 21:00 (configurable). La app cruza tus horas de sueño con tu frescura y tus sensaciones y te muestra cuánto te afecta dormir poco, con tus propios datos.</p></div>
+    <div class="box"><h3>Test de sudoración</h3><p>Te pesas sin ropa antes y después de un entreno de ~1 h, sin orinar en medio, y anotas lo que tomaste. Pérdida por hora = (peso antes − peso después + líquido tomado) ÷ horas. Se repite en rodillo y en exterior, porque en rodillo se suda más. Ese número reemplaza el rango genérico de 500–800 ml/h.</p></div>
+    <div class="box"><h3>Resumen para tu coach</h3><p>Página semanal lista para mandarle: peso promedio, sueño, cumplimiento nutricional, comida en las salidas largas, sensaciones y alertas. Tu coach ve los entrenos, pero no cómo comes ni cómo duermes. Lo revisas antes de mandarlo.</p></div>
+    <div class="box"><h3>Cocina por lotes el domingo</h3><p>El menú semanal se diseña para cocinar el domingo después del trail: 2 proteínas, 2 carbohidratos base y verduras listas. Entre semana solo armas los platos y ajustas la porción de carbohidrato según el día. La lista de compras va ordenada para esa sesión de cocina.</p></div>
+    <div class="box"><h3>Modo enfermo / pausa</h3><p>Un botón para enfermedad, viaje o lesión: suspende el déficit (comer a mantenimiento ayuda a recuperarte), pausa las alertas y no cuenta esos días en el cumplimiento. Al volver, la app retoma de forma gradual.</p></div>
+  </div>
+  <div class="tbl"><table>
+    <tr><th>Para después de la versión 1</th><th>Qué hace</th></tr>
+    <tr><td><b>Plan de carrera</b></td><td>Cuando cargues una carrera en TrainingPeaks: carga de carbohidratos 2–3 días antes, desayuno del día y plan por puesto de abastecimiento.</td></tr>
+    <tr><td><b>Exámenes de sangre</b></td><td>Registro de ferritina, vitamina D y hemoglobina 1–2 veces al año. En altura y con deporte de resistencia, el hierro bajo es común y baja el rendimiento sin que lo notes.</td></tr>
+    <tr><td><b>Alcohol y café</b></td><td>Registro rápido; la app muestra su efecto en tu HRV y tu sueño con tus propios datos.</td></tr>
+  </table></div>
+</section>
+
+<section>
   <h2><span class="n">06</span>Procesos: un día y una semana</h2>
   <div class="flow">
     <div class="step"><div class="t">Noche anterior</div><div><b>Cálculo del día siguiente</b><span>Entreno planificado de mañana → tipo de día → calorías y macros → menú ajustado, incluido el snack previo si el entreno de las 05:00 es intenso.</span></div></div>
@@ -265,7 +285,10 @@ flowchart LR
     <div class="step"><div class="t">Antes de salir</div><div><b>Salida larga</b><span>Abres "Voy a salir", la app propone carbohidrato y líquido por hora, tú escribes lo que llevas y te lo valida.</span></div></div>
     <div class="step"><div class="t">19:30</div><div><b>Plan de mañana</b><span>Comidas de mañana y snack de las 04:45 si hace falta, para dejarlo listo antes de dormir. Viernes y sábado incluye el desayuno previo a la salida y el plan de hidratación.</span></div></div>
     <div class="step"><div class="t">L · M · V 06:40</div><div><b>Peso</b><span>Va dentro del aviso de la mañana; el viernes es obligatorio. Si Garmin ya trajo el peso de hoy, solo pide confirmarlo.</span></div></div>
-    <div class="step"><div class="t">Domingo 18:00</div><div><b>Cierre semanal</b><span>Informe del coach, cumplimiento nutricional, ajuste de calorías y propuesta de menú de la semana siguiente con lista de compras.</span></div></div>
+    <div class="step"><div class="t">21:00</div><div><b>Hora de dormir</b><span>Aviso para estar acostado a las 21:30. Configurable por día.</span></div></div>
+    <div class="step"><div class="t">Sábado</div><div><b>Propuesta de menú</b><span>El menú de la semana siguiente y la lista de compras llegan el sábado, para comprar antes de la cocina del domingo.</span></div></div>
+    <div class="step"><div class="t">Domingo</div><div><b>Cocina por lotes</b><span>Después del trail: la app muestra qué cocinar y en qué cantidades para la semana.</span></div></div>
+    <div class="step"><div class="t">Domingo 18:00</div><div><b>Cierre semanal</b><span>Informe del coach, cumplimiento nutricional, ajuste de calorías y resumen listo para mandar a tu coach.</span></div></div>
   </div>
   <div class="note"><b>Por qué no hay mensaje antes del entreno de las 05:00:</b> los datos de sueño y HRV llegan cuando el reloj sincroniza con el celular, y no hay garantía de que pase antes de salir. Un semáforo con datos de ayer sería engañoso. La lectura de recuperación llega con el aviso de las 06:40.</div>
   <div class="note ok"><b>Alerta de fatiga:</b> se envía en el momento en que el semáforo pasa a "descansa" (sueño malo + HRV bajo + pulso en reposo alto). Sugiere hablar con el coach, no cancela nada.</div>
@@ -348,6 +371,8 @@ flowchart LR
     <tr><td class="mono">objetivos_diarios</td><td>Tipo de día, calorías y macros objetivo, con la regla que los generó</td></tr>
     <tr><td class="mono">menus / menu_items</td><td>Menú de cada semana, estado (propuesto, aceptado) y versión</td></tr>
     <tr><td class="mono">comidas_registradas</td><td>Lo que comiste, con foto o texto original y alimentos desglosados</td></tr>
+    <tr><td class="mono">tests_sudoracion</td><td>Cada test: peso antes y después, líquido, duración, condiciones, resultado ml/h</td></tr>
+    <tr><td class="mono">pausas</td><td>Periodos de enfermedad, viaje o lesión</td></tr>
     <tr><td class="mono">salidas_largas</td><td>Plan de hidratación, lo que llevaste y lo que realmente consumiste</td></tr>
     <tr><td class="mono">analisis_coach</td><td>Mensajes diarios e informes semanales</td></tr>
     <tr><td class="mono">sincronizaciones</td><td>Registro de cada lectura de Intervals y TrainingPeaks: si funcionó o falló</td></tr>
@@ -361,17 +386,17 @@ flowchart LR
   <div class="tbl"><table>
     <tr><th>Etapa</th><th>Entrega</th><th>Qué haces tú</th></tr>
     <tr><td>0 · Preparación</td><td>Repo, proyecto Next.js, pruebas automáticas, enlace a Vercel</td><td>Crear el proyecto Supabase y conectar Vercel (con instructivo)</td></tr>
-    <tr><td>1 · Perfil y motor</td><td>Perfil, peso manual, cálculo de calorías y macros con pruebas, pantalla Hoy con entreno ingresado a mano</td><td>Cargar tus datos y revisar si los números tienen sentido</td></tr>
+    <tr><td>1 · Perfil y motor</td><td>Perfil, peso manual, cálculo de calorías y macros con pruebas, modo pausa, pantalla Hoy con entreno ingresado a mano</td><td>Cargar tus datos y revisar si los números tienen sentido</td></tr>
     <tr><td>2 · Intervals.icu</td><td>Lectura automática de actividades, bienestar y peso; aviso si pasan 48 h sin datos</td><td>Crear cuenta en Intervals, conectar Garmin y copiar la llave de API</td></tr>
     <tr><td>3 · Registro de comidas</td><td>Foto y texto con IA, pantalla Comidas</td><td>Probar una semana de registros reales</td></tr>
-    <tr><td>4 · TrainingPeaks</td><td>Entrenos planificados, tipo de día automático, salida larga (después del 1-nov)</td><td>Reactivar Premium y copiar el enlace del calendario</td></tr>
-    <tr><td>5 · Menú semanal</td><td>Menú rotativo, aceptar / mantener / pedir cambio, lista de compras</td><td>Aprobar la primera semana</td></tr>
-    <tr><td>6 · Coach</td><td>Análisis diario y semanal, pantallas Entreno y Peso</td><td>Validar que el lenguaje se entiende</td></tr>
-    <tr><td>7 · Avisos</td><td>Los 5 avisos en el iPhone</td><td>Instalar la app en la pantalla de inicio y aceptar avisos</td></tr>
+    <tr><td>4 · TrainingPeaks</td><td>Entrenos planificados, tipo de día automático, salida larga y test de sudoración (después del 1-nov)</td><td>Reactivar Premium y copiar el enlace del calendario</td></tr>
+    <tr><td>5 · Menú semanal</td><td>Menú rotativo pensado para cocina por lotes, aceptar / mantener / pedir cambio, lista de compras</td><td>Aprobar la primera semana</td></tr>
+    <tr><td>6 · Coach</td><td>Análisis diario y semanal, pantallas Entreno y Peso, resumen para tu coach, cruce sueño-rendimiento</td><td>Validar que el lenguaje se entiende</td></tr>
+    <tr><td>7 · Avisos</td><td>Los avisos en el iPhone, incluida la hora de dormir</td><td>Instalar la app en la pantalla de inicio y aceptar avisos</td></tr>
   </table></div>
   <div class="grid2">
     <div class="box"><h3>Costo mensual estimado</h3><p>Supabase, Vercel e Intervals: <b>$0</b> en planes gratis. IA de Claude: <b>~$3–6</b> según cuántas fotos registres (estimación, se mide en la etapa 3). TrainingPeaks Premium ya lo pagas.</p></div>
-    <div class="box"><h3>Sugerencia a futuro</h3><p>La lista de compras puede pasar directo a tu carrito de Tipti (Megamaxi/Supermaxi), que ya usas. Queda fuera de esta versión.</p></div>
+    <div class="box"><h3>Después de la versión 1</h3><p>Plan de carrera, exámenes de sangre, y alcohol y café (detalle en la sección 05b).</p></div>
   </div>
 </section>
 
