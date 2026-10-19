@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Registrar comida</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D6B52}a:hover{color:#14503D}
+</style>
+</helmet>
+<div style="width: 390px; height: 1000px; position: relative; box-sizing: border-box; background: #F3F5F1; color: #18211D; font-family: 'Public Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.45; overflow: hidden">
+<div style="padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 14px">
+
+<header style="display: flex; justify-content: space-between; align-items: center">
+<a href="Main.dc.html" style="font-weight: 600; text-decoration: none; padding: 10px 0">Cancelar</a>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700">Registrar comida</h1>
+<span style="width: 62px"></span>
+</header>
+
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D">Desayuno</button>
+<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D">Media mañana</button>
+<button type="button" style="font: inherit; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 99px; border: 1px solid #1D6B52; background: #1D6B52; color: #FFFFFF">Almuerzo</button>
+<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D">Media tarde</button>
+<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D">Cena</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<button type="button" style="font: inherit; font-weight: 700; padding: 14px 8px; border-radius: 12px; border: 2px solid #1D6B52; background: #E1EFE8; color: #14503D; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>Foto</button>
+<button type="button" style="font: inherit; font-weight: 600; padding: 14px 8px; border-radius: 12px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h9"></path></svg>Escribir</button>
+<button type="button" style="font: inherit; font-weight: 600; padding: 14px 8px; border-radius: 12px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Del plan</button>
+</div>
+
+<div style="height: 170px; border-radius: 16px; background: repeating-linear-gradient(45deg, #E3E8E4, #E3E8E4 10px, #EDF1EE 10px, #EDF1EE 20px); display: flex; align-items: center; justify-content: center; color: #56645D; font-weight: 600">[Foto del plato]</div>
+
+<section style="background: #FFFFFF; border: 1px solid #DCE2DD; border-radius: 16px; padding: 6px 16px; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><div style="display: flex; flex-direction: column"><strong>Pollo al horno</strong><span style="font-size: 12px; color: #56645D">~150 g · pechuga sin piel</span></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #2C62B8; font-weight: 700; align-self: center">46 g P</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><div style="display: flex; flex-direction: column"><strong>Arroz</strong><span style="font-size: 12px; color: #56645D">~1½ taza cocida</span></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #9A5B06; font-weight: 700; align-self: center">68 g C</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><div style="display: flex; flex-direction: column"><strong>Ensalada con ½ aguacate</strong><span style="font-size: 12px; color: #56645D">lechuga, tomate, cebolla</span></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #7E4FA0; font-weight: 700; align-self: center">12 g G</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0"><div style="display: flex; flex-direction: column"><strong>Jugo de mora</strong><span style="font-size: 12px; color: #56645D">1 vaso · ¿con azúcar?</span></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #9A5B06; font-weight: 700; align-self: center">30 g C</span></div>
+</section>
+
+<section style="background: #FFF4E0; border: 1px solid #F0D9AE; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<strong>No se distingue en la foto: ¿el jugo tenía azúcar?</strong>
+<div style="display: flex; gap: 8px">
+<button type="button" style="font: inherit; font-weight: 600; flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D">Sí, con azúcar</button>
+<button type="button" style="font: inherit; font-weight: 600; flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #DCE2DD; background: #FFFFFF; color: #18211D">Sin azúcar</button>
+</div>
+</section>
+
+<section style="background: #E1EFE8; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+<strong style="color: #14503D">Con este almuerzo vas bien</strong>
+<span style="color: #2E3A34">Llegas a 69 % de los carbohidratos y 79 % de la proteína del día. Te faltan ~35 g de proteína: inclúyela en la media tarde.</span>
+</section>
+
+<span style="font-size: 12px; color: #56645D">La estimación por foto puede variar ±20 %. Toca un alimento para corregir la porción.</span>
+
+<a href="Comidas.dc.html" style="display: block; text-align: center; padding: 15px; border-radius: 14px; background: #1D6B52; color: #FFFFFF; font-weight: 700; text-decoration: none">Guardar almuerzo</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

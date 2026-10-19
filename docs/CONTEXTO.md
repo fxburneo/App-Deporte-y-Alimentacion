@@ -66,3 +66,7 @@ Blueprint publicado: https://claude.ai/artifact/K5mr2PvweSDvwdkMrSh3hL (`docs/bl
 
 - Aprobar el blueprint v2.
 - Instalar la app de Claude en GitHub para este repo (el push dio 403 el 15-oct).
+
+## Maquetas (19-oct-2026)
+
+Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia en `docs/maquetas/`). **Pendiente de aprobación.**
