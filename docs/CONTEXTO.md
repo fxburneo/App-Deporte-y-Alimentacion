@@ -102,3 +102,13 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
   publishable key para Vercel.
 - Francisco hace él mismo: desactivar "Allow new users to sign up", crear su usuario (Auto Confirm) y el import en Vercel
   (el conector de Vercel es solo de lectura). Instructivo vigente: partes 2 y 3 de `docs/instructivo-etapa0.html`.
+
+## Etapa 0 CERRADA (20-oct-2026)
+
+- Supabase: proyecto "FXB Performance", ref `vufjxebehmfgtafwnwac`, us-east-1, URL https://vufjxebehmfgtafwnwac.supabase.co.
+  Registro público desactivado. Usuario único: xavierburneo@hotmail.com (confirmado).
+- Vercel: https://app-deporte-y-alimentacion.vercel.app (publica desde `main`). Variables: NEXT_PUBLIC_SUPABASE_URL y
+  NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
+- Francisco ingresó desde el iPhone: las 3 verificaciones en OK.
+- Pendiente para la etapa 1: en Supabase, Authentication > URL Configuration, poner Site URL = la dirección de Vercel
+  (hoy es localhost:3000; afecta los correos de recuperación de clave).
