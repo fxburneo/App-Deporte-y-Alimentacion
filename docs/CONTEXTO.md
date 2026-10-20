@@ -90,3 +90,12 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
 - Inicio provisional (`app/page.tsx`) con 3 verificaciones: publicada, sesión, Supabase.
 - Pendiente de Francisco: crear proyecto Supabase nuevo (región East US), desactivar registro público, crear su usuario,
   importar el repo en Vercel con NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
+
+## Supabase de la app (20-oct-2026)
+
+- Proyecto **FXB Performance** creado: ref `vufjxebehmfgtafwnwac`, región us-east-1 (East US), org BPs, plan gratis.
+  URL: https://vufjxebehmfgtafwnwac.supabase.co. La publishable key no va en el repo: se copia en Vercel
+  como NEXT_PUBLIC_SUPABASE_ANON_KEY (se obtiene en Supabase > Project Settings > API Keys).
+- Con este, la org BPs tiene 2 proyectos activos: el límite del plan gratis. Un tercero exigiría pausar uno o pagar.
+- Pendiente de Francisco: desactivar registro público, crear su usuario, configurar URL del sitio en Auth al tener
+  el dominio de Vercel, importar el repo en Vercel con las 2 variables.
