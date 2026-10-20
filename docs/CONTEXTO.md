@@ -76,7 +76,7 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
 - Nombre: **FXB Performance** (elegido entre varias opciones).
 - Estilo: oscuro tipo reloj deportivo (referencias Garmin Connect y Strava). Grafito #0E1113, acento naranja #FF6A1A
   solo para marca y acciones; carbohidratos #FFB020, proteína #4C9DFF, grasa #B98CFF, recuperación #3DDC84.
-  Saira Condensed (números) + Archivo (texto). Pantalla 1 rehecha; las otras 8 esperan su visto bueno.
+  Saira Condensed (números) + Archivo (texto). Las 9 pantallas rehechas en este estilo (20-oct); pendiente aprobación final.
   Motivo: el primer diseño "se notaba hecho por IA" (tarjetas blancas, recuadros pastel, píldoras).
 - Recálculo: plan la noche anterior → ajuste por entreno real (umbral ~150 kcal o 15 %) → rebalanceo por comidas.
   Compensación moderada (máx. 30 % de las comidas pendientes, sin arrastre al día siguiente). Nunca quitar comidas,

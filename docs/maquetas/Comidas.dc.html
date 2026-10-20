@@ -2,101 +2,92 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Comidas</title>
+<title>Comidas · FXB Performance</title>
 <script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&amp;family=Archivo:wght@400;500;600;700&amp;display=swap">
 <style>
-body{margin:0}
-a{color:#1D6B52}a:hover{color:#14503D}
+body{margin:0;background:#0E1113}
+a{color:#FF6A1A}a:hover{color:#FF8A4A}
 </style>
 </helmet>
-<div style="width: 390px; height: 1100px; position: relative; box-sizing: border-box; background: #F3F5F1; color: #18211D; font-family: 'Public Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.45; overflow: hidden">
-<div style="padding: 24px 16px 108px; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 390px; height: 1060px; position: relative; box-sizing: border-box; background: #0E1113; color: #F2F4F5; font-family: 'Archivo', system-ui, sans-serif; font-size: 14px; line-height: 1.45; overflow: hidden">
+<div style="padding: 20px 18px 110px; display: flex; flex-direction: column; gap: 22px">
 
 <header style="display: flex; justify-content: space-between; align-items: flex-end">
 <div style="display: flex; flex-direction: column; gap: 2px">
-<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #56645D">Lunes 20 de octubre · día suave</span>
-<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; line-height: 1">Comidas</h1>
+<span style="font-size: 12px; color: #9AA4AD">Lun 20 oct · día suave</span>
+<h1 style="margin: 0; font-family: 'Saira Condensed', sans-serif; font-size: 34px; font-weight: 700; letter-spacing: 0.02em; line-height: 1">COMIDAS</h1>
 </div>
-<a href="Menu.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; padding: 8px 0">Menú semanal</a>
+<a href="Menu.dc.html" style="font-size: 13px; font-weight: 700; text-decoration: none; padding: 8px 0">Menú semanal ›</a>
 </header>
 
-<div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #E3E8E4; border-radius: 12px; padding: 4px">
-<button type="button" role="tab" aria-selected="true" style="font: inherit; font-weight: 700; padding: 8px; border: 0; border-radius: 9px; background: #FFFFFF; color: #18211D">Día</button>
-<button type="button" role="tab" aria-selected="false" style="font: inherit; font-weight: 500; padding: 8px; border: 0; border-radius: 9px; background: transparent; color: #56645D">Semana</button>
+<div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid #22282E">
+<button type="button" role="tab" aria-selected="true" style="font: inherit; font-weight: 700; padding: 10px; border: 0; border-bottom: 2px solid #FF6A1A; background: transparent; color: #F2F4F5">Día</button>
+<button type="button" role="tab" aria-selected="false" style="font: inherit; font-weight: 500; padding: 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #9AA4AD">Semana</button>
 </div>
 
-<section style="background: #FFFFFF; border: 1px solid #DCE2DD; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; justify-content: space-between; align-items: baseline">
-<strong style="font-size: 16px">Objetivo vs lo que comiste</strong>
-<span style="font-size: 13px; color: #56645D; font-variant-numeric: tabular-nums">2.310 / 2.250 kcal</span>
-</div>
-<div style="display: grid; grid-template-columns: 96px 1fr 64px; gap: 6px 10px; align-items: center; font-size: 13px">
-<span>Carbohidratos</span>
-<div style="height: 10px; border-radius: 5px; background: #E8ECE8; position: relative"><div style="width: 92%; height: 100%; border-radius: 5px; background: #D08A1E"></div></div>
-<span style="text-align: right; font-variant-numeric: tabular-nums">276/300</span>
-<span>Proteína</span>
-<div style="height: 10px; border-radius: 5px; background: #E8ECE8"><div style="width: 83%; height: 100%; border-radius: 5px; background: #2C62B8"></div></div>
-<span style="text-align: right; font-variant-numeric: tabular-nums">125/150</span>
-<span>Grasa</span>
-<div style="height: 10px; border-radius: 5px; background: #E8ECE8"><div style="width: 100%; height: 100%; border-radius: 5px; background: #7E4FA0"></div></div>
-<span style="text-align: right; font-variant-numeric: tabular-nums; color: #B3261E; font-weight: 700">83/65</span>
+<section style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Saira Condensed', sans-serif; font-size: 52px; font-weight: 700; line-height: 1">2.310</span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 22px; color: #9AA4AD">/ 2.250 kcal</span><span style="margin-left: auto; font-family: 'Saira Condensed', sans-serif; font-size: 20px; font-weight: 600; color: #FFB020">+60</span></div>
+<div style="display: grid; grid-template-columns: 104px 1fr 70px; gap: 10px 12px; align-items: center">
+<span style="font-size: 13px; color: #D5DADE">Carbohidratos</span>
+<div style="height: 8px; border-radius: 4px; background: #1F2429"><div style="width: 92%; height: 100%; border-radius: 4px; background: #FFB020"></div></div>
+<span style="text-align: right; font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600">276<span style="color: #9AA4AD">/300</span></span>
+<span style="font-size: 13px; color: #D5DADE">Proteína</span>
+<div style="height: 8px; border-radius: 4px; background: #1F2429"><div style="width: 83%; height: 100%; border-radius: 4px; background: #4C9DFF"></div></div>
+<span style="text-align: right; font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600">125<span style="color: #9AA4AD">/150</span></span>
+<span style="font-size: 13px; color: #D5DADE">Grasa</span>
+<div style="height: 8px; border-radius: 4px; background: #1F2429; position: relative"><div style="width: 100%; height: 100%; border-radius: 4px; background: #B98CFF"></div></div>
+<span style="text-align: right; font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600; color: #FF5A5F">83<span style="color: #9AA4AD">/65</span></span>
 </div>
 </section>
 
-<section style="background: #FFFFFF; border: 1px solid #DCE2DD; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; gap: 10px">
-<span style="font-size: 12px; font-weight: 700; color: #B3261E; background: #FBE7E5; padding: 2px 8px; border-radius: 99px; height: fit-content; white-space: nowrap">Te pasaste</span>
-<div style="display: flex; flex-direction: column"><strong>Grasa +18 g</strong><span style="color: #56645D">La cena (chorizo y aguacate entero) explica casi todo. En días suaves, ½ aguacate basta.</span></div>
-</div>
-<div style="display: flex; gap: 10px">
-<span style="font-size: 12px; font-weight: 700; color: #9A5B06; background: #FBEFD9; padding: 2px 8px; border-radius: 99px; height: fit-content; white-space: nowrap">Te faltó</span>
-<div style="display: flex; flex-direction: column"><strong>Proteína −25 g</strong><span style="color: #56645D">La media tarde fue solo fruta. Un yogur griego o 2 huevos lo resuelven.</span></div>
-</div>
+<section style="display: flex; flex-direction: column">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD; padding-bottom: 4px">DÓNDE AJUSTAR</span>
+<div style="display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #22282E"><span style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; font-weight: 700; color: #FF5A5F; width: 62px; flex: none">+18 g</span><div style="display: flex; flex-direction: column"><strong>Grasa de más</strong><span style="color: #9AA4AD">La cena (chorizo y aguacate entero). En días suaves, ½ aguacate basta.</span></div></div>
+<div style="display: flex; gap: 12px; padding: 12px 0"><span style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; font-weight: 700; color: #FFB020; width: 62px; flex: none">−25 g</span><div style="display: flex; flex-direction: column"><strong>Proteína corta</strong><span style="color: #9AA4AD">La media tarde fue solo fruta. Yogur griego o 2 huevos lo resuelven.</span></div></div>
 </section>
 
-<section style="background: #FFFFFF; border: 1px solid #DCE2DD; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
-<div style="display: flex; justify-content: space-between; align-items: baseline">
-<strong style="font-size: 16px">Últimos 7 días</strong>
-<span style="font-size: 12px; color: #56645D">% del objetivo de kcal · ámbar = día bajo</span>
+<section style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD">ÚLTIMOS 7 DÍAS</span><span style="font-size: 12px; color: #9AA4AD">% del objetivo</span></div>
+<div style="position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end; height: 110px">
+<div style="position: absolute; left: 0; right: 0; top: 10px; border-top: 1px dashed #4A535B"></div>
+<div style="height: 70%; background: #3A434B; border-radius: 3px 3px 0 0"></div>
+<div style="height: 88%; background: #3A434B; border-radius: 3px 3px 0 0"></div>
+<div style="height: 84%; background: #3A434B; border-radius: 3px 3px 0 0"></div>
+<div style="height: 90%; background: #3A434B; border-radius: 3px 3px 0 0"></div>
+<div style="height: 74%; background: #FFB020; border-radius: 3px 3px 0 0"></div>
+<div style="height: 92%; background: #3A434B; border-radius: 3px 3px 0 0"></div>
+<div style="height: 93%; background: #F2F4F5; border-radius: 3px 3px 0 0"></div>
 </div>
-<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; align-items: end; height: 120px">
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 70%; background: #1D6B52; border-radius: 4px 4px 0 0"></div></div>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 88%; background: #1D6B52; border-radius: 4px 4px 0 0"></div></div>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 66%; background: #1D6B52; border-radius: 4px 4px 0 0"></div></div>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 78%; background: #1D6B52; border-radius: 4px 4px 0 0"></div></div>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 74%; background: #D08A1E; border-radius: 4px 4px 0 0"></div></div>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 100%; background: #1D6B52; border-radius: 4px 4px 0 0"></div></div>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%"><div style="height: 80%; background: #1D6B52; border-radius: 4px 4px 0 0"></div></div>
-</div>
-<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; font-size: 11px; color: #56645D; text-align: center"><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span><span>Lun</span></div>
-<span style="font-size: 13px; color: #2E3A34">Cumpliste 5 de 7 días. El sábado del fondo comiste 18 % menos de lo planificado: en salidas largas eso cuesta recuperación el domingo.</span>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; font-size: 11px; color: #9AA4AD; text-align: center"><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span style="color: #FFB020">Sáb</span><span>Dom</span><span style="color: #F2F4F5">Hoy</span></div>
+<p style="margin: 0; color: #D5DADE">El sábado del fondo comiste 18 % menos de lo planificado. En salidas largas eso se paga en la recuperación del domingo.</p>
 </section>
 
-<section style="background: #FFFFFF; border: 1px solid #DCE2DD; border-radius: 16px; padding: 6px 16px; display: flex; flex-direction: column">
-<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><span><strong>Desayuno</strong> · foto</span><span style="color: #56645D; font-variant-numeric: tabular-nums">540 kcal</span></div>
-<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><span><strong>Media mañana</strong> · del plan</span><span style="color: #56645D; font-variant-numeric: tabular-nums">310 kcal</span></div>
-<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><span><strong>Almuerzo</strong> · foto</span><span style="color: #56645D; font-variant-numeric: tabular-nums">720 kcal</span></div>
-<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E8ECE8"><span><strong>Media tarde</strong> · texto</span><span style="color: #56645D; font-variant-numeric: tabular-nums">120 kcal</span></div>
-<div style="display: flex; justify-content: space-between; padding: 10px 0"><span><strong>Cena</strong> · foto</span><span style="color: #56645D; font-variant-numeric: tabular-nums">620 kcal</span></div>
+<section style="display: flex; flex-direction: column">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD; padding-bottom: 4px">REGISTROS DE HOY</span>
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #22282E"><span>Desayuno <span style="color: #9AA4AD">· foto</span></span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 17px">540</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #22282E"><span>Media mañana <span style="color: #9AA4AD">· del plan</span></span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 17px">310</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #22282E"><span>Almuerzo <span style="color: #9AA4AD">· foto</span></span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 17px">720</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #22282E"><span>Media tarde <span style="color: #9AA4AD">· texto</span></span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 17px">120</span></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0"><span>Cena <span style="color: #9AA4AD">· foto</span></span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 17px">620</span></div>
 </section>
 
 </div>
 
-<nav aria-label="Navegación principal" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #FFFFFF; border-top: 1px solid #DCE2DD; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; box-sizing: border-box">
-<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; text-decoration: none; color: #56645D; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>Hoy</a>
-<a href="Comidas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; text-decoration: none; color: #1D6B52; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle></svg>Comidas</a>
-<a href="Registrar.dc.html" aria-label="Registrar comida" style="width: 52px; height: 52px; margin-top: -8px; border-radius: 50%; background: #1D6B52; color: #FFFFFF; display: flex; align-items: center; justify-content: center; text-decoration: none"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></a>
-<a href="Entreno.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; text-decoration: none; color: #56645D; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg>Entreno</a>
-<a href="Mas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; text-decoration: none; color: #56645D; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>Más</a>
+<nav aria-label="Navegación principal" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #121518; border-top: 1px solid #22282E; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 10px; box-sizing: border-box">
+<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; text-decoration: none; color: #8C969F; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>Hoy</a>
+<a href="Comidas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; text-decoration: none; color: #FF6A1A; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle></svg>Comidas</a>
+<a href="Registrar.dc.html" aria-label="Registrar comida" style="width: 52px; height: 52px; margin-top: -8px; border-radius: 50%; background: #FF6A1A; color: #0E1113; display: flex; align-items: center; justify-content: center; text-decoration: none"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></a>
+<a href="Entreno.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; text-decoration: none; color: #8C969F; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg>Entreno</a>
+<a href="Mas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; text-decoration: none; color: #8C969F; min-width: 56px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>Más</a>
 </nav>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1060}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};
