@@ -1,0 +1,59 @@
+<title>FXB Performance · Pantallas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: hoja de presentación como en finanzas. Una sección por parte de la app; en cada una, iPhones en fila que se envuelven. Cada pantalla se desplaza por dentro. */
+:root{
+  --stage:#e6e8e6; --ink:#15191c; --ink-2:#55606a; --frame:#050607; --rule:#cfd4d1; --accent:#c94d0b;
+  --display:"Saira Condensed","Arial Narrow",sans-serif;
+  --body:"Archivo",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--stage:#090b0c;--ink:#eef1f2;--ink-2:#9aa4ad;--rule:#22282e;--accent:#ff6a1a;color-scheme:dark}}
+:root[data-theme="dark"]{--stage:#090b0c;--ink:#eef1f2;--ink-2:#9aa4ad;--rule:#22282e;--accent:#ff6a1a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--stage);color:var(--ink);font-family:var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.head{max-width:1240px;margin:0 auto 8px;display:flex;flex-direction:column;gap:8px}
+.brand{font-family:var(--display);font-weight:800;letter-spacing:.12em;color:var(--accent);font-size:15px}
+.head h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,6vw,44px);line-height:1;margin:0;text-wrap:balance}
+.head p{margin:0;max-width:74ch;line-height:1.55;font-size:15px;color:var(--ink-2)}
+.indice{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;font-weight:600}
+.indice a{color:var(--ink);text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:1px}
+.grupo{max-width:1240px;margin:48px auto 0;display:flex;flex-direction:column;gap:20px}
+.gh{border-top:1px solid var(--rule);padding-top:18px;display:flex;flex-direction:column;gap:4px}
+.gh h2{font-family:var(--display);font-size:30px;font-weight:700;margin:0;line-height:1.05}
+.gh p{margin:0;color:var(--ink-2);font-size:14px;max-width:70ch}
+.stage{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:36px 32px}
+.shot{display:flex;flex-direction:column;align-items:center;gap:14px;width:380px;max-width:100%;margin:0;scroll-margin-top:24px}
+.shot figcaption{text-align:center;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.shot figcaption b{font-family:var(--display);font-size:21px;font-weight:700}
+.shot figcaption span{font-size:13px;color:var(--ink-2);line-height:1.45}
+.nueva{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:1px 9px}
+.phone{width:380px;max-width:100%;height:800px;border-radius:54px;background:var(--frame);padding:11px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6),inset 0 0 0 2px #2a2f34}
+.screen{position:relative;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:#0E1113}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:104px;height:30px;border-radius:20px;background:#000;z-index:5}
+.sbar{height:48px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 30px 0 34px;font-size:13px;font-weight:700;color:#F2F4F5;font-family:var(--body)}
+.sbar i{font-style:normal;font-size:11px;letter-spacing:1px}
+.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;display:flex;flex-direction:column}
+.scroll::-webkit-scrollbar{display:none}
+.scroll a{color:#FF6A1A}
+.scroll button{cursor:default}
+footer{max-width:1240px;margin:48px auto 0;border-top:1px solid var(--rule);padding-top:16px;color:var(--ink-2);font-size:13px}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<div class="head">
+  <span class="brand">FXB PERFORMANCE</span>
+  <h1>Pantallas de la app</h1>
+  <p>Las 12 pantallas aprobadas y por aprobar, ordenadas como las usarías. Cada iPhone se desplaza por dentro; los botones y la barra inferior te llevan a la pantalla correspondiente. Los números son ejemplos con tus datos.</p>
+  <nav class="indice" aria-label="Secciones">
+    <a href="#p-Bienvenida1">1 · Primer uso</a>
+    <a href="#p-Main">2 · Día a día</a>
+    <a href="#p-Entreno">3 · Entreno</a>
+    <a href="#p-Mas">4 · Perfil y ajustes</a>
+  </nav>
+</div>
+
+<!--PANTALLAS-->
+
+<footer>Pendiente de aprobación: 1.1, 1.2 y 2.2 (etapa 1). El resto aprobado el 20-oct-2026.</footer>

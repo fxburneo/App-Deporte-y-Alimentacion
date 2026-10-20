@@ -69,7 +69,7 @@ Blueprint publicado: https://claude.ai/artifact/K5mr2PvweSDvwdkMrSh3hL (`docs/bl
 
 ## Maquetas (19-oct-2026)
 
-Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia en `docs/maquetas/`). **Pendiente de aprobación.**
+Hoja de pantallas (formato de presentación, como en finanzas): https://claude.ai/artifact/7K9ftsWgZahRoq1srhpjq1 (`docs/maquetas/pantallas.html`). Lienzo editable: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q. Mostrar siempre la hoja, no el lienzo.
 
 ## Nombre, estilo y recálculo (20-oct-2026)
 
