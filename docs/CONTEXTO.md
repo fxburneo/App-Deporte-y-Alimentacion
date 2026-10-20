@@ -81,3 +81,12 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
 - Recálculo: plan la noche anterior → ajuste por entreno real (umbral ~150 kcal o 15 %) → rebalanceo por comidas.
   Compensación moderada (máx. 30 % de las comidas pendientes, sin arrastre al día siguiente). Nunca quitar comidas,
   nunca bajar proteína, nunca recortar carbohidratos antes de entreno duro. Aviso solo si cambia la siguiente comida.
+
+## Etapa 0 (20-oct-2026): construida, falta configuración de Francisco
+
+- Proyecto Next.js 16.3.5 (mismas versiones que finanzas), Tailwind 4 con los tokens del tema oscuro, fuentes
+  Saira Condensed + Archivo, login con Supabase (correo y clave), protección de todas las rutas (`proxy.ts`),
+  manifiesto PWA e íconos FXB, pruebas con Vitest (`lib/perfil/edad.ts`, 4 pruebas).
+- Inicio provisional (`app/page.tsx`) con 3 verificaciones: publicada, sesión, Supabase.
+- Pendiente de Francisco: crear proyecto Supabase nuevo (región East US), desactivar registro público, crear su usuario,
+  importar el repo en Vercel con NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
