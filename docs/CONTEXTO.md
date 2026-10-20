@@ -92,3 +92,13 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
   importar el repo en Vercel con NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
 - Instructivo etapa 0: `docs/instructivo-etapa0.html`, https://claude.ai/artifact/3LnrSxQfuijvhVB1TrBhd1
 - PR fxburneo/App-Deporte-y-Alimentacion#1 fusionado a main (20-oct).
+
+## Conector Supabase (20-oct-2026)
+
+- Francisco aprobó conectar el conector oficial de Supabase en claude.ai para que Claude cree el proyecto y, en cada etapa,
+  las tablas y cambios (sin scripts SQL manuales). Aceptó que el conector también ve el proyecto de finanzas:
+  **regla: solo se trabaja sobre el proyecto "FXB Performance"; el de finanzas no se lee ni se modifica.**
+- Al crear el proyecto: nombre "FXB Performance", región East US (us-east-1), plan Free. Entregar a Francisco el Project URL y la
+  publishable key para Vercel.
+- Francisco hace él mismo: desactivar "Allow new users to sign up", crear su usuario (Auto Confirm) y el import en Vercel
+  (el conector de Vercel es solo de lectura). Instructivo vigente: partes 2 y 3 de `docs/instructivo-etapa0.html`.
