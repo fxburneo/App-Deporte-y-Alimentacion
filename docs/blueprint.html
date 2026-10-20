@@ -1,4 +1,4 @@
-<title>Blueprint Fondo y Plato</title>
+<title>Blueprint FXB Performance</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -88,12 +88,11 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 <div class="wrap">
 
 <header style="display:flex;flex-direction:column;gap:14px">
-  <div class="eyebrow">Blueprint v3 · 17-oct-2026 · antes de programar</div>
-  <h1>Fondo y Plato</h1>
+  <div class="eyebrow">Blueprint v4 · 20-oct-2026 · antes de programar</div>
+  <h1>FXB Performance</h1>
   <p class="lead">App personal que lee tus entrenamientos y tu recuperación, calcula cuánto y qué comer cada día según la carga, registra lo que comes con foto o texto, y te explica en lenguaje simple cómo va tu forma física.</p>
   <div class="meta"><span>Usuario: <b>solo Francisco</b></span><span>Dispositivo: <b>iPhone (app instalable)</b></span><span>Objetivo: <b>76 → 72–73 kg a 0,3–0,5 kg/semana sin perder rendimiento</b></span></div>
-  <p class="small">"Fondo y Plato" es un nombre de trabajo; se cambia cuando quieras.</p>
-</header>
+  </header>
 
 <section>
   <h2><span class="n">00</span>Tu perfil</h2>
@@ -157,7 +156,7 @@ flowchart LR
   TP -- entrenos planificados --> GC
   GC -- entrenos y bienestar --> IV[Intervals.icu]
   TP -- calendario iCal:<br/>lo planificado --> APP
-  IV -- API con llave:<br/>lo hecho y la recuperación --> APP[(Fondo y Plato<br/>Supabase)]
+  IV -- API con llave:<br/>lo hecho y la recuperación --> APP[(FXB Performance<br/>Supabase)]
   M[Plan B: subes archivo<br/>o captura] -.-> APP
   F[Tus fotos y textos<br/>de comida] --> IA[IA Claude] --> APP
   APP --> PH[iPhone: pantallas<br/>y avisos]
@@ -228,6 +227,22 @@ flowchart LR
     <li><b>Validación de lo que llevas:</b> escribes "2 geles de 25 g, caramañola con isotónico, 1 banano" y la app suma los gramos por hora contra lo recomendado y te dice si te falta, si te sobra o si está bien.</li>
     <li><b>Después:</b> comida con 25–40 g de proteína y carbohidrato según el tipo de día, idealmente en las 2 h siguientes.</li>
     <li>Más de 60 g/h necesita mezclar glucosa y fructosa y acostumbrar el estómago en los entrenos; la app te lo recuerda.</li>
+  </ul>
+
+  <h3>Paso 6 · Recálculo durante el día</h3>
+  <p>El plan del día se calcula la noche anterior con el entreno planificado y se reprograma con lo que realmente pasa, como un plan de producción.</p>
+  <div class="tbl"><table>
+    <tr><th>Disparador</th><th>Qué hace</th><th>Ejemplo</th></tr>
+    <tr><td><b>Entreno real distinto al plan</b> (más de ~150 kcal o 15 %)</td><td>Recalcula solo las comidas pendientes; ajusta carbohidrato, no proteína</td><td>Planificado 75 min, hiciste 50: −45 g de carbohidrato en el almuerzo</td></tr>
+    <tr><td><b>Entreno más largo o duro</b></td><td>Sube carbohidrato en la recuperación y el siguiente snack</td><td>Fondo de 4 h 40 en vez de 4 h: +60 g repartidos</td></tr>
+    <tr><td><b>No entrenaste / entreno no planificado</b></td><td>Cambia el tipo de día</td><td>Día de descanso: se quitan los carbohidratos extra</td></tr>
+    <tr><td><b>Te pasaste en una comida</b></td><td>Reparte la diferencia en las comidas pendientes</td><td>Almuerzo con +25 g de grasa: cena sin aguacate ni fritura</td></tr>
+    <tr><td><b>Te quedaste corto</b></td><td>Refuerza la siguiente comida</td><td>Proteína baja: "agrega 2 huevos a la media tarde"</td></tr>
+  </table></div>
+  <ul>
+    <li><b>Compensación moderada:</b> recorta como máximo un 30 % de las comidas que faltan. Lo que no alcance a compensar no se arrastra al día siguiente: lo absorbe el ajuste semanal por peso.</li>
+    <li><b>Nunca</b> quita una comida, nunca baja la proteína del mínimo y <b>nunca recorta carbohidratos antes de un entreno duro</b>.</li>
+    <li><b>Aviso:</b> notificación corta solo cuando cambia la siguiente comida; el detalle y la razón quedan en la pantalla Hoy.</li>
   </ul>
 
   <h3>Peso objetivo</h3>
