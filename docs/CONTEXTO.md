@@ -90,3 +90,5 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
 - Inicio provisional (`app/page.tsx`) con 3 verificaciones: publicada, sesión, Supabase.
 - Pendiente de Francisco: crear proyecto Supabase nuevo (región East US), desactivar registro público, crear su usuario,
   importar el repo en Vercel con NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
+- Instructivo etapa 0: `docs/instructivo-etapa0.html`, https://claude.ai/artifact/3LnrSxQfuijvhVB1TrBhd1
+- PR fxburneo/App-Deporte-y-Alimentacion#1 fusionado a main (20-oct).
