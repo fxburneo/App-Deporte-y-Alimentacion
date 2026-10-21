@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Primer uso: comidas y horarios · FXB Performance</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&amp;family=Archivo:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#0E1113}
+a{color:#FF6A1A}a:hover{color:#FF8A4A}
+</style>
+</helmet>
+<div style="width: 390px; height: 1040px; position: relative; box-sizing: border-box; background: #0E1113; color: #F2F4F5; font-family: 'Archivo', system-ui, sans-serif; font-size: 14px; line-height: 1.45; overflow: hidden">
+<div style="padding: 20px 18px 28px; display: flex; flex-direction: column; gap: 22px">
+
+<header style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<a href="Bienvenida1.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; color: #9AA4AD; padding: 4px 0">‹ Atrás</a>
+<span style="font-size: 12px; color: #9AA4AD">Paso 2 de 4</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
+<span style="height: 4px; border-radius: 2px; background: #FF6A1A"></span>
+<span style="height: 4px; border-radius: 2px; background: #FF6A1A"></span>
+<span style="height: 4px; border-radius: 2px; background: #2A3036"></span>
+<span style="height: 4px; border-radius: 2px; background: #2A3036"></span>
+</div>
+<h1 style="margin: 0; font-family: 'Saira Condensed', sans-serif; font-size: 40px; font-weight: 700; line-height: 1">COMIDAS Y HORARIOS</h1>
+</header>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD">NO INCLUIR EN EL MENÚ</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" aria-pressed="true" style="font: inherit; font-weight: 700; padding: 8px 12px; border-radius: 99px; border: 1px solid #F2F4F5; background: #F2F4F5; color: #0E1113">Pescado ×</button>
+<button type="button" aria-pressed="true" style="font: inherit; font-weight: 700; padding: 8px 12px; border-radius: 99px; border: 1px solid #F2F4F5; background: #F2F4F5; color: #0E1113">Mariscos ×</button>
+<button type="button" aria-pressed="true" style="font: inherit; font-weight: 700; padding: 8px 12px; border-radius: 99px; border: 1px solid #F2F4F5; background: #F2F4F5; color: #0E1113">Vísceras ×</button>
+<button type="button" style="font: inherit; padding: 8px 12px; border-radius: 99px; border: 1px dashed #4A535B; background: transparent; color: #D5DADE">+ Agregar</button>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD; padding-bottom: 4px">COMIDAS ENTRE SEMANA</span>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #22282E"><label for="h1">Desayuno</label><input id="h1" type="text" value="06:45" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #22282E"><label for="h2">Media mañana</label><input id="h2" type="text" value="10:00" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #22282E"><label for="h3">Almuerzo</label><input id="h3" type="text" value="13:00" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #22282E"><label for="h4">Media tarde</label><input id="h4" type="text" value="16:00" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0"><label for="h5">Cena</label><input id="h5" type="text" value="19:00" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+</section>
+
+<section style="display: flex; flex-direction: column">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD; padding-bottom: 4px">ENTRENO HABITUAL</span>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #22282E"><label for="e1">Lunes a viernes</label><input id="e1" type="text" value="05:00" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0"><label for="e2">Sábado y domingo</label><input id="e2" type="text" value="06:30" style="font-family: 'Saira Condensed', sans-serif; font-size: 20px; width: 84px; text-align: center; padding: 6px; border-radius: 8px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5"></div>
+<span style="font-size: 12px; color: #9AA4AD; padding-top: 6px">Con esto la app decide si el desayuno va antes o después del entreno.</span>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD">DÍAS DE PESAJE</span>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px">
+<button type="button" aria-pressed="true" style="font: inherit; font-weight: 700; padding: 9px 0; border: 0; border-radius: 8px; background: #F2F4F5; color: #0E1113">L</button>
+<button type="button" style="font: inherit; padding: 9px 0; border: 0; border-radius: 8px; background: #171B1F; color: #9AA4AD">M</button>
+<button type="button" aria-pressed="true" style="font: inherit; font-weight: 700; padding: 9px 0; border: 0; border-radius: 8px; background: #F2F4F5; color: #0E1113">M</button>
+<button type="button" style="font: inherit; padding: 9px 0; border: 0; border-radius: 8px; background: #171B1F; color: #9AA4AD">J</button>
+<button type="button" aria-pressed="true" style="font: inherit; font-weight: 700; padding: 9px 0; border: 0; border-radius: 8px; background: #F2F4F5; color: #0E1113">V</button>
+<button type="button" style="font: inherit; padding: 9px 0; border: 0; border-radius: 8px; background: #171B1F; color: #9AA4AD">S</button>
+<button type="button" style="font: inherit; padding: 9px 0; border: 0; border-radius: 8px; background: #171B1F; color: #9AA4AD">D</button>
+</div>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="Main.dc.html" style="display: block; text-align: center; padding: 15px; border-radius: 12px; background: #FF6A1A; color: #0E1113; font-weight: 800; letter-spacing: 0.04em; text-decoration: none">GUARDAR Y EMPEZAR</a>
+<span style="font-size: 12px; color: #9AA4AD; text-align: center">Los pasos 3 (conectar Garmin) y 4 (avisos) se activan en las próximas etapas.</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1040}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

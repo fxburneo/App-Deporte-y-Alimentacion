@@ -1,0 +1,158 @@
+<title>Instructivo Etapa 0</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una columna de lectura de 680px; cada parte es un bloque con pasos numerados (el orden importa). Tema único oscuro, el de la app. */
+:root{
+  --bg:#0E1113; --surface:#171B1F; --line:#22282E; --border:#2A3036;
+  --fg:#F2F4F5; --soft:#D5DADE; --muted:#9AA4AD; --accent:#FF6A1A; --ok:#3DDC84; --warn:#FFB020;
+  --display:"Saira Condensed","Arial Narrow",sans-serif;
+  --body:"Archivo",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,8vw,52px);font-weight:700}
+h2{font-size:28px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 small{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
+p{margin:0}
+.brand{font-family:var(--display);font-weight:800;letter-spacing:.12em;color:var(--accent);font-size:16px}
+.lead{color:var(--soft);font-size:17px;max-width:60ch}
+section{display:flex;flex-direction:column;gap:16px}
+ol{margin:0;padding:0;list-style:none;counter-reset:paso;display:flex;flex-direction:column}
+ol>li{counter-increment:paso;display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+ol>li::before{content:counter(paso);font-family:var(--display);font-size:24px;font-weight:700;color:var(--accent);line-height:1.1}
+ol>li>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;color:var(--soft)}
+b{color:var(--fg)}
+.ui{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0 7px;font-weight:600;font-size:14px;white-space:nowrap}
+code,.code{font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1px 6px;word-break:break-all}
+.why{font-size:14px;color:var(--muted)}
+.note{border-left:3px solid var(--warn);padding:2px 0 2px 12px;color:var(--soft);font-size:15px}
+.note.ok{border-color:var(--ok)}
+.vars{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.vars div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.vars div:first-child{border-top:0;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.1em}
+.copy{font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:99px;padding:2px 10px;margin-left:6px;cursor:pointer}
+.copy:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+a{color:var(--accent)}
+footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header style="display:flex;flex-direction:column;gap:12px">
+  <span class="brand">FXB PERFORMANCE</span>
+  <h1>Etapa 0: publicar la app</h1>
+  <p class="lead">Son 3 partes y toman unos 25 minutos en total. Al final tendrás la app en tu iPhone con tu usuario. Las pantallas de Supabase y Vercel están en inglés: lo que ves en gris es el texto exacto del botón.</p>
+</header>
+
+<section>
+  <h2>Parte 1 · Supabase <small>~10 min · la base de datos</small></h2>
+  <ol>
+    <li><div><p>Entra a <a href="https://supabase.com/dashboard">supabase.com/dashboard</a> con la misma cuenta de la app de finanzas.</p></div></li>
+    <li><div><p>Pulsa el botón verde <span class="ui">New project</span>. Si te pide organización, elige la misma de finanzas.</p></div></li>
+    <li><div>
+      <p>Completa el formulario:</p>
+      <ul>
+        <li><span class="ui">Project name</span>: <b>FXB Performance</b></li>
+        <li><span class="ui">Database Password</span>: pulsa <span class="ui">Generate a password</span>, cópiala y guárdala en un lugar seguro. No se usa en el día a día, pero no se puede recuperar.</li>
+        <li><span class="ui">Region</span>: <b>East US (North Virginia)</b></li>
+      </ul>
+      <p>Pulsa <span class="ui">Create new project</span> y espera 1–2 minutos.</p>
+      <p class="why">Por qué esa región: es la más cercana a Ecuador y está en el mismo lugar que los servidores de Vercel, así la app responde más rápido.</p>
+    </div></li>
+    <li><div>
+      <p>Cierra el registro público. Menú izquierdo: <span class="ui">Authentication</span> → <span class="ui">Sign In / Providers</span>. Apaga <span class="ui">Allow new users to sign up</span> y pulsa <span class="ui">Save changes</span>.</p>
+      <p class="why">Por qué: así nadie más puede crearse una cuenta en tu app. Tus datos de salud quedan solo para ti.</p>
+    </div></li>
+    <li><div>
+      <p>Crea tu usuario. <span class="ui">Authentication</span> → <span class="ui">Users</span> → <span class="ui">Add user</span> → <span class="ui">Create new user</span>.</p>
+      <ul>
+        <li><span class="ui">Email</span>: tu correo.</li>
+        <li><span class="ui">Password</span>: una clave que recuerdes. Con esta entras a la app.</li>
+        <li>Marca <span class="ui">Auto Confirm User</span>. Si no lo marcas, la app te rechaza.</li>
+      </ul>
+      <p>Pulsa <span class="ui">Create user</span>.</p>
+    </div></li>
+    <li><div>
+      <p>Copia dos datos. Pulsa el botón <span class="ui">Connect</span> arriba en la página del proyecto, o ve a <span class="ui">Project Settings</span> → <span class="ui">API Keys</span>:</p>
+      <ul>
+        <li><b>Project URL</b>: se ve como <code>https://abcdxyz.supabase.co</code></li>
+        <li><b>Publishable key</b>: empieza con <code>sb_publishable_</code>. Si solo ves una que dice <span class="ui">anon public</span>, esa sirve igual.</li>
+      </ul>
+      <p>Pégalos en una nota temporal; los usas en la parte 2.</p>
+      <p class="note">No copies la <b>secret key</b> ni la <b>service_role</b>. Esas no van en Vercel por ahora.</p>
+    </div></li>
+  </ol>
+  <p class="note">Si Supabase dice que alcanzaste el límite de proyectos gratis, detente y avísame. El plan gratis permite 2 proyectos activos y uno ya es el de finanzas, así que este debería entrar justo.</p>
+</section>
+
+<section>
+  <h2>Parte 2 · Vercel <small>~10 min · publicar la app</small></h2>
+  <ol>
+    <li><div><p>Entra a <a href="https://vercel.com/new">vercel.com/new</a> con la misma cuenta de la app de finanzas.</p></div></li>
+    <li><div>
+      <p>En <span class="ui">Import Git Repository</span> busca <b>App-Deporte-y-Alimentacion</b> y pulsa <span class="ui">Import</span>.</p>
+      <p class="why">Si no aparece: pulsa <span class="ui">Adjust GitHub App Permissions</span>, agrega ese repositorio, guarda y vuelve.</p>
+    </div></li>
+    <li><div><p>En <span class="ui">Project Name</span> escribe <b>fxb-performance</b>. <span class="ui">Framework Preset</span> debe decir <b>Next.js</b> (lo detecta solo). No toques nada más.</p></div></li>
+    <li><div>
+      <p>Abre <span class="ui">Environment Variables</span> y agrega estas dos. Copia los nombres exactos, con mayúsculas y guiones bajos:</p>
+      <div class="vars">
+        <div><span>KEY</span><span>VALUE</span></div>
+        <div><span><code id="v1">NEXT_PUBLIC_SUPABASE_URL</code><button class="copy" type="button" data-copy="v1">Copiar</button></span><span>tu Project URL</span></div>
+        <div><span><code id="v2">NEXT_PUBLIC_SUPABASE_ANON_KEY</code><button class="copy" type="button" data-copy="v2">Copiar</button></span><span>tu Publishable key</span></div>
+      </div>
+    </div></li>
+    <li><div>
+      <p>Pulsa <span class="ui">Deploy</span>. Tarda 1–2 minutos. Cuando aparezca la celebración, pulsa <span class="ui">Continue to Dashboard</span>.</p>
+      <p>En <span class="ui">Domains</span> verás la dirección de tu app, algo como <code>fxb-performance.vercel.app</code>.</p>
+    </div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Parte 3 · En tu iPhone <small>~3 min</small></h2>
+  <ol>
+    <li><div><p>Abre la dirección de tu app en <b>Safari</b>. La app de Chrome no permite instalarla.</p></div></li>
+    <li><div><p>Entra con el correo y la clave del paso 5 de la parte 1.</p></div></li>
+    <li><div><p>Debes ver <b>Hola, Francisco</b> y tres líneas con <b style="color:var(--ok)">OK</b>.</p></div></li>
+    <li><div><p>Instálala: botón <span class="ui">Compartir</span> (el cuadrado con flecha) → <span class="ui">Agregar a pantalla de inicio</span> → <span class="ui">Agregar</span>. Aparece el ícono negro con <b>FXB</b>.</p></div></li>
+    <li><div><p>Mándame la dirección de la app y una captura de la pantalla con los tres OK.</p></div></li>
+  </ol>
+  <p class="note ok">Listo eso, la etapa 0 queda cerrada y arranco la etapa 1: tu perfil y el cálculo de calorías y macros.</p>
+</section>
+
+<section>
+  <h2>Si algo falla</h2>
+  <ul>
+    <li><b>El Deploy falla en Vercel:</b> casi siempre es un nombre de variable mal escrito. Revisa la parte 2, paso 4, y pulsa <span class="ui">Redeploy</span>.</li>
+    <li><b>"Correo o clave incorrectos":</b> revisa que marcaste <span class="ui">Auto Confirm User</span> en la parte 1, paso 5. Si no, borra el usuario y créalo de nuevo.</li>
+    <li><b>Una línea dice FALLA:</b> mándame la captura.</li>
+    <li><b>Cualquier otra cosa:</b> captura de lo que ves y te digo dónde tocar.</li>
+  </ul>
+</section>
+
+<footer>Instructivo de la etapa 0 · 20-oct-2026. Ninguna llave se guarda en el repositorio: viven solo en Vercel.</footer>
+</div>
+
+<script>
+document.querySelectorAll(".copy").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var el = document.getElementById(btn.dataset.copy);
+    var texto = el.textContent;
+    var hecho = function () { btn.textContent = "Copiado"; setTimeout(function () { btn.textContent = "Copiar"; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(hecho, function () { seleccionar(el); });
+    } else { seleccionar(el); }
+  });
+});
+function seleccionar(el) {
+  var r = document.createRange(); r.selectNodeContents(el);
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+</script>

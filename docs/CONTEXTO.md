@@ -69,7 +69,7 @@ Blueprint publicado: https://claude.ai/artifact/K5mr2PvweSDvwdkMrSh3hL (`docs/bl
 
 ## Maquetas (19-oct-2026)
 
-Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia en `docs/maquetas/`). **Pendiente de aprobación.**
+Hoja de pantallas (formato de presentación, como en finanzas): https://claude.ai/artifact/7K9ftsWgZahRoq1srhpjq1 (`docs/maquetas/pantallas.html`). Lienzo editable: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q. Mostrar siempre la hoja, no el lienzo.
 
 ## Nombre, estilo y recálculo (20-oct-2026)
 
@@ -90,3 +90,39 @@ Canvas con 9 pantallas: https://claude.ai/artifact/FBpH6vnaFWs6FZeamzAj4Q (copia
 - Inicio provisional (`app/page.tsx`) con 3 verificaciones: publicada, sesión, Supabase.
 - Pendiente de Francisco: crear proyecto Supabase nuevo (región East US), desactivar registro público, crear su usuario,
   importar el repo en Vercel con NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
+- Instructivo etapa 0: `docs/instructivo-etapa0.html`, https://claude.ai/artifact/3LnrSxQfuijvhVB1TrBhd1
+- PR fxburneo/App-Deporte-y-Alimentacion#1 fusionado a main (20-oct).
+
+## Conector Supabase (20-oct-2026)
+
+- Francisco aprobó conectar el conector oficial de Supabase en claude.ai para que Claude cree el proyecto y, en cada etapa,
+  las tablas y cambios (sin scripts SQL manuales). Aceptó que el conector también ve el proyecto de finanzas:
+  **regla: solo se trabaja sobre el proyecto "FXB Performance"; el de finanzas no se lee ni se modifica.**
+- Al crear el proyecto: nombre "FXB Performance", región East US (us-east-1), plan Free. Entregar a Francisco el Project URL y la
+  publishable key para Vercel.
+- Francisco hace él mismo: desactivar "Allow new users to sign up", crear su usuario (Auto Confirm) y el import en Vercel
+  (el conector de Vercel es solo de lectura). Instructivo vigente: partes 2 y 3 de `docs/instructivo-etapa0.html`.
+
+## Etapa 0 CERRADA (20-oct-2026)
+
+- Supabase: proyecto "FXB Performance", ref `vufjxebehmfgtafwnwac`, us-east-1, URL https://vufjxebehmfgtafwnwac.supabase.co.
+  Registro público desactivado. Usuario único: xavierburneo@hotmail.com (confirmado).
+- Vercel: https://app-deporte-y-alimentacion.vercel.app (publica desde `main`). Variables: NEXT_PUBLIC_SUPABASE_URL y
+  NEXT_PUBLIC_SUPABASE_ANON_KEY (publishable key).
+- Francisco ingresó desde el iPhone: las 3 verificaciones en OK.
+- Pendiente para la etapa 1: en Supabase, Authentication > URL Configuration, poner Site URL = la dirección de Vercel
+  (hoy es localhost:3000; afecta los correos de recuperación de clave).
+
+## Etapa 1 (21-oct-2026): construida, falta prueba de Francisco en la vista previa
+
+- Tablas `perfil`, `pesos`, `entrenos` con RLS (script `supabase/migrations/20261020_etapa1_perfil.sql`, aplicado con el
+  conector). Prueba de RLS hecha con transacción y rollback: el otro usuario ve 0 filas; pesaje del mismo día se reemplaza.
+- Motor `lib/nutricion/motor.ts` (Mifflin/Katch, MET, tipo de día, rangos de carbo por día, proteína 2 g/kg, grasa
+  0,6–1,0 g/kg que completa calorías, extra de cena 0,5 g/kg si mañana es duro, snack previo, lo hecho reemplaza al plan,
+  modo pausa sin déficit). Tendencia de peso `lib/nutricion/peso.ts` (regresión 28 días, ≥4 pesajes en ≥10 días).
+  Fechas en hora de Ecuador `lib/fecha.ts` (Vercel corre en UTC).
+- Pantallas: `/bienvenida` (1.1 + 1.2, también edita el perfil), `/` Hoy (2.1 sin recuperación ni consumo: llegan en
+  etapas 2 y 3; muestra objetivo por comida), `/entreno/nuevo` (2.2 con vista previa en vivo), `/peso` (4.2), `/mas` (4.1
+  con modo pausa). `/comidas`, `/registrar`, `/entreno` dicen en qué etapa llegan.
+- 56 pruebas (incluye prueba de pantalla del formulario de entreno con jsdom).
+- Pendiente de Francisco: Supabase › Authentication › URL Configuration › Site URL = https://app-deporte-y-alimentacion.vercel.app
