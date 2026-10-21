@@ -1,0 +1,115 @@
+<title>Instructivo Intervals.icu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una columna de lectura de 680px; cada parte es un bloque con pasos numerados (el orden importa). Tema único oscuro, el de la app. */
+:root{
+  --bg:#0E1113; --surface:#171B1F; --line:#22282E; --border:#2A3036;
+  --fg:#F2F4F5; --soft:#D5DADE; --muted:#9AA4AD; --accent:#FF6A1A; --ok:#3DDC84; --warn:#FFB020;
+  --display:"Saira Condensed","Arial Narrow",sans-serif;
+  --body:"Archivo",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,8vw,52px);font-weight:700}
+h2{font-size:28px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 small{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
+p{margin:0}
+.brand{font-family:var(--display);font-weight:800;letter-spacing:.12em;color:var(--accent);font-size:16px}
+.lead{color:var(--soft);font-size:17px;max-width:60ch}
+section{display:flex;flex-direction:column;gap:16px}
+ol{margin:0;padding:0;list-style:none;counter-reset:paso;display:flex;flex-direction:column}
+ol>li{counter-increment:paso;display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+ol>li::before{content:counter(paso);font-family:var(--display);font-size:24px;font-weight:700;color:var(--accent);line-height:1.1}
+ol>li>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;color:var(--soft)}
+b{color:var(--fg)}
+.ui{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0 7px;font-weight:600;font-size:14px;white-space:nowrap}
+code,.code{font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1px 6px;word-break:break-all}
+.why{font-size:14px;color:var(--muted)}
+.note{border-left:3px solid var(--warn);padding:2px 0 2px 12px;color:var(--soft);font-size:15px}
+.note.ok{border-color:var(--ok)}
+.vars{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.vars div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.vars div:first-child{border-top:0;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.1em}
+.copy{font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:99px;padding:2px 10px;margin-left:6px;cursor:pointer}
+.copy:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+a{color:var(--accent)}
+footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header style="display:flex;flex-direction:column;gap:12px">
+  <span class="brand">FXB PERFORMANCE</span>
+  <h1>Etapa 2: conectar Garmin con Intervals.icu</h1>
+  <p class="lead">Intervals.icu es el puente entre tu reloj y la app: recibe de Garmin tus entrenos, sueño, HRV, pulso en reposo y peso. Son 2 partes y unos 15 minutos. Las pantallas están en inglés; lo que ves en gris es el texto del botón.</p>
+</header>
+
+<section>
+  <h2>Parte 1 · Cuenta y Garmin <small>~10 min · hazlo ya</small></h2>
+  <ol>
+    <li><div><p>Entra a <a href="https://intervals.icu">intervals.icu</a> desde el computador o el celular y pulsa <span class="ui">Sign up</span>. Regístrate con tu correo. Es gratis.</p></div></li>
+    <li><div><p>Abre la configuración: <a href="https://intervals.icu/settings">intervals.icu/settings</a>. Busca la sección de conexiones, donde aparecen Garmin, Strava y otros.</p></div></li>
+    <li><div>
+      <p>En <b>Garmin</b> pulsa <span class="ui">Connect</span>. Te lleva a la página de Garmin: entra con tu cuenta de Garmin Connect.</p>
+      <p>Garmin te muestra una lista de permisos con interruptores. <b>Déjalos todos activados</b>, en especial los de actividades y los de salud diaria (sueño, HRV, peso). Pulsa <span class="ui">Save</span> o <span class="ui">Agree</span>.</p>
+      <p class="why">Por qué todos: sin los datos de salud, la app no puede darte el semáforo de recuperación ni el ajuste por fatiga.</p>
+    </div></li>
+    <li><div>
+      <p>De vuelta en Intervals, en la tarjeta de Garmin, revisa que estén marcadas las opciones de <b>descargar actividades</b> y <b>descargar datos de bienestar</b> (wellness).</p>
+      <p>Si ves una opción para traer el historial (algo como <span class="ui">Download old data</span>), pide los <b>últimos 3 meses</b>. Puede tardar unas horas.</p>
+    </div></li>
+    <li><div>
+      <p>Verifica que llegaron datos. En el menú, abre el <b>calendario</b>: deben aparecer tus entrenos recientes. Abre también la sección de <b>Wellness</b> o <b>Fitness</b>: deben aparecer sueño, HRV o pulso en reposo.</p>
+      <p class="note">Si los entrenos aparecen pero el sueño o el HRV no, desconecta Garmin y vuelve a conectarlo revisando los permisos de salud. Es un problema conocido y se resuelve así.</p>
+    </div></li>
+  </ol>
+  <p class="note ok">No conectes TrainingPeaks dentro de Intervals: la app lee tu plan directo de TrainingPeaks en la etapa 4.</p>
+</section>
+
+<section>
+  <h2>Parte 2 · Llave de acceso <small>~3 min · cuando te avise</small></h2>
+  <p style="color:var(--soft)">Esta parte la haces cuando tenga lista la sincronización. Te aviso y te doy el lugar seguro donde pegar la llave.</p>
+  <ol>
+    <li><div><p>En <a href="https://intervals.icu/settings">intervals.icu/settings</a> baja hasta el final, a <span class="ui">Developer Settings</span>.</p></div></li>
+    <li><div><p>Ahí ves tu <b>Athlete ID</b> (algo como <code>i123456</code>) y tu <b>API Key</b> (pulsa <span class="ui">View</span> o <span class="ui">Generate</span> si no aparece).</p></div></li>
+    <li><div>
+      <p>El <b>Athlete ID</b> me lo puedes mandar por aquí: no es secreto.</p>
+      <p class="note">La <b>API Key</b> no me la mandes por el chat. Es como una clave: la pegarás directamente en Supabase, en un campo protegido que te indico en su momento. Así nunca queda escrita en ningún lado.</p>
+    </div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Si algo falla</h2>
+  <ul>
+    <li><b>No encuentras la sección de Garmin:</b> mándame una captura de la página de settings.</li>
+    <li><b>Garmin no te deja autorizar:</b> revisa que entres con la misma cuenta de tu app Garmin Connect.</li>
+    <li><b>Llegan entrenos pero no sueño ni HRV:</b> desconecta y vuelve a conectar Garmin (parte 1, paso 5).</li>
+  </ul>
+</section>
+
+<footer>Instructivo de la etapa 2 · 21-oct-2026. Riesgo conocido: Garmin podría restringir los datos que Intervals comparte; la app está preparada para cambiar de fuente sin rehacer nada.</footer>
+</div>
+
+<script>
+document.querySelectorAll(".copy").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var el = document.getElementById(btn.dataset.copy);
+    var texto = el.textContent;
+    var hecho = function () { btn.textContent = "Copiado"; setTimeout(function () { btn.textContent = "Copiar"; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(hecho, function () { seleccionar(el); });
+    } else { seleccionar(el); }
+  });
+});
+function seleccionar(el) {
+  var r = document.createRange(); r.selectNodeContents(el);
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+</script>

@@ -138,3 +138,10 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - **Armar los menús juntos:** además de la propuesta automática, una conversación dentro de la app donde Francisco
   propone platos y Claude ajusta cantidades a su objetivo del día y valida macros. La maqueta 2.5 debe rehacerse con
   esto antes de programar la etapa 5.
+
+## Etapa 2 (21-oct-2026): instructivo entregado
+
+- Instructivo Intervals.icu: `docs/instructivo-etapa2-intervals.html`, https://claude.ai/artifact/HTLKctEp57RNJde5ACY85D
+- Riesgo Garmin sin cambios al 21-oct (conversaciones abiertas, sin fecha de bloqueo). Se sigue con Intervals.
+- La API key de Intervals NO va por el chat: se carga como secreto de Supabase (Edge Function secret) que Francisco pega en el dashboard. El Athlete ID sí puede ir por chat.
+- Sincronización: función en Supabase programada (pg_cron), no en Vercel.
