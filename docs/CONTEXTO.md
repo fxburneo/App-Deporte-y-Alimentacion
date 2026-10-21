@@ -126,3 +126,15 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   con modo pausa). `/comidas`, `/registrar`, `/entreno` dicen en qué etapa llegan.
 - 56 pruebas (incluye prueba de pantalla del formulario de entreno con jsdom).
 - Pendiente de Francisco: Supabase › Authentication › URL Configuration › Site URL = https://app-deporte-y-alimentacion.vercel.app
+
+## Etapa 1 CERRADA (21-oct-2026)
+
+- Francisco probó la vista previa y aprobó. PR fxburneo/App-Deporte-y-Alimentacion#2 fusionado a main.
+
+## Pedidos de Francisco para el menú (etapa 5, 21-oct-2026)
+
+- **Cantidades siempre explícitas:** cada alimento del menú con su peso en gramos y su medida casera. Aclarar si el
+  peso es en crudo o cocido (los cereales y carnes cambian mucho: 75 g de arroz crudo ≈ 1 taza cocida).
+- **Armar los menús juntos:** además de la propuesta automática, una conversación dentro de la app donde Francisco
+  propone platos y Claude ajusta cantidades a su objetivo del día y valida macros. La maqueta 2.5 debe rehacerse con
+  esto antes de programar la etapa 5.
