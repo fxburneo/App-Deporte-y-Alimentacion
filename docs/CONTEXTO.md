@@ -112,3 +112,17 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Francisco ingresó desde el iPhone: las 3 verificaciones en OK.
 - Pendiente para la etapa 1: en Supabase, Authentication > URL Configuration, poner Site URL = la dirección de Vercel
   (hoy es localhost:3000; afecta los correos de recuperación de clave).
+
+## Etapa 1 (21-oct-2026): construida, falta prueba de Francisco en la vista previa
+
+- Tablas `perfil`, `pesos`, `entrenos` con RLS (script `supabase/migrations/20261020_etapa1_perfil.sql`, aplicado con el
+  conector). Prueba de RLS hecha con transacción y rollback: el otro usuario ve 0 filas; pesaje del mismo día se reemplaza.
+- Motor `lib/nutricion/motor.ts` (Mifflin/Katch, MET, tipo de día, rangos de carbo por día, proteína 2 g/kg, grasa
+  0,6–1,0 g/kg que completa calorías, extra de cena 0,5 g/kg si mañana es duro, snack previo, lo hecho reemplaza al plan,
+  modo pausa sin déficit). Tendencia de peso `lib/nutricion/peso.ts` (regresión 28 días, ≥4 pesajes en ≥10 días).
+  Fechas en hora de Ecuador `lib/fecha.ts` (Vercel corre en UTC).
+- Pantallas: `/bienvenida` (1.1 + 1.2, también edita el perfil), `/` Hoy (2.1 sin recuperación ni consumo: llegan en
+  etapas 2 y 3; muestra objetivo por comida), `/entreno/nuevo` (2.2 con vista previa en vivo), `/peso` (4.2), `/mas` (4.1
+  con modo pausa). `/comidas`, `/registrar`, `/entreno` dicen en qué etapa llegan.
+- 56 pruebas (incluye prueba de pantalla del formulario de entreno con jsdom).
+- Pendiente de Francisco: Supabase › Authentication › URL Configuration › Site URL = https://app-deporte-y-alimentacion.vercel.app
