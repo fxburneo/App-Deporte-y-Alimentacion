@@ -145,3 +145,21 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Riesgo Garmin sin cambios al 21-oct (conversaciones abiertas, sin fecha de bloqueo). Se sigue con Intervals.
 - La API key de Intervals NO va por el chat: se carga como secreto de Supabase (Edge Function secret) que Francisco pega en el dashboard. El Athlete ID sí puede ir por chat.
 - Sincronización: función en Supabase programada (pg_cron), no en Vercel.
+
+## Cambio de fuente de Garmin (25-oct-2026)
+
+- Garmin abrió el 21-oct-2026 la **Garmin Connect Personal API** (gratis, sin aprobación). Francisco eligió usarla como
+  fuente principal; Intervals.icu queda como respaldo opcional.
+- Llave: se crea en https://connect.garmin.com/app/settings/personalApiToken (vence a 30/90/180/365 días; elegir 1 año;
+  avisar 1 mes antes). Se canjea por un token de 24 h: `POST https://personal.connectapi.garmin.com/personalapitoken-service/personal-api/personal-api-key/token`
+  con cabecera `Authorization: ApiKey <llave>`; la respuesta es el JWT en texto plano. Sin refresh token: se pide uno nuevo.
+- Endpoints (cliente oficial github.com/garmin/connect-personal-api-python, todos GET con `Authorization: Bearer`):
+  sueño `/sleep-service/sleep/dailySleepSummariesByDate?startDate&endDate` y `/sleep-service/sleep/dailySleep?date`;
+  HRV `/hrv-service/hrv/daily/{ini}/{fin}`; Body Battery `/wellness-service/wellness/bodyBattery/reports/daily?startDate&endDate`;
+  estrés `/usersummary-service/stats/stress/daily/{ini}/{fin}`; resumen diario `/usersummary-service/v2/dailysummaries?startDate&endDate`;
+  pulso `/wellness-service/wellness/dailyHeartRate?date`; peso `/weight-service/weight/range/{ini}/{fin}?includeAll=true`;
+  actividades `/activitylist-service/activities/search/activities?start&limit&startDate&endDate`; detalle `/activity-service/activity/{id}`;
+  FIT `/download-service/files/activity/{id}`. Solo lectura (no envía entrenos al reloj).
+- La llave va como secreto de Supabase `GARMIN_PERSONAL_API_KEY` (Edge Function secret), nunca por chat.
+- La red del entorno de Claude bloquea los dominios de Garmin: las pruebas reales se hacen desde una Edge Function de Supabase.
+- Instructivo actualizado: `docs/instructivo-etapa2-garmin.html` (misma URL https://claude.ai/artifact/HTLKctEp57RNJde5ACY85D).

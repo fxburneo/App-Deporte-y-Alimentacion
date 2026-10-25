@@ -1,4 +1,4 @@
-<title>Instructivo Intervals.icu</title>
+<title>Instructivo Garmin</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
@@ -46,55 +46,43 @@ footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);paddin
 <div class="wrap">
 <header style="display:flex;flex-direction:column;gap:12px">
   <span class="brand">FXB PERFORMANCE</span>
-  <h1>Etapa 2: conectar Garmin con Intervals.icu</h1>
-  <p class="lead">Intervals.icu es el puente entre tu reloj y la app: recibe de Garmin tus entrenos, sueño, HRV, pulso en reposo y peso. Son 2 partes y unos 15 minutos. Las pantallas están en inglés; lo que ves en gris es el texto del botón.</p>
+  <h1>Etapa 2: tu llave personal de Garmin</h1>
+  <p class="lead">Desde el 21 de octubre Garmin da a cada usuario una llave gratuita para leer sus propios datos: entrenos, sueño, HRV, Body Battery, estrés y peso. La app la usa para traer todo directo de Garmin, sin intermediarios. Son 2 partes y unos 5 minutos. No hay solicitud ni aprobación.</p>
 </header>
 
 <section>
-  <h2>Parte 1 · Cuenta y Garmin <small>~10 min · hazlo ya</small></h2>
+  <h2>Parte 1 · Crear la llave <small>~3 min · en el computador</small></h2>
   <ol>
-    <li><div><p>Entra a <a href="https://intervals.icu">intervals.icu</a> desde el computador o el celular y pulsa <span class="ui">Sign up</span>. Regístrate con tu correo. Es gratis.</p></div></li>
-    <li><div><p>Abre la configuración: <a href="https://intervals.icu/settings">intervals.icu/settings</a>. Busca la sección de conexiones, donde aparecen Garmin, Strava y otros.</p></div></li>
+    <li><div><p>Entra a <a href="https://connect.garmin.com/app/settings/personalApiToken">connect.garmin.com/app/settings/personalApiToken</a> con tu cuenta de Garmin Connect.</p><p class="why">Si el enlace no abre directo: en Garmin Connect web abre <span class="ui">Settings</span> y busca <span class="ui">Personal API Key</span> cerca del final de la lista.</p></div></li>
+    <li><div><p>Pulsa <span class="ui">Create Key</span> y acepta los términos.</p></div></li>
+    <li><div><p>En la duración elige <b>1 year</b> (un año). Así no tienes que renovarla seguido; la app te avisa un mes antes de que venza.</p></div></li>
     <li><div>
-      <p>En <b>Garmin</b> pulsa <span class="ui">Connect</span>. Te lleva a la página de Garmin: entra con tu cuenta de Garmin Connect.</p>
-      <p>Garmin te muestra una lista de permisos con interruptores. <b>Déjalos todos activados</b>, en especial los de actividades y los de salud diaria (sueño, HRV, peso). Pulsa <span class="ui">Save</span> o <span class="ui">Agree</span>.</p>
-      <p class="why">Por qué todos: sin los datos de salud, la app no puede darte el semáforo de recuperación ni el ajuste por fatiga.</p>
+      <p>Pulsa <span class="ui">Create</span> y <b>copia la llave</b>. Garmin la muestra <b>una sola vez</b>.</p>
+      <p class="note">Guárdala en tu gestor de contraseñas o en una nota privada mientras haces la parte 2. <b>No me la mandes por el chat</b>: es como una clave de tu cuenta.</p>
     </div></li>
-    <li><div>
-      <p>De vuelta en Intervals, en la tarjeta de Garmin, revisa que estén marcadas las opciones de <b>descargar actividades</b> y <b>descargar datos de bienestar</b> (wellness).</p>
-      <p>Si ves una opción para traer el historial (algo como <span class="ui">Download old data</span>), pide los <b>últimos 3 meses</b>. Puede tardar unas horas.</p>
-    </div></li>
-    <li><div>
-      <p>Verifica que llegaron datos. En el menú, abre el <b>calendario</b>: deben aparecer tus entrenos recientes. Abre también la sección de <b>Wellness</b> o <b>Fitness</b>: deben aparecer sueño, HRV o pulso en reposo.</p>
-      <p class="note">Si los entrenos aparecen pero el sueño o el HRV no, desconecta Garmin y vuelve a conectarlo revisando los permisos de salud. Es un problema conocido y se resuelve así.</p>
-    </div></li>
+    <li><div><p>Pulsa <span class="ui">Done</span>. La página debe mostrar la llave como <b>Active</b>, con su fecha de vencimiento.</p></div></li>
   </ol>
-  <p class="note ok">No conectes TrainingPeaks dentro de Intervals: la app lee tu plan directo de TrainingPeaks en la etapa 4.</p>
 </section>
 
 <section>
-  <h2>Parte 2 · Llave de acceso <small>~3 min · cuando te avise</small></h2>
-  <p style="color:var(--soft)">Esta parte la haces cuando tenga lista la sincronización. Te aviso y te doy el lugar seguro donde pegar la llave.</p>
+  <h2>Parte 2 · Guardarla en lugar seguro <small>~2 min · cuando te avise</small></h2>
   <ol>
-    <li><div><p>En <a href="https://intervals.icu/settings">intervals.icu/settings</a> baja hasta el final, a <span class="ui">Developer Settings</span>.</p></div></li>
-    <li><div><p>Ahí ves tu <b>Athlete ID</b> (algo como <code>i123456</code>) y tu <b>API Key</b> (pulsa <span class="ui">View</span> o <span class="ui">Generate</span> si no aparece).</p></div></li>
-    <li><div>
-      <p>El <b>Athlete ID</b> me lo puedes mandar por aquí: no es secreto.</p>
-      <p class="note">La <b>API Key</b> no me la mandes por el chat. Es como una clave: la pegarás directamente en Supabase, en un campo protegido que te indico en su momento. Así nunca queda escrita en ningún lado.</p>
-    </div></li>
+    <li><div><p>Cuando me confirmes que creaste la llave, te aparece un enlace de <b>Supabase</b> para guardar un secreto llamado <code>GARMIN_PERSONAL_API_KEY</code>.</p></div></li>
+    <li><div><p>Pega ahí la llave y guarda. Queda cifrada en Supabase: ni yo ni nadie la ve después, solo el proceso que trae tus datos.</p></div></li>
+    <li><div><p>Avísame y hago la primera lectura de prueba de tus datos.</p></div></li>
   </ol>
 </section>
 
 <section>
   <h2>Si algo falla</h2>
   <ul>
-    <li><b>No encuentras la sección de Garmin:</b> mándame una captura de la página de settings.</li>
-    <li><b>Garmin no te deja autorizar:</b> revisa que entres con la misma cuenta de tu app Garmin Connect.</li>
-    <li><b>Llegan entrenos pero no sueño ni HRV:</b> desconecta y vuelve a conectar Garmin (parte 1, paso 5).</li>
+    <li><b>No encuentras "Personal API Key":</b> mándame una captura de tu página de Settings en Garmin Connect web.</li>
+    <li><b>Perdiste la llave antes de guardarla:</b> borra la que creaste (<span class="ui">Delete</span>) y crea otra. La anterior deja de funcionar.</li>
+    <li><b>Intervals.icu:</b> es opcional. Si ya creaste la cuenta, déjala: sirve de respaldo.</li>
   </ul>
 </section>
 
-<footer>Instructivo de la etapa 2 · 21-oct-2026. Riesgo conocido: Garmin podría restringir los datos que Intervals comparte; la app está preparada para cambiar de fuente sin rehacer nada.</footer>
+<footer>Instructivo de la etapa 2 · 25-oct-2026. Fuente: documentación oficial de Garmin Connect Personal API.</footer>
 </div>
 
 <script>
