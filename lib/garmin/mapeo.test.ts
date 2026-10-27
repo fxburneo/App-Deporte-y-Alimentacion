@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { actividadAEntreno, armarBienestar, deporteDesdeTipo, intensidadDesde, tramos } from "@/supabase/functions/garmin-sync/mapeo";
+import { actividadAEntreno, armarBienestar, deporteDesdeTipo, intensidadDesde, intensidadPorPotencia, tramos } from "@/supabase/functions/garmin-sync/mapeo";
 
 describe("deporteDesdeTipo", () => {
   it("clasifica los deportes de Francisco", () => {
@@ -23,6 +23,20 @@ describe("intensidadDesde", () => {
   });
 });
 
+describe("intensidadPorPotencia (rodillos reales de Francisco)", () => {
+  it("Sprint 23-oct: IF 0,62 pero 94 s en zona 7 es moderado", () =>
+    expect(intensidadPorPotencia(0.617, [0, 958, 2305, 0, 0, 0, 94])).toBe("moderado"));
+  it("Recorrido largo 24-oct: IF 0,64 sin sprints es suave", () =>
+    expect(intensidadPorPotencia(0.642, [0, 0, 7479, 0, 0, 0, 0])).toBe("suave"));
+  it("Rodillo 17-oct: IF 0,68 con 79 s en zona 4 es suave", () =>
+    expect(intensidadPorPotencia(0.675, [0, 0, 3229, 79, 0, 0, 0])).toBe("suave"));
+  it("IF 0,78 (tempo / sweet spot) es moderado", () => expect(intensidadPorPotencia(0.78, [])).toBe("moderado"));
+  it("IF 0,9 (umbral) es fuerte", () => expect(intensidadPorPotencia(0.9, [])).toBe("fuerte"));
+  it("20 % sobre el umbral es fuerte aunque el IF sea bajo", () =>
+    expect(intensidadPorPotencia(0.7, [600, 1200, 600, 0, 500, 200, 100])).toBe("fuerte"));
+  it("sin potencia devuelve null", () => expect(intensidadPorPotencia(null, [])).toBeNull());
+});
+
 describe("actividadAEntreno", () => {
   const rodillo = {
     activityId: 987654321,
@@ -41,6 +55,19 @@ describe("actividadAEntreno", () => {
       user_id: "u1", garmin_id: 987654321, fecha: "2026-10-21", hora: "05:02", estado: "hecho",
       deporte: "rodillo", duracion_min: 60, intensidad: "moderado", kcal: 613, origen: "garmin",
       carga: 92.4, fc_media: 138, zonas_seg: [300, 1500, 1100, 600, 100],
+    });
+  });
+  it("con potencia, la intensidad sale de la potencia y no del pulso", () => {
+    const sprint = {
+      ...rodillo,
+      hrTimeInZone_1: 900, hrTimeInZone_2: 2400, hrTimeInZone_3: 180, hrTimeInZone_4: 0, hrTimeInZone_5: 0,
+      normPower: 136.4, intensityFactor: 0.6172, trainingStressScore: 36.41,
+      powerTimeInZone_2: 958, powerTimeInZone_3: 2305, powerTimeInZone_7: 94,
+    };
+    expect(intensidadDesde([900, 2400, 180, 0, 0])).toBe("suave");
+    expect(actividadAEntreno(sprint, "u1")).toMatchObject({
+      intensidad: "moderado", potencia_norm: 136, factor_intensidad: 0.617, tss: 36.4,
+      zonas_potencia_seg: [0, 958, 2305, 0, 0, 0, 94],
     });
   });
   it("ignora actividades que no son entreno", () => {

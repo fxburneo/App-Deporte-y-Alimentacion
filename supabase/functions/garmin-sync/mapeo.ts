@@ -38,6 +38,28 @@ export function intensidadDesde(zonas: (number | null | undefined)[], efecto?: n
   return "suave";
 }
 
+// Intensidad por potencia (rodillo con potenciómetro). En intervalos cortos
+// el pulso no alcanza a subir, así que la potencia manda:
+// - factor de intensidad (IF = potencia normalizada / FTP): 0,85 o más es
+//   fuerte; 0,75 o más es moderado.
+// - sprints: 60 s o más en zonas de potencia 6-7 (anaeróbica y sprint)
+//   suben la sesión al menos a moderado; 20 % o más en zonas 5-7 (sobre el
+//   umbral) es fuerte.
+// Devuelve null si la actividad no tiene datos de potencia.
+export function intensidadPorPotencia(
+  factor: number | null | undefined,
+  zonasPotencia: (number | null | undefined)[]
+): Intensidad | null {
+  const z = [0, 1, 2, 3, 4, 5, 6].map((i) => Number(zonasPotencia[i] ?? 0) || 0);
+  const total = z.reduce((a, b) => a + b, 0);
+  const f = factor != null && Number(factor) > 0 ? Number(factor) : null;
+  if (f == null && total === 0) return null;
+  const sobreUmbral = total > 0 ? (z[4] + z[5] + z[6]) / total : 0;
+  if ((f != null && f >= 0.85) || sobreUmbral >= 0.2) return "fuerte";
+  if ((f != null && f >= 0.75) || z[5] + z[6] >= 60) return "moderado";
+  return "suave";
+}
+
 // deno-lint-ignore no-explicit-any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- JSON de Garmin sin tipos publicados
 type Json = any;
@@ -48,6 +70,8 @@ export function actividadAEntreno(a: Json, userId: string) {
   const inicio: string | undefined = a?.startTimeLocal; // "2026-10-25 05:02:11"
   if (!deporte || !inicio || !a?.activityId) return null;
   const zonas = [1, 2, 3, 4, 5].map((i) => Math.round(Number(a[`hrTimeInZone_${i}`] ?? 0)));
+  const zonasPotencia = [1, 2, 3, 4, 5, 6, 7].map((i) => Math.round(Number(a[`powerTimeInZone_${i}`] ?? 0)));
+  const porPotencia = intensidadPorPotencia(a.intensityFactor, zonasPotencia);
   return {
     user_id: userId,
     garmin_id: Number(a.activityId),
@@ -56,7 +80,7 @@ export function actividadAEntreno(a: Json, userId: string) {
     estado: "hecho" as const,
     deporte,
     duracion_min: Math.max(1, Math.round(Number(a.duration ?? 0) / 60)),
-    intensidad: intensidadDesde(zonas, a.aerobicTrainingEffect),
+    intensidad: porPotencia ?? intensidadDesde(zonas, a.aerobicTrainingEffect),
     kcal: a.calories != null ? Math.round(Number(a.calories)) : null,
     origen: "garmin" as const,
     tipo_garmin: tipo ?? null,
@@ -66,6 +90,10 @@ export function actividadAEntreno(a: Json, userId: string) {
     zonas_seg: zonas.some((x) => x > 0) ? zonas : null,
     distancia_m: a.distance != null ? Math.round(Number(a.distance)) : null,
     efecto_aerobico: a.aerobicTrainingEffect != null ? Math.round(Number(a.aerobicTrainingEffect) * 10) / 10 : null,
+    potencia_norm: a.normPower != null ? Math.round(Number(a.normPower)) : null,
+    factor_intensidad: a.intensityFactor != null ? Math.round(Number(a.intensityFactor) * 1000) / 1000 : null,
+    tss: a.trainingStressScore != null ? Math.round(Number(a.trainingStressScore) * 10) / 10 : null,
+    zonas_potencia_seg: zonasPotencia.some((x) => x > 0) ? zonasPotencia : null,
   };
 }
 

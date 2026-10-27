@@ -176,9 +176,24 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Edge Function `garmin-sync` (código en `supabase/functions/garmin-sync/`, verify_jwt=false con autenticación propia:
   `x-sync-token` de app_config o JWT del usuario). Lógica pura en `mapeo.ts` con pruebas en `lib/garmin/mapeo.test.ts`.
   Tareas pg_cron: 06:35, 07:30, 12:00 y 20:00 Ecuador (`lanzar_sync_garmin(3)`). Carga inicial de 60 días OK:
-  60 días de bienestar y 20 entrenos (hueco 13-sep a 9-oct por confirmar con Francisco).
+  60 días de bienestar y 20 entrenos.
 - Semáforo `lib/recuperacion.ts`: sueño 40 %, HRV contra su rango normal 40 % (−8 por ms bajo el rango), pulso en
   reposo contra los 7 días previos 20 %. Verde ≥70, ámbar 50–69, rojo <50.
 - Pantallas: Hoy con anillo de recuperación, aviso si pasan 48 h sin datos y botón Actualizar; entrenos de Garmin
   con su nombre (no se pueden borrar); Más › Conexiones con última sincronización y vencimiento de la llave.
 - 77 pruebas. La red de Claude bloquea los dominios de Garmin; Supabase sí llega.
+
+## Revisión de datos con Francisco (27-oct-2026)
+
+- Hueco 13-sep a 9-oct: estuvo LESIONADO. En el análisis de coach (etapa 6) tratarlo como lesión y vuelta
+  progresiva, no como falta de constancia.
+- Las 10,2 h de sueño del domingo 26-oct son reales.
+- Rodillo con potenciómetro: la intensidad se mide por POTENCIA, no por pulso (en intervalos cortos el pulso no sube).
+  Regla `intensidadPorPotencia` en `mapeo.ts`: IF ≥0,85 o ≥20 % en zonas de potencia 5-7 = fuerte; IF ≥0,75 o
+  ≥60 s en zonas 6-7 (sprints) = moderado; si no, suave. Sin potencia se usa el pulso como antes.
+  Columnas nuevas en `entrenos` (migración aditiva `20261027_etapa2_potencia.sql`): potencia_norm,
+  factor_intensidad, tss, zonas_potencia_seg. Resultado: "Sprint" 23-oct pasó de suave a moderado; el resto sigue suave.
+- FTP en Garmin = 221 W. Las zonas de potencia de Garmin parecen mal configuradas (un "Aeróbico Z2" con IF 0,73
+  marca 1759 s en zona 4; rodajes con IF 0,64 caen en zona 3). Por eso la regla usa el IF y solo las zonas 5-7.
+  Pedido a Francisco: revisar las zonas de potencia en Garmin Connect.
+- Función temporal `garmin-prueba` neutralizada (responde 410); borrarla desde el panel cuando se pueda.
