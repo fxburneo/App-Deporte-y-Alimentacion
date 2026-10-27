@@ -197,3 +197,10 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   marca 1759 s en zona 4; rodajes con IF 0,64 caen en zona 3). Por eso la regla usa el IF y solo las zonas 5-7.
   Pedido a Francisco: revisar las zonas de potencia en Garmin Connect.
 - Función temporal `garmin-prueba` neutralizada (responde 410); borrarla desde el panel cuando se pueda.
+
+## Etapa 2 CERRADA (27-oct-2026)
+
+- Francisco probó en la vista previa: recuperación 91 (verde), sueño 7:17 h, HRV 56, FC reposo 51. PR #3 juntado a main.
+- Ojo: el ícono instalado en el celular abre la versión principal (main). Las vistas previas se prueban abriendo
+  el enlace de Vercel en el navegador, no desde el ícono. Avisárselo en cada etapa.
+- Siguiente: etapa 3 (registro de comidas con foto o texto + IA). TrainingPeaks (etapa 4) después del 1-nov.
