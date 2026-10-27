@@ -25,3 +25,13 @@ export function fechaLarga(fecha: string): string {
   const [, m, d] = fecha.split("-").map(Number);
   return `${DIAS[diaSemana(fecha)]} ${d} ${MESES[m - 1]}`;
 }
+
+// "06:35" en hora de Ecuador, para mostrar cuándo se sincronizó.
+export function horaEcuador(iso: string): string {
+  return new Intl.DateTimeFormat("es-EC", { timeZone: ZONA, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
+}
+
+// Horas completas entre un instante y ahora.
+export function horasDesde(iso: string, ahora: Date = new Date()): number {
+  return Math.floor((ahora.getTime() - new Date(iso).getTime()) / 3600000);
+}

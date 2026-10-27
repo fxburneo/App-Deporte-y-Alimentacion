@@ -21,6 +21,15 @@ export interface PerfilFila {
   factor_actividad: number;
   pausa: boolean;
   pausa_desde: string | null;
+  garmin_llave_vence?: string | null;
+}
+
+export interface SincronizacionFila {
+  inicio: string;
+  fin: string | null;
+  ok: boolean | null;
+  registros: number | null;
+  detalle: string | null;
 }
 
 export interface EntrenoFila {
@@ -33,6 +42,8 @@ export interface EntrenoFila {
   intensidad: Intensidad;
   kcal: number | null;
   origen: string;
+  nombre?: string | null;
+  carga?: number | null;
 }
 
 export interface PesoFila {

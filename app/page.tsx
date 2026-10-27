@@ -8,7 +8,9 @@ import NavBar from "@/components/NavBar";
 import Pantalla from "@/components/Pantalla";
 import { leerDatosDia } from "@/lib/datos/dia";
 import { aEntreno, aPerfilMotor, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
-import { diaSemana, fechaLarga } from "@/lib/fecha";
+import { diaSemana, fechaLarga, horaEcuador, horasDesde } from "@/lib/fecha";
+import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
+import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
 import {
   COMIDAS,
@@ -53,6 +55,9 @@ export default async function Hoy() {
   const temprano = hoy.some((e) => e.hora != null && e.hora < perfil.horaDesayuno && e.deporte !== "descanso");
   const reparto = repartirComidas(obj, temprano);
   const tipoManana = tipoDia(manana);
+  const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
+  const bienestarHoy = d.bienestar.find((b) => b.fecha === d.fecha) ?? null;
+  const sinDatos = d.ultimaSyncOk == null || horasDesde(d.ultimaSyncOk.inicio) >= 48;
   const filasHoy: { fila: EntrenoFila; cuenta: boolean }[] = d.entrenosHoy.map((fila, i) => ({ fila, cuenta: cuentan.has(hoy[i]) }));
 
   return (
@@ -66,6 +71,22 @@ export default async function Hoy() {
             <p className="text-[#e6e9eb]">Comes a mantenimiento, sin déficit. Desactívalo en Más cuando vuelvas.</p>
           </section>
         )}
+
+        {sinDatos && (
+          <section className="rounded-[14px] border border-[#5a2326] bg-[#1f1213] px-3.5 py-3">
+            <span className="etiqueta text-mal!">Sin datos de Garmin</span>
+            <p className="text-[#e6e9eb]">
+              {d.ultimaSync?.ok === false ? `La última sincronización falló: ${d.ultimaSync.detalle ?? "error desconocido"}` : "Hace más de 48 horas que no llegan datos nuevos."}
+            </p>
+            <BotonActualizar texto="Reintentar" />
+          </section>
+        )}
+
+        <BloqueRecuperacion
+          r={recuperacion}
+          bienestar={bienestarHoy}
+          ultima={d.ultimaSyncOk ? horaEcuador(d.ultimaSyncOk.inicio) : null}
+        />
 
         {pesaHoy && (
           <Link href="/peso" className="flex items-center justify-between rounded-[14px] bg-superficie px-4 py-3">
@@ -81,25 +102,27 @@ export default async function Hoy() {
           </div>
           {filasHoy.length === 0 ? (
             <div className="rounded-[14px] bg-superficie px-4 py-3.5 text-suave">
-              Sin entreno cargado: hoy cuenta como descanso. Desde la etapa 2 llega solo desde Garmin y TrainingPeaks.
+              Sin entreno todavía: hoy cuenta como descanso. Lo que hagas con el reloj llega solo desde Garmin.
             </div>
           ) : (
             filasHoy.map(({ fila, cuenta }) => (
               <div key={fila.id} className={`rounded-[14px] bg-superficie px-4 py-3.5 ${cuenta ? "" : "opacity-50"}`}>
                 <div className="flex items-baseline justify-between">
-                  <strong className="text-[17px]">{NOMBRE_DEPORTE[fila.deporte]}</strong>
+                  <strong className="text-[17px]">{fila.origen === "garmin" && fila.nombre ? fila.nombre : NOMBRE_DEPORTE[fila.deporte]}</strong>
                   <span className={`text-xs font-bold ${fila.estado === "hecho" ? "text-bien" : "text-tenue"}`}>
-                    {fila.estado === "hecho" ? "HECHO" : "PLAN"}{fila.hora ? ` ${fila.hora.slice(0, 5)}` : ""}
+                    {fila.origen === "garmin" ? "GARMIN" : fila.estado === "hecho" ? "HECHO" : "PLAN"}{fila.hora ? ` ${fila.hora.slice(0, 5)}` : ""}
                   </span>
                 </div>
                 <div className="mt-2 flex items-end gap-6">
                   <Dato valor={duracion(fila.duracion_min)} nombre="Duración" />
                   <Dato valor={INTENSIDAD[fila.intensidad]} nombre="Intensidad" />
                   {fila.kcal != null && <Dato valor={miles(fila.kcal)} nombre="Kcal reloj" />}
-                  <form action={borrarEntreno} className="ml-auto">
-                    <input type="hidden" name="id" value={fila.id} />
-                    <button type="submit" className="py-1 text-xs text-tenue underline">Borrar</button>
-                  </form>
+                  {fila.origen === "manual" && (
+                    <form action={borrarEntreno} className="ml-auto">
+                      <input type="hidden" name="id" value={fila.id} />
+                      <button type="submit" className="py-1 text-xs text-tenue underline">Borrar</button>
+                    </form>
+                  )}
                 </div>
                 {!cuenta && <p className="mt-1.5 text-xs text-tenue">No cuenta: ya cargaste lo que hiciste.</p>}
               </div>
@@ -200,6 +223,57 @@ function Macro({ valor, nombre, color }: { valor: number; nombre: string; color:
       <div className={`h-1.5 rounded-sm ${color}`} />
       <span className="font-display text-[22px] font-semibold leading-none">{valor} g</span>
       <span className="text-[11px] uppercase text-tenue">{nombre}</span>
+    </div>
+  );
+}
+
+const COLOR_NIVEL = { listo: "#3ddc84", cuidado: "#ffb020", descansa: "#ff5a5f" };
+
+function BloqueRecuperacion({ r, bienestar, ultima }: { r: Recuperacion | null; bienestar: { sueno_seg: number | null; hrv_noche: number | null; fc_reposo: number | null } | null; ultima: string | null }) {
+  const sueno = bienestar?.sueno_seg != null ? duracion(Math.round(bienestar.sueno_seg / 60)) + " h" : "—";
+  const circ = 2 * Math.PI * 56;
+  return (
+    <section className="flex flex-col gap-3.5">
+      <div className="flex items-center gap-[18px]">
+        <div className="relative h-[132px] w-[132px] flex-none">
+          <svg aria-hidden="true" width="132" height="132" viewBox="0 0 132 132">
+            <circle cx="66" cy="66" r="56" fill="none" stroke="#1f2429" strokeWidth="10" />
+            {r && (
+              <circle cx="66" cy="66" r="56" fill="none" stroke={COLOR_NIVEL[r.nivel]} strokeWidth="10" strokeLinecap="round"
+                strokeDasharray={`${(r.puntaje / 100) * circ} ${circ}`} transform="rotate(-90 66 66)" />
+            )}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-display text-[46px] font-bold leading-none">{r ? r.puntaje : "—"}</span>
+            <span className="text-[11px] tracking-[0.1em] text-tenue">RECUPERACIÓN</span>
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col gap-2.5">
+          <Fila nombre="Sueño" valor={sueno} />
+          <Fila nombre="HRV" valor={bienestar?.hrv_noche != null ? `${bienestar.hrv_noche} ms` : "—"} />
+          <Fila nombre="FC reposo" valor={bienestar?.fc_reposo != null ? `${bienestar.fc_reposo} lpm` : "—"} ultima />
+        </div>
+      </div>
+      {r ? (
+        <p className="text-[15px] text-suave">
+          <strong style={{ color: COLOR_NIVEL[r.nivel] }}>{ETIQUETA_NIVEL[r.nivel]}.</strong> {r.mensaje.replace(/^[^:.]*[:.]\s*/, "")}
+        </p>
+      ) : (
+        <p className="text-[15px] text-suave">Tu noche todavía no llega: el reloj la envía cuando sincroniza con el celular al despertar.</p>
+      )}
+      <div className="flex items-center justify-between text-xs text-tenue">
+        <span>{ultima ? `Garmin · actualizado ${ultima}` : "Garmin · sin sincronizar"}</span>
+        <BotonActualizar />
+      </div>
+    </section>
+  );
+}
+
+function Fila({ nombre, valor, ultima }: { nombre: string; valor: string; ultima?: boolean }) {
+  return (
+    <div className={`flex justify-between ${ultima ? "" : "border-b border-linea pb-1.5"}`}>
+      <span className="text-tenue">{nombre}</span>
+      <span className="font-display text-xl font-semibold">{valor}</span>
     </div>
   );
 }

@@ -126,3 +126,74 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   con modo pausa). `/comidas`, `/registrar`, `/entreno` dicen en qué etapa llegan.
 - 56 pruebas (incluye prueba de pantalla del formulario de entreno con jsdom).
 - Pendiente de Francisco: Supabase › Authentication › URL Configuration › Site URL = https://app-deporte-y-alimentacion.vercel.app
+
+## Etapa 1 CERRADA (21-oct-2026)
+
+- Francisco probó la vista previa y aprobó. PR fxburneo/App-Deporte-y-Alimentacion#2 fusionado a main.
+
+## Pedidos de Francisco para el menú (etapa 5, 21-oct-2026)
+
+- **Cantidades siempre explícitas:** cada alimento del menú con su peso en gramos y su medida casera. Aclarar si el
+  peso es en crudo o cocido (los cereales y carnes cambian mucho: 75 g de arroz crudo ≈ 1 taza cocida).
+- **Armar los menús juntos:** además de la propuesta automática, una conversación dentro de la app donde Francisco
+  propone platos y Claude ajusta cantidades a su objetivo del día y valida macros. La maqueta 2.5 debe rehacerse con
+  esto antes de programar la etapa 5.
+
+## Etapa 2 (21-oct-2026): instructivo entregado
+
+- Instructivo Intervals.icu: `docs/instructivo-etapa2-intervals.html`, https://claude.ai/artifact/HTLKctEp57RNJde5ACY85D
+- Riesgo Garmin sin cambios al 21-oct (conversaciones abiertas, sin fecha de bloqueo). Se sigue con Intervals.
+- La API key de Intervals NO va por el chat: se carga como secreto de Supabase (Edge Function secret) que Francisco pega en el dashboard. El Athlete ID sí puede ir por chat.
+- Sincronización: función en Supabase programada (pg_cron), no en Vercel.
+
+## Cambio de fuente de Garmin (25-oct-2026)
+
+- Garmin abrió el 21-oct-2026 la **Garmin Connect Personal API** (gratis, sin aprobación). Francisco eligió usarla como
+  fuente principal; Intervals.icu queda como respaldo opcional.
+- Llave: se crea en https://connect.garmin.com/app/settings/personalApiToken (vence a 30/90/180/365 días; elegir 1 año;
+  avisar 1 mes antes). Se canjea por un token de 24 h: `POST https://personal.connectapi.garmin.com/personalapitoken-service/personal-api/personal-api-key/token`
+  con cabecera `Authorization: ApiKey <llave>`; la respuesta es el JWT en texto plano. Sin refresh token: se pide uno nuevo.
+- Endpoints (cliente oficial github.com/garmin/connect-personal-api-python, todos GET con `Authorization: Bearer`):
+  sueño `/sleep-service/sleep/dailySleepSummariesByDate?startDate&endDate` y `/sleep-service/sleep/dailySleep?date`;
+  HRV `/hrv-service/hrv/daily/{ini}/{fin}`; Body Battery `/wellness-service/wellness/bodyBattery/reports/daily?startDate&endDate`;
+  estrés `/usersummary-service/stats/stress/daily/{ini}/{fin}`; resumen diario `/usersummary-service/v2/dailysummaries?startDate&endDate`;
+  pulso `/wellness-service/wellness/dailyHeartRate?date`; peso `/weight-service/weight/range/{ini}/{fin}?includeAll=true`;
+  actividades `/activitylist-service/activities/search/activities?start&limit&startDate&endDate`; detalle `/activity-service/activity/{id}`;
+  FIT `/download-service/files/activity/{id}`. Solo lectura (no envía entrenos al reloj).
+- La llave va como secreto de Supabase `GARMIN_PERSONAL_API_KEY` (Edge Function secret), nunca por chat.
+- La red del entorno de Claude bloquea los dominios de Garmin: las pruebas reales se hacen desde una Edge Function de Supabase.
+- Instructivo actualizado: `docs/instructivo-etapa2-garmin.html` (misma URL https://claude.ai/artifact/HTLKctEp57RNJde5ACY85D).
+
+## Etapa 2 (26/27-oct-2026): construida, falta prueba de Francisco
+
+- Llave personal de Garmin creada (vence 2027-10-26) y guardada como secreto de Supabase `GARMIN_PERSONAL_API_KEY`.
+  El formulario automático del conector (create_edge_function_secret) no le llegó a Francisco: lo hizo a mano en
+  Edge Functions › Secrets. Las migraciones "destructivas" (drop/update) piden confirmación que tampoco le llega:
+  diseñar migraciones solo aditivas.
+- Script `supabase/migrations/20261026_etapa2_garmin.sql` + restricción `entrenos_user_garmin_unico (user_id, garmin_id)`.
+  Tablas: `bienestar_diario`, `sincronizaciones`, `app_config` (token interno de las tareas programadas, sin acceso
+  desde la app), columnas Garmin en `entrenos`, `perfil.garmin_llave_vence`.
+- Edge Function `garmin-sync` (código en `supabase/functions/garmin-sync/`, verify_jwt=false con autenticación propia:
+  `x-sync-token` de app_config o JWT del usuario). Lógica pura en `mapeo.ts` con pruebas en `lib/garmin/mapeo.test.ts`.
+  Tareas pg_cron: 06:35, 07:30, 12:00 y 20:00 Ecuador (`lanzar_sync_garmin(3)`). Carga inicial de 60 días OK:
+  60 días de bienestar y 20 entrenos.
+- Semáforo `lib/recuperacion.ts`: sueño 40 %, HRV contra su rango normal 40 % (−8 por ms bajo el rango), pulso en
+  reposo contra los 7 días previos 20 %. Verde ≥70, ámbar 50–69, rojo <50.
+- Pantallas: Hoy con anillo de recuperación, aviso si pasan 48 h sin datos y botón Actualizar; entrenos de Garmin
+  con su nombre (no se pueden borrar); Más › Conexiones con última sincronización y vencimiento de la llave.
+- 77 pruebas. La red de Claude bloquea los dominios de Garmin; Supabase sí llega.
+
+## Revisión de datos con Francisco (27-oct-2026)
+
+- Hueco 13-sep a 9-oct: estuvo LESIONADO. En el análisis de coach (etapa 6) tratarlo como lesión y vuelta
+  progresiva, no como falta de constancia.
+- Las 10,2 h de sueño del domingo 26-oct son reales.
+- Rodillo con potenciómetro: la intensidad se mide por POTENCIA, no por pulso (en intervalos cortos el pulso no sube).
+  Regla `intensidadPorPotencia` en `mapeo.ts`: IF ≥0,85 o ≥20 % en zonas de potencia 5-7 = fuerte; IF ≥0,75 o
+  ≥60 s en zonas 6-7 (sprints) = moderado; si no, suave. Sin potencia se usa el pulso como antes.
+  Columnas nuevas en `entrenos` (migración aditiva `20261027_etapa2_potencia.sql`): potencia_norm,
+  factor_intensidad, tss, zonas_potencia_seg. Resultado: "Sprint" 23-oct pasó de suave a moderado; el resto sigue suave.
+- FTP en Garmin = 221 W. Las zonas de potencia de Garmin parecen mal configuradas (un "Aeróbico Z2" con IF 0,73
+  marca 1759 s en zona 4; rodajes con IF 0,64 caen en zona 3). Por eso la regla usa el IF y solo las zonas 5-7.
+  Pedido a Francisco: revisar las zonas de potencia en Garmin Connect.
+- Función temporal `garmin-prueba` neutralizada (responde 410); borrarla desde el panel cuando se pueda.
