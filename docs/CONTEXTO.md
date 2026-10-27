@@ -204,3 +204,7 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Ojo: el ícono instalado en el celular abre la versión principal (main). Las vistas previas se prueban abriendo
   el enlace de Vercel en el navegador, no desde el ícono. Avisárselo en cada etapa.
 - Siguiente: etapa 3 (registro de comidas con foto o texto + IA). TrainingPeaks (etapa 4) después del 1-nov.
+- Umbrales: TrainingPeaks no tiene API para usuarios individuales (solo socios); el iCal no trae FTP ni zonas.
+  Decisión: Francisco actualiza las zonas en Garmin Connect con los valores de TrainingPeaks cuando reactive
+  Premium (1-nov). La app sigue tomando el IF de Garmin (calculado con el FTP de Garmin); no se cargan umbrales a mano.
+  Los entrenos anteriores conservan el IF con FTP 221.
