@@ -17,3 +17,11 @@ describe("fechas en hora de Ecuador", () => {
     expect(fechaLarga("2026-10-21")).toBe("Miércoles 21 oct");
   });
 });
+
+import { horaEcuador, horasDesde } from "./fecha";
+
+describe("hora de sincronización", () => {
+  it("11:35 UTC son las 06:35 en Quito", () => expect(horaEcuador("2026-10-26T11:35:00Z")).toBe("06:35"));
+  it("cuenta horas desde la última sincronización", () =>
+    expect(horasDesde("2026-10-24T11:35:00Z", new Date("2026-10-26T12:00:00Z"))).toBe(48));
+});

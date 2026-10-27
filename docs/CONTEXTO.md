@@ -163,3 +163,22 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - La llave va como secreto de Supabase `GARMIN_PERSONAL_API_KEY` (Edge Function secret), nunca por chat.
 - La red del entorno de Claude bloquea los dominios de Garmin: las pruebas reales se hacen desde una Edge Function de Supabase.
 - Instructivo actualizado: `docs/instructivo-etapa2-garmin.html` (misma URL https://claude.ai/artifact/HTLKctEp57RNJde5ACY85D).
+
+## Etapa 2 (26/27-oct-2026): construida, falta prueba de Francisco
+
+- Llave personal de Garmin creada (vence 2027-10-26) y guardada como secreto de Supabase `GARMIN_PERSONAL_API_KEY`.
+  El formulario automático del conector (create_edge_function_secret) no le llegó a Francisco: lo hizo a mano en
+  Edge Functions › Secrets. Las migraciones "destructivas" (drop/update) piden confirmación que tampoco le llega:
+  diseñar migraciones solo aditivas.
+- Script `supabase/migrations/20261026_etapa2_garmin.sql` + restricción `entrenos_user_garmin_unico (user_id, garmin_id)`.
+  Tablas: `bienestar_diario`, `sincronizaciones`, `app_config` (token interno de las tareas programadas, sin acceso
+  desde la app), columnas Garmin en `entrenos`, `perfil.garmin_llave_vence`.
+- Edge Function `garmin-sync` (código en `supabase/functions/garmin-sync/`, verify_jwt=false con autenticación propia:
+  `x-sync-token` de app_config o JWT del usuario). Lógica pura en `mapeo.ts` con pruebas en `lib/garmin/mapeo.test.ts`.
+  Tareas pg_cron: 06:35, 07:30, 12:00 y 20:00 Ecuador (`lanzar_sync_garmin(3)`). Carga inicial de 60 días OK:
+  60 días de bienestar y 20 entrenos (hueco 13-sep a 9-oct por confirmar con Francisco).
+- Semáforo `lib/recuperacion.ts`: sueño 40 %, HRV contra su rango normal 40 % (−8 por ms bajo el rango), pulso en
+  reposo contra los 7 días previos 20 %. Verde ≥70, ámbar 50–69, rojo <50.
+- Pantallas: Hoy con anillo de recuperación, aviso si pasan 48 h sin datos y botón Actualizar; entrenos de Garmin
+  con su nombre (no se pueden borrar); Más › Conexiones con última sincronización y vencimiento de la llave.
+- 77 pruebas. La red de Claude bloquea los dominios de Garmin; Supabase sí llega.

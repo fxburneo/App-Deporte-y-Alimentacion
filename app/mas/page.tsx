@@ -8,6 +8,8 @@ import { leerDatosDia } from "@/lib/datos/dia";
 import { kg } from "@/lib/formato";
 import { pesoReferencia } from "@/lib/nutricion/motor";
 import { edadEnAnios } from "@/lib/perfil/edad";
+import { fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
+import BotonActualizar from "../garmin/BotonActualizar";
 import { signOut } from "../login/actions";
 import { cambiarPausa } from "./actions";
 
@@ -59,9 +61,31 @@ export default async function Page() {
           </button>
         </form>
 
+        <section className="flex flex-col gap-1">
+          <span className="etiqueta pb-1">Conexiones</span>
+          <div className="flex items-start gap-3 py-2">
+            <span className={`mt-1.5 h-2 w-2 flex-none rounded-full ${d.ultimaSync?.ok === false ? "bg-mal" : d.ultimaSyncOk ? "bg-bien" : "bg-tenue"}`} />
+            <div className="flex flex-1 flex-col">
+              <strong>Garmin · llave personal</strong>
+              <span className="text-xs text-tenue">
+                {d.ultimaSyncOk
+                  ? `Sueño, HRV, pulso y entrenos · actualizado ${fechaLarga(d.ultimaSyncOk.inicio.slice(0, 10)).toLowerCase()} ${horaEcuador(d.ultimaSyncOk.inicio)}`
+                  : "Todavía no sincroniza."}
+              </span>
+              {d.ultimaSync?.ok === false && <span className="text-xs text-mal">Último intento falló: {d.ultimaSync.detalle}</span>}
+              {p.garmin_llave_vence && (
+                <span className={`text-xs ${p.garmin_llave_vence <= sumarDias(hoyEcuador(), 30) ? "text-carbo" : "text-tenue"}`}>
+                  La llave vence el {fechaLarga(p.garmin_llave_vence).toLowerCase()}
+                  {p.garmin_llave_vence <= sumarDias(hoyEcuador(), 30) ? ": créala de nuevo en Garmin Connect y cámbiala en Supabase." : "."}
+                </span>
+              )}
+            </div>
+            <BotonActualizar />
+          </div>
+        </section>
+
         <section className="flex flex-col">
           <span className="etiqueta pb-1">Próximamente</span>
-          <Proximo nombre="Conexión con Garmin (Intervals.icu)" etapa={2} />
           <Proximo nombre="Plan de TrainingPeaks y test de sudoración" etapa={4} />
           <Proximo nombre="Avisos en el iPhone" etapa={7} />
         </section>
