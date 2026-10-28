@@ -9,7 +9,7 @@ secciones = [
  ("2 · Día a día", "Lo que usas todos los días: el plan del día, registrar lo que comes y el menú de la semana.", [
    ("Main","2.1 · Hoy","Recuperación, entreno, energía del día y comidas. El recuadro naranja aparece cuando el plan se ajusta.",False),
    ("EntrenoManual","2.2 · Cargar entreno","Plan o real, a mano, mientras no llega la conexión con Garmin. Muestra cómo queda el día antes de guardar.",True),
-   ("Registrar","2.3 · Registrar comida","Foto, texto o 'del plan'. La IA desglosa y pregunta lo que no ve.",False),
+   ("Registrar","2.3 · Registrar comida","Foto, texto o repetir una comida. La IA desglosa en gramos y medida casera, pregunta lo que no ve y ajusta el resto del día.",True),
    ("Comidas","2.4 · Comidas del día","Objetivo contra lo real, dónde ajustar y la semana.",False),
    ("Menu","2.5 · Menú semanal","Menú rotativo con la porción de carbohidrato según el día, cocina del domingo y cambios validados.",False)]),
  ("3 · Entreno", "El análisis de entrenador en lenguaje simple y la comida de las salidas largas.", [

@@ -14,7 +14,7 @@ body{margin:0;background:#0E1113}
 a{color:#FF6A1A}a:hover{color:#FF8A4A}
 </style>
 </helmet>
-<div style="width: 390px; height: 960px; position: relative; box-sizing: border-box; background: #0E1113; color: #F2F4F5; font-family: 'Archivo', system-ui, sans-serif; font-size: 14px; line-height: 1.45; overflow: hidden">
+<div style="width: 390px; height: 1240px; position: relative; box-sizing: border-box; background: #0E1113; color: #F2F4F5; font-family: 'Archivo', system-ui, sans-serif; font-size: 14px; line-height: 1.45; overflow: hidden">
 <div style="padding: 18px 18px 24px; display: flex; flex-direction: column; gap: 18px">
 
 <header style="display: flex; justify-content: space-between; align-items: center">
@@ -23,45 +23,54 @@ a{color:#FF6A1A}a:hover{color:#FF8A4A}
 <span style="width: 62px"></span>
 </header>
 
-<div style="display: flex; gap: 6px; overflow: hidden">
-<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap">Desayuno</button>
-<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap">Media mañana</button>
-<button type="button" style="font: inherit; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 99px; border: 1px solid #F2F4F5; background: #F2F4F5; color: #0E1113; white-space: nowrap">Almuerzo</button>
-<button type="button" style="font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap">Cena</button>
+<div style="display: flex; gap: 5px; overflow: hidden">
+<button type="button" style="font: inherit; font-size: 12px; padding: 7px 9px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap; flex: none">Desayuno</button><button type="button" style="font: inherit; font-size: 12px; padding: 7px 9px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap; flex: none">Media mañana</button><button type="button" style="font: inherit; font-size: 12px; font-weight: 700; padding: 7px 9px; border-radius: 99px; border: 1px solid #F2F4F5; background: #F2F4F5; color: #0E1113; white-space: nowrap; flex: none">Almuerzo</button><button type="button" style="font: inherit; font-size: 12px; padding: 7px 9px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap; flex: none">Media tarde</button><button type="button" style="font: inherit; font-size: 12px; padding: 7px 9px; border-radius: 99px; border: 1px solid #2A3036; background: transparent; color: #9AA4AD; white-space: nowrap; flex: none">Cena</button>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #2A3036; border-radius: 12px; overflow: hidden">
 <button type="button" style="font: inherit; font-weight: 700; padding: 12px 6px; border: 0; background: #FF6A1A; color: #0E1113; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>Foto</button>
 <button type="button" style="font: inherit; font-weight: 600; padding: 12px 6px; border: 0; border-left: 1px solid #2A3036; background: #171B1F; color: #D5DADE; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h9"></path></svg>Escribir</button>
-<button type="button" style="font: inherit; font-weight: 600; padding: 12px 6px; border: 0; border-left: 1px solid #2A3036; background: #171B1F; color: #D5DADE; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Del plan</button>
+<button type="button" style="font: inherit; font-weight: 600; padding: 12px 6px; border: 0; border-left: 1px solid #2A3036; background: #171B1F; color: #D5DADE; display: flex; flex-direction: column; align-items: center; gap: 4px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"></path></svg>Repetir</button>
 </div>
 
-<div style="height: 180px; border-radius: 14px; background: repeating-linear-gradient(45deg, #171B1F, #171B1F 10px, #1C2126 10px, #1C2126 20px); display: flex; align-items: center; justify-content: center; color: #9AA4AD; font-weight: 600">[Foto del plato]</div>
+<div style="height: 150px; border-radius: 14px; background: repeating-linear-gradient(45deg, #171B1F, #171B1F 10px, #1C2126 10px, #1C2126 20px); display: flex; align-items: center; justify-content: center; color: #9AA4AD; font-weight: 600">[Foto del plato]</div>
 
 <section style="display: flex; flex-direction: column">
-<div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD">LO QUE VE LA IA</span><span style="font-size: 12px; color: #9AA4AD">toca para corregir</span></div>
-<div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #22282E"><div style="display: flex; flex-direction: column"><strong>Pollo al horno</strong><span style="font-size: 12px; color: #9AA4AD">~150 g · pechuga</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600; color: #4C9DFF">46 g P</span></div>
-<div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #22282E"><div style="display: flex; flex-direction: column"><strong>Arroz</strong><span style="font-size: 12px; color: #9AA4AD">~1 taza cocida</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600; color: #FFB020">45 g C</span></div>
-<div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #22282E"><div style="display: flex; flex-direction: column"><strong>Ensalada + ½ aguacate</strong><span style="font-size: 12px; color: #9AA4AD">lechuga, tomate, cebolla</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600; color: #B98CFF">12 g G</span></div>
-<div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0"><div style="display: flex; flex-direction: column"><strong>Jugo de mora</strong><span style="font-size: 12px; color: #9AA4AD">1 vaso</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 600; color: #FFB020">? g C</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 4px"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD">LO QUE VE LA IA</span><span style="font-size: 12px; color: #9AA4AD">toca para corregir</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #22282E;"><div style="display: flex; flex-direction: column"><strong>Pollo a la plancha</strong><span style="font-size: 12px; color: #9AA4AD">150 g · 1 pechuga mediana</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 16px; font-weight: 600; white-space: nowrap"><span style="color: #FFB020">0 C</span>&nbsp;&nbsp;<span style="color: #4C9DFF">46 P</span>&nbsp;&nbsp;<span style="color: #B98CFF">5 G</span></span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #22282E;"><div style="display: flex; flex-direction: column"><strong>Arroz blanco</strong><span style="font-size: 12px; color: #9AA4AD">160 g cocido · 1 taza</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 16px; font-weight: 600; white-space: nowrap"><span style="color: #FFB020">45 C</span>&nbsp;&nbsp;<span style="color: #4C9DFF">4 P</span>&nbsp;&nbsp;<span style="color: #B98CFF">0 G</span></span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #22282E;"><div style="display: flex; flex-direction: column"><strong>Ensalada + aguacate</strong><span style="font-size: 12px; color: #9AA4AD">½ aguacate (70 g) · lechuga, tomate</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 16px; font-weight: 600; white-space: nowrap"><span style="color: #FFB020">6 C</span>&nbsp;&nbsp;<span style="color: #4C9DFF">2 P</span>&nbsp;&nbsp;<span style="color: #B98CFF">11 G</span></span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;"><div style="display: flex; flex-direction: column"><strong>Jugo de mora</strong><span style="font-size: 12px; color: #9AA4AD">300 ml · 1 vaso</span></div><span style="font-family: 'Saira Condensed', sans-serif; font-size: 16px; font-weight: 600; white-space: nowrap"><span style="color: #FFB020">30 C</span>&nbsp;&nbsp;<span style="color: #4C9DFF">1 P</span>&nbsp;&nbsp;<span style="color: #B98CFF">0 G</span></span></div>
 </section>
 
 <section style="border-left: 3px solid #FFB020; padding: 2px 0 2px 12px; display: flex; flex-direction: column; gap: 8px">
 <span style="font-weight: 600">No se ve en la foto: ¿el jugo tenía azúcar?</span>
 <div style="display: flex; gap: 8px">
-<button type="button" style="font: inherit; font-weight: 600; flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5">Sí, con azúcar</button>
+<button type="button" style="font: inherit; font-weight: 700; flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #F2F4F5; background: #F2F4F5; color: #0E1113">Sí, con azúcar</button>
 <button type="button" style="font: inherit; font-weight: 600; flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #2A3036; background: #171B1F; color: #F2F4F5">Sin azúcar</button>
 </div>
 </section>
 
-<p style="margin: 0; color: #D5DADE">Con este almuerzo llegas a <strong style="color: #F2F4F5">77 %</strong> de la proteína del día. Te faltan ~35 g: van en la media tarde.</p>
+<section style="display: flex; flex-direction: column; gap: 10px; border-radius: 14px; background: #171B1F; padding: 14px 16px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #9AA4AD">ALMUERZO CONTRA EL OBJETIVO</span><span style="font-family: 'Saira Condensed', sans-serif; font-size: 18px; font-weight: 700">680 <span style="font-size: 13px; color: #9AA4AD">/ 440 kcal</span></span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Saira Condensed', sans-serif; font-size: 22px; font-weight: 700; color: #FFB020">81<span style="font-size: 14px; color: #9AA4AD"> / 57 g</span></span><span style="font-size: 11px; color: #9AA4AD">Carbo · +24 g</span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Saira Condensed', sans-serif; font-size: 22px; font-weight: 700; color: #4C9DFF">53<span style="font-size: 14px; color: #9AA4AD"> / 30 g</span></span><span style="font-size: 11px; color: #9AA4AD">Proteína · +23 g</span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Saira Condensed', sans-serif; font-size: 22px; font-weight: 700; color: #B98CFF">16<span style="font-size: 14px; color: #9AA4AD"> / 10 g</span></span><span style="font-size: 11px; color: #9AA4AD">Grasa · +6 g</span></div>
+</div>
+</section>
+
+<section style="border-left: 3px solid #FF6A1A; padding: 2px 0 2px 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #FF6A1A">TE PASASTE 240 KCAL: ASÍ SE AJUSTA EL RESTO DEL DÍA</span>
+<span><strong>Media tarde 16:00</strong> <span style="color: #9AA4AD">·</span> <span style="color: #FFB020">−10 g C</span>&nbsp;&nbsp;<span style="color: #B98CFF">−3 g G</span><span style="display: block; font-size: 12px; color: #9AA4AD">Yogur griego sin la granola.</span></span>
+<span><strong>Cena 19:00</strong> <span style="color: #9AA4AD">·</span> <span style="color: #FFB020">−20 g C</span>&nbsp;&nbsp;<span style="color: #B98CFF">−4 g G</span><span style="display: block; font-size: 12px; color: #9AA4AD">½ taza de arroz en vez de 1. Mañana es día suave: se puede.</span></span>
+<span style="font-size: 12px; color: #9AA4AD">La proteína no se toca. Se compensa hasta 30 % de lo que queda; el resto se acepta y no pasa a mañana.</span>
+</section>
 
 <a href="Comidas.dc.html" style="display: block; text-align: center; padding: 15px; border-radius: 12px; background: #FF6A1A; color: #0E1113; font-weight: 800; letter-spacing: 0.04em; text-decoration: none">GUARDAR ALMUERZO</a>
-<span style="font-size: 12px; color: #9AA4AD; text-align: center">La estimación por foto puede variar ±20 %.</span>
+<span style="font-size: 12px; color: #9AA4AD; text-align: center">La estimación por foto puede variar ±20 %. Si pesas algo, corrige los gramos y queda exacto.</span>
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":960}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1240}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};
