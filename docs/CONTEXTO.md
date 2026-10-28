@@ -227,3 +227,13 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   "Semana" de 2.4 queda para después. Más › Conexiones muestra si la IA está conectada.
 - Instructivo: `docs/instructivo-etapa3-ia.html` (https://claude.ai/artifact/WFBMXk5cfSBbhNpTfz1KrW).
 - 110 pruebas.
+
+## Pedido para la etapa 3.1 "Mi despensa" (28-oct-2026) — después de cerrar la etapa 3
+
+- Alimentos con marca: foto de la etiqueta una vez (IA lee marca, porción y macros por porción y por 100 g;
+  etiquetas de Ecuador suelen traer solo "por porción"); después se registran por unidad o gramos sin IA.
+- Platos/comidas habituales: combinación de alimentos con gramos; al registrar se elige y se ajusta la cantidad.
+- Carga: desde la app (casilla "Guardar en mi despensa" al registrar con IA) y por el chat (Francisco manda
+  etiquetas y describe sus comidas; Claude las lee y las inserta en la base con el conector, sin costo de IA).
+- En Registrar, "Repetir" pasa a "Mis comidas" con buscador: despensa + platos + recientes.
+- Requiere maqueta aprobada antes de programar.
