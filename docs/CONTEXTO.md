@@ -208,3 +208,22 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Decisión: Francisco actualiza las zonas en Garmin Connect con los valores de TrainingPeaks cuando reactive
   Premium (1-nov). La app sigue tomando el IF de Garmin (calculado con el FTP de Garmin); no se cargan umbrales a mano.
   Los entrenos anteriores conservan el IF con FTP 221.
+
+## Etapa 3 (28-oct-2026): construida, falta llave de Anthropic y prueba de Francisco
+
+- Maqueta 2.3 v2 aprobada: 5 comidas, Foto/Escribir/Repetir ("Del plan" vuelve en la etapa 5), cada alimento en
+  gramos + medida casera, comida contra su objetivo y ajuste del resto del día.
+- Tabla `comidas` (migración `20261028_etapa3_comidas.sql`, aplicada): alimentos en jsonb + totales; RLS propia.
+  La foto NO se guarda.
+- IA: `lib/ia/analizarComida.ts`, SDK `@anthropic-ai/sdk` con `client.beta.messages.parse` + esquema zod
+  (`lib/comidas/alimentos.ts`), modelo `claude-opus-5-5`, effort medium, fallbacks "default" (beta
+  server-side-fallback-2026-07-01). Llave `ANTHROPIC_API_KEY` solo en Vercel (Production y Preview).
+  Costo estimado ~4-5 centavos por foto, ~6-8 USD/mes. Opción más barata: claude-haiku-5-5 (decidir con datos).
+  La foto se achica en el celular a 1280 px JPEG (límite de 1 MB de las acciones del servidor).
+- Ajuste del resto del día: `lib/nutricion/ajuste.ts` (reglas en el encabezado; tope 30 %, proteína nunca baja,
+  cena protegida si mañana es duro, umbral 60 kcal). `lib/datos/planDia.ts` arma el plan para Hoy, Registrar y Comidas.
+- Pantallas: /registrar (FormRegistrar), Hoy con comidas registradas, objetivos ajustados y aviso de la siguiente
+  comida; /comidas (2.4, vista del día: barras, dónde ajustar, últimos 7 días, registros con borrar). Pestaña
+  "Semana" de 2.4 queda para después. Más › Conexiones muestra si la IA está conectada.
+- Instructivo: `docs/instructivo-etapa3-ia.html` (https://claude.ai/artifact/WFBMXk5cfSBbhNpTfz1KrW).
+- 110 pruebas.

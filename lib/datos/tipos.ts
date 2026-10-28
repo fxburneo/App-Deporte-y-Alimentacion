@@ -46,6 +46,30 @@ export interface EntrenoFila {
   carga?: number | null;
 }
 
+export interface AlimentoRegistrado {
+  nombre: string;
+  detalle: string;
+  gramos: number;
+  medida_casera: string;
+  carbo_g: number;
+  proteina_g: number;
+  grasa_g: number;
+}
+
+export interface ComidaFila {
+  id: number;
+  fecha: string;
+  comida: Comida;
+  origen: "foto" | "texto" | "repetida";
+  descripcion: string | null;
+  alimentos: AlimentoRegistrado[];
+  carbo_g: number;
+  proteina_g: number;
+  grasa_g: number;
+  kcal: number;
+  creado_en: string;
+}
+
 export interface PesoFila {
   id: number;
   fecha: string;

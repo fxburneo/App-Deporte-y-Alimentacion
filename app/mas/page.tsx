@@ -18,6 +18,8 @@ export default async function Page() {
   if (!d.perfil) redirect("/bienvenida");
   const p = d.perfil;
   const peso = pesoReferencia(d.pesos, d.fecha);
+  // Solo se mira si la variable existe; la llave nunca sale del servidor.
+  const iaConectada = Boolean(process.env.ANTHROPIC_API_KEY);
 
   return (
     <>
@@ -81,6 +83,15 @@ export default async function Page() {
               )}
             </div>
             <BotonActualizar />
+          </div>
+          <div className="flex items-start gap-3 py-2">
+            <span className={`mt-1.5 h-2 w-2 flex-none rounded-full ${iaConectada ? "bg-bien" : "bg-carbo"}`} />
+            <div className="flex flex-1 flex-col">
+              <strong>IA de Claude · registro de comidas</strong>
+              <span className="text-xs text-tenue">
+                {iaConectada ? "Lee fotos y textos de tus comidas." : "Falta la llave de Anthropic en Vercel (variable ANTHROPIC_API_KEY)."}
+              </span>
+            </div>
           </div>
         </section>
 
