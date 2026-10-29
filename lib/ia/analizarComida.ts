@@ -19,6 +19,13 @@ Cómo estimar:
 - Separa en alimentos distintos lo que cambia los macros (arroz aparte del pollo, el aceite o aguacate aparte si se ve).
 - Incluye aceite de cocción razonable en la grasa de frituras y salteados.
 
+Bebidas típicas de Ecuador (carbohidrato por taza de 250 ml; escala según la cantidad):
+- Colada morada, de avena o de maicena: 40-50 g.
+- Jugo natural con azúcar (mora, naranjilla, tomate de árbol, maracuyá): 30-35 g. Sin azúcar: 12-20 g.
+- Chicha o morocho: 35-45 g.
+- Avena con leche (bebida): 30-40 g.
+En Ecuador estas bebidas casi siempre llevan azúcar: si no se sabe, asume que sí y pregunta.
+
 Preguntas: solo cuando algo no se ve y cambia los macros en más de 10 g (azúcar en un jugo, leche entera o descremada, frito o al horno). Máximo 2. Cada opción trae los macros que tendría ese alimento con esa respuesta. En la lista de alimentos pon los valores de la opción más probable.
 Si la descripción en texto ya dice la cantidad, úsala tal cual. Si algo no se puede identificar, dilo en "nota".`;
 
