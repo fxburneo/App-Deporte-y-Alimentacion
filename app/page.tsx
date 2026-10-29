@@ -198,11 +198,14 @@ export default async function Hoy() {
                     </span>
                   )}
                 </div>
-                {real ? (
-                  <span className="font-display text-lg font-semibold text-bien">{miles(Math.round(kcalDe(real)))}</span>
-                ) : (
-                  <span className="text-xl text-tenue">+</span>
-                )}
+                <span className="flex flex-col items-end leading-tight">
+                  {real ? (
+                    <span className="font-display text-lg font-semibold text-bien">{miles(Math.round(kcalDe(real)))}</span>
+                  ) : (
+                    <span className="font-display text-lg font-semibold text-suave">{miles(kcalDe(meta))}</span>
+                  )}
+                  <span className="text-[11px] text-tenue">{real ? `de ${miles(kcalDe(meta))} kcal` : "kcal · +"}</span>
+                </span>
               </Link>
             );
           })}

@@ -237,3 +237,7 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   etiquetas y describe sus comidas; Claude las lee y las inserta en la base con el conector, sin costo de IA).
 - En Registrar, "Repetir" pasa a "Mis comidas" con buscador: despensa + platos + recientes.
 - Requiere maqueta aprobada antes de programar.
+- (29-oct) Calculadora, también en la 3.1: (a) "Cuánto me sirvo": eliges alimentos y te dice los gramos para cumplir
+  el objetivo de la comida (usa macros por 100 g de la despensa); (b) "Probar antes de comer": como Registrar pero
+  sin guardar, con opción de guardar con un toque. Francisco eligió ambas.
+- (29-oct) Hoy muestra las kcal por comida (objetivo en pendientes; real "de" objetivo en registradas).
