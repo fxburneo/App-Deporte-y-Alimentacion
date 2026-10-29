@@ -77,7 +77,7 @@ export default async function Page() {
               {d.ultimaSync?.ok === false && <span className="text-xs text-mal">Último intento falló: {d.ultimaSync.detalle}</span>}
               {p.garmin_llave_vence && (
                 <span className={`text-xs ${p.garmin_llave_vence <= sumarDias(hoyEcuador(), 30) ? "text-carbo" : "text-tenue"}`}>
-                  La llave vence el {fechaLarga(p.garmin_llave_vence).toLowerCase()}
+                  La llave vence el {fechaLarga(p.garmin_llave_vence).toLowerCase()} de {p.garmin_llave_vence.slice(0, 4)}
                   {p.garmin_llave_vence <= sumarDias(hoyEcuador(), 30) ? ": créala de nuevo en Garmin Connect y cámbiala en Supabase." : "."}
                 </span>
               )}
