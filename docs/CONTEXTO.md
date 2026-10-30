@@ -241,3 +241,11 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   el objetivo de la comida (usa macros por 100 g de la despensa); (b) "Probar antes de comer": como Registrar pero
   sin guardar, con opción de guardar con un toque. Francisco eligió ambas.
 - (29-oct) Hoy muestra las kcal por comida (objetivo en pendientes; real "de" objetivo en registradas).
+- (30-oct) Ajustes en alimentos, no solo en gramos de macro: cuando exista el "menú tipo" (plato habitual asignado
+  a cada comida en la 3.1, o el menú semanal de la etapa 5), el ajuste se traduce al alimento principal de la
+  siguiente comida: proteína -> pollo/huevo/carne/queso; carbohidrato -> arroz/pan/papa/fruta; grasa -> aceite,
+  aguacate, queso. Gramos = diferencia / macro por gramo del alimento (ej. faltan 20 g de proteína -> +65 g de
+  pechuga cocida, 31 g P/100 g). Se mantienen las reglas: tope 30 %, proteína nunca baja, cena protegida.
+  Si la siguiente comida no tiene un alimento de ese tipo, sugerir uno de la despensa. Pedido de Francisco.
+- (30-oct) Repetir: muestra solo la comida elegida (hasta 5 distintas), permite cambiar gramos, quitar, agregar
+  con IA ("Agregar algo distinto") o elegir otra.
