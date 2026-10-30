@@ -30,6 +30,7 @@ export interface PerfilMotor {
   factorActividad: number;
   pausa: boolean;
   horaDesayuno: string; // "HH:MM"
+  deficitDescanso?: number | null; // kcal de déficit en día de descanso elegido por Francisco (null = 450)
 }
 
 export interface ObjetivoDia {
@@ -44,6 +45,7 @@ export interface ObjetivoDia {
   deficitKcal: number;
   extraCenaG: number; // carbohidrato extra en la cena porque mañana es día duro
   snackPreEntreno: boolean; // entreno exigente antes del desayuno
+  vispera: boolean; // mañana es fondo de más de 3 h: hoy sin déficit y carbohidrato moderado
 }
 
 // Rango de carbohidrato (g/kg) y déficit (kcal) por tipo de día. Rangos de
@@ -57,6 +59,23 @@ export const NIVELES: Record<TipoDia, { carbo: [number, number]; deficit: number
   muy_largo: { carbo: [8, 10], deficit: 0 },
 };
 
+// El déficit del día sale del déficit de descanso elegido, en la misma
+// proporción de la tabla: suave 78 %, moderado 56 %, duro 17 %, muy largo 0.
+export const DEFICIT_DESCANSO_BASE = 450;
+export const DEFICIT_DESCANSO_MAX = 750;
+const PROPORCION_DEFICIT: Record<TipoDia, number> = Object.fromEntries(
+  (Object.keys(NIVELES) as TipoDia[]).map((t) => [t, NIVELES[t].deficit / DEFICIT_DESCANSO_BASE])
+) as Record<TipoDia, number>;
+
+export function deficitDelTipo(tipo: TipoDia, deficitDescanso?: number | null): number {
+  const base = Math.min(DEFICIT_DESCANSO_MAX, Math.max(0, deficitDescanso ?? DEFICIT_DESCANSO_BASE));
+  return Math.round(base * PROPORCION_DEFICIT[tipo]);
+}
+
+// Piso de seguridad del carbohidrato (g/kg): si para cumplir el déficit el
+// carbohidrato tiene que bajar del rango, baja hasta aquí y no más
+// (decisión de Francisco, 30-oct: el déficit manda sobre el rango).
+const CARBO_PISO: Record<TipoDia, number> = { descanso: 2, suave: 3, moderado: 4, duro: 5.5, muy_largo: 7 };
 const PROTEINA_G_KG = 2.0;
 const GRASA_MIN_G_KG = 0.6;
 const GRASA_MAX_G_KG = 1.0;
@@ -107,7 +126,8 @@ export function tipoDia(lista: Entreno[]): TipoDia {
   const total = aerobicos.reduce((s, e) => s + e.duracionMin, 0);
   if (total > 180) return "muy_largo";
   if (total >= 120 || aerobicos.some((e) => e.intensidad === "fuerte")) return "duro";
-  if (total >= 60 || aerobicos.some((e) => e.intensidad === "moderado")) return "moderado";
+  // Una hora suave es "liviano" (ACSM 3-5 g/kg): moderado desde 90 min o con intensidad moderada.
+  if (total >= 90 || aerobicos.some((e) => e.intensidad === "moderado")) return "moderado";
   return "suave";
 }
 
@@ -130,11 +150,15 @@ export function objetivoDelDia(args: {
   const reposoKcal = metabolismoReposo(pesoKg, perfil.estaturaCm, perfil.edad, perfil.grasaPct);
   const entrenoKcal = cuentan.reduce((s, e) => s + kcalEntreno(e, pesoKg), 0);
   const gastoKcal = Math.round(reposoKcal * perfil.factorActividad) + entrenoKcal;
-  const deficitMeta = perfil.pausa ? 0 : NIVELES[tipo].deficit * FACTOR_RITMO[perfil.ritmo];
+  // Víspera de un fondo de más de 3 h: hoy no hay déficit y el carbohidrato
+  // sube al menos a nivel moderado, para llegar con el músculo lleno.
+  const vispera = tipoManana === "muy_largo" && tipo !== "duro" && tipo !== "muy_largo";
+  const deficitMeta = perfil.pausa || vispera ? 0 : deficitDelTipo(tipo, perfil.deficitDescanso) * FACTOR_RITMO[perfil.ritmo];
   const kcalMeta = gastoKcal - deficitMeta;
 
   const proteinaG = Math.round(PROTEINA_G_KG * pesoKg);
-  const [carboMin, carboMax] = NIVELES[tipo].carbo.map((x) => x * pesoKg);
+  const nivelCarbo = vispera && (tipo === "descanso" || tipo === "suave") ? "moderado" : tipo;
+  const [carboMin, carboMax] = NIVELES[nivelCarbo].carbo.map((x) => x * pesoKg);
   const grasaMin = GRASA_MIN_G_KG * pesoKg;
   const grasaMax = GRASA_MAX_G_KG * pesoKg;
 
@@ -150,7 +174,9 @@ export function objetivoDelDia(args: {
   let grasa = (kcalMeta - proteinaG * 4 - carbo * 4) / 9;
   if (grasa < grasaMin) {
     grasa = grasaMin;
-    carbo = Math.max(carboMin, (kcalMeta - proteinaG * 4 - grasa * 9) / 4);
+    // En la víspera el carbohidrato no baja del rango aunque quede un pequeño superávit.
+    const piso = vispera ? carboMin : CARBO_PISO[nivelCarbo] * pesoKg;
+    carbo = Math.max(piso, (kcalMeta - proteinaG * 4 - grasa * 9) / 4);
   } else if (grasa > grasaMax) {
     grasa = grasaMax;
     carbo = Math.min(carboMax, (kcalMeta - proteinaG * 4 - grasa * 9) / 4);
@@ -179,6 +205,7 @@ export function objetivoDelDia(args: {
     deficitKcal: Math.max(0, gastoKcal - kcal),
     extraCenaG,
     snackPreEntreno,
+    vispera,
   };
 }
 

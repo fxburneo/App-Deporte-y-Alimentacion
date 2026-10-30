@@ -22,6 +22,7 @@ export interface PerfilFila {
   pausa: boolean;
   pausa_desde: string | null;
   garmin_llave_vence?: string | null;
+  deficit_descanso?: number | null;
 }
 
 export interface SincronizacionFila {
@@ -86,6 +87,7 @@ export function aPerfilMotor(p: PerfilFila, hoy: Date = new Date()): PerfilMotor
     factorActividad: Number(p.factor_actividad),
     pausa: p.pausa,
     horaDesayuno: p.horarios_comida.desayuno,
+    deficitDescanso: p.deficit_descanso ?? null,
   };
 }
 

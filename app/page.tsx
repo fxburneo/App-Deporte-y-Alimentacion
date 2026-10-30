@@ -221,7 +221,11 @@ export default async function Hoy() {
           ) : (
             <p className="text-suave">
               {d.entrenosManana.map((e) => `${NOMBRE_DEPORTE[e.deporte]} ${duracion(e.duracion_min)}`).join(" + ")} · {NOMBRE_TIPO[tipoManana].toLowerCase()}.
-              {obj.extraCenaG > 0 ? " La cena de hoy lleva carbohidrato extra para llegar con energía." : ""}
+              {obj.vispera
+                ? " Hoy es víspera de fondo largo: comes sin déficit y con más carbohidrato. Cena rica en carbohidrato y baja en grasa y fibra (arroz, papa o pasta; poca ensalada)."
+                : obj.extraCenaG > 0
+                  ? " La cena de hoy lleva carbohidrato extra para llegar con energía."
+                  : ""}
             </p>
           )}
         </section>

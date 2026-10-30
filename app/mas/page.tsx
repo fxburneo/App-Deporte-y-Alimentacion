@@ -4,20 +4,33 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Pantalla from "@/components/Pantalla";
-import { leerDatosDia } from "@/lib/datos/dia";
+import { leerDatosDia, leerEntrenos } from "@/lib/datos/dia";
+import { aEntreno, aPerfilMotor } from "@/lib/datos/tipos";
+import { estimarRitmo } from "@/lib/nutricion/estimacion";
+import { DEFICIT_DESCANSO_BASE, DEFICIT_DESCANSO_MAX } from "@/lib/nutricion/motor";
 import { kg } from "@/lib/formato";
 import { pesoReferencia } from "@/lib/nutricion/motor";
 import { edadEnAnios } from "@/lib/perfil/edad";
 import { fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
 import BotonActualizar from "../garmin/BotonActualizar";
 import { signOut } from "../login/actions";
-import { cambiarPausa } from "./actions";
+import { cambiarDeficit, cambiarPausa } from "./actions";
 
 export default async function Page() {
   const d = await leerDatosDia();
   if (!d.perfil) redirect("/bienvenida");
   const p = d.perfil;
   const peso = pesoReferencia(d.pesos, d.fecha);
+  // Ritmo de bajada estimado con los entrenos reales de los últimos 28 días.
+  const deficit = p.deficit_descanso ?? DEFICIT_DESCANSO_BASE;
+  const desde = sumarDias(d.fecha, -28);
+  const entrenos = await leerEntrenos(desde, d.fecha);
+  const dias = Array.from({ length: 29 }, (_, i) => entrenos.filter((e) => e.fecha === sumarDias(desde, i)).map(aEntreno));
+  const motor = aPerfilMotor(p);
+  const estimar = (def: number) =>
+    peso != null ? estimarRitmo({ perfil: { ...motor, deficitDescanso: def }, pesoKg: peso, objetivoKg: Number(p.objetivo_max_kg), dias }) : null;
+  const ritmo = estimar(deficit);
+  const alternativas = [deficit - 100, deficit + 100].filter((v) => v >= 0 && v <= DEFICIT_DESCANSO_MAX).map((v) => ({ v, r: estimar(v) }));
   // Solo se mira si la variable existe; la llave nunca sale del servidor.
   const iaConectada = Boolean(process.env.ANTHROPIC_API_KEY);
 
@@ -44,6 +57,40 @@ export default async function Page() {
             {p.no_incluir.length > 0 ? `Sin ${p.no_incluir.join(", ").toLowerCase()}` : "Sin restricciones"} · {p.ciudad}, {p.altitud_m.toLocaleString("de-DE")} m
           </span>
           <Link href="/peso" className="font-bold">Peso y tendencia ›</Link>
+        </section>
+
+        <section className="flex flex-col gap-2.5 border-t border-linea pt-3.5">
+          <div className="flex flex-col">
+            <strong className="text-base">Déficit en días de descanso</strong>
+            <span className="text-[13px] text-tenue">Los demás días bajan en proporción. Víspera y día del fondo largo van sin déficit.</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <form action={cambiarDeficit}>
+              <input type="hidden" name="deficit" value={deficit - 50} />
+              <button type="submit" aria-label="Menos 50 kcal" disabled={deficit <= 0} className="h-11 w-11 rounded-full border border-borde bg-superficie text-xl disabled:opacity-40">−</button>
+            </form>
+            <span className="flex-1 text-center font-display text-[34px] font-bold leading-none">
+              {deficit} <span className="text-base text-tenue">kcal</span>
+            </span>
+            <form action={cambiarDeficit}>
+              <input type="hidden" name="deficit" value={deficit + 50} />
+              <button type="submit" aria-label="Más 50 kcal" disabled={deficit >= DEFICIT_DESCANSO_MAX} className="h-11 w-11 rounded-full border border-borde bg-superficie text-xl disabled:opacity-40">+</button>
+            </form>
+          </div>
+          {ritmo && (
+            <p className="text-sm text-suave">
+              Con tus entrenos de las últimas 4 semanas: déficit real de <strong>{ritmo.deficitPromedio} kcal/día</strong>, unos{" "}
+              <strong>{kg(ritmo.kgSemana)} kg por semana</strong>
+              {ritmo.semanasAlObjetivo != null
+                ? `. Llegarías a ${Number(p.objetivo_max_kg)} kg en ~${ritmo.semanasAlObjetivo} semanas (${fechaLarga(sumarDias(d.fecha, ritmo.semanasAlObjetivo * 7)).toLowerCase()} de ${sumarDias(d.fecha, ritmo.semanasAlObjetivo * 7).slice(0, 4)}).`
+                : "."}
+            </p>
+          )}
+          {alternativas.length > 0 && (
+            <span className="text-xs text-tenue">
+              {alternativas.map(({ v, r }) => (r ? `Con ${v}: ${kg(r.kgSemana)} kg/sem` : "")).join(" · ")}. El tope es {DEFICIT_DESCANSO_MAX}: la proteína y un mínimo de carbohidrato no se tocan.
+            </span>
+          )}
         </section>
 
         <form action={cambiarPausa} className="flex items-center gap-3.5 border-y border-linea py-3.5">

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  deficitDelTipo,
   kcalEntreno,
   metabolismoReposo,
   objetivoDelDia,
@@ -97,13 +98,43 @@ describe("objetivoDelDia", () => {
     expect(o.deficitKcal).toBeLessThanOrEqual(10);
   });
 
-  it("si mañana es el fondo largo, la cena de hoy sube 0,5 g/kg de carbohidrato", () => {
+  it("si mañana es duro (trail 2 h), la cena de hoy sube 0,5 g/kg y el día sigue con su déficit", () => {
+    const o = objetivoDelDia({
+      perfil: francisco, pesoKg: PESO, entrenosHoy: [],
+      entrenosManana: [{ deporte: "trail_correr", duracionMin: 120, intensidad: "suave", estado: "planificado" }],
+    });
+    expect(o.vispera).toBe(false);
+    expect(o.extraCenaG).toBe(38);
+    expect(o.carboG).toBe(202 + 38);
+  });
+
+  it("víspera del fondo de 4 h: sin déficit y carbohidrato de día moderado (≥ 5 g/kg) más la cena", () => {
     const o = objetivoDelDia({
       perfil: francisco, pesoKg: PESO, entrenosHoy: [],
       entrenosManana: [{ deporte: "ruta_mtb", duracionMin: 240, intensidad: "suave", estado: "planificado" }],
     });
-    expect(o.extraCenaG).toBe(38);
-    expect(o.carboG).toBe(202 + 38);
+    expect(o.vispera).toBe(true);
+    expect(o.deficitKcal).toBeLessThanOrEqual(10);
+    expect(o.carboG).toBeGreaterThanOrEqual(Math.round(5 * PESO) + 38);
+  });
+
+  it("el déficit de descanso elegido cambia el de todos los días en proporción", () => {
+    const suave = [{ deporte: "rodillo" as const, duracionMin: 45, intensidad: "suave" as const, estado: "planificado" as const }];
+    const base = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: suave });
+    const mas = objetivoDelDia({ perfil: { ...francisco, deficitDescanso: 600 }, pesoKg: PESO, entrenosHoy: suave });
+    expect(base.kcal - mas.kcal).toBeGreaterThanOrEqual(100); // suave: 350 -> 467
+    expect(base.kcal - mas.kcal).toBeLessThanOrEqual(130);
+    expect(deficitDelTipo("descanso", 600)).toBe(600);
+    expect(deficitDelTipo("suave", 600)).toBe(467);
+    expect(deficitDelTipo("muy_largo", 600)).toBe(0);
+    expect(deficitDelTipo("descanso", 2000)).toBe(750); // tope de seguridad
+  });
+
+  it("en descanso el piso de macros (proteína 2 g/kg, carbo 2 g/kg, grasa 0,6 g/kg) limita el déficit real", () => {
+    const o = objetivoDelDia({ perfil: { ...francisco, deficitDescanso: 750 }, pesoKg: PESO, entrenosHoy: [] });
+    const piso = Math.round(2 * PESO) * 4 + 2 * PESO * 4 + 0.6 * PESO * 9;
+    expect(o.kcal).toBeGreaterThanOrEqual(Math.floor(piso / 10) * 10);
+    expect(o.deficitKcal).toBeLessThan(750);
   });
 
   it("un trote suave temprano no pide snack previo", () => {
@@ -127,7 +158,7 @@ describe("repartirComidas", () => {
   it("el extra de la cena va solo a la cena", () => {
     const o = objetivoDelDia({
       perfil: francisco, pesoKg: PESO, entrenosHoy: [],
-      entrenosManana: [{ deporte: "ruta_mtb", duracionMin: 240, intensidad: "suave", estado: "planificado" }],
+      entrenosManana: [{ deporte: "trail_correr", duracionMin: 120, intensidad: "suave", estado: "planificado" }],
     });
     const r = repartirComidas(o, false);
     expect(r.cena.carboG).toBe(Math.round(202 * 0.2) + 38);

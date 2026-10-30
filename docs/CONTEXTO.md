@@ -254,3 +254,19 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 
 - Probado por Francisco: texto, foto (cena 29-oct) y Repetir ajustado. PR #4 juntado a main. Llave ANTHROPIC_API_KEY
   en Vercel (Production y Preview).
+
+## Déficit elegible y víspera de fondo largo (30-oct-2026)
+
+- Hallazgo: con la semana real de Francisco el déficit efectivo era ~55 kcal/día (≈0,05 kg/sem) porque 1 h de rodillo
+  suave contaba como "moderado" (5-7 g/kg) y el piso del rango de carbohidrato impedía el déficit.
+- Cambios aprobados: (A) el déficit manda sobre el rango de carbohidrato, con piso de seguridad por tipo de día
+  (descanso 2, suave 3, moderado 4, duro 5,5, muy largo 7 g/kg); (B) "moderado" desde 90 min o intensidad moderada.
+- Déficit elegible: `perfil.deficit_descanso` (0-750, pasos de 50; null = 450). Los demás días en proporción
+  (suave 78 %, moderado 56 %, duro 17 %, muy largo 0). Control en Más con estimación real (`lib/nutricion/estimacion.ts`,
+  últimos 28 días de entrenos, 7.700 kcal/kg) y fecha estimada al objetivo.
+- Víspera de fondo de más de 3 h (mañana "muy largo" y hoy no duro): sin déficit, carbohidrato al menos de día moderado
+  (5-6 g/kg) sin piso reducido, más la cena extra; Hoy muestra la nota de cena baja en grasa y fibra.
+- Pendiente etapa 4 (con TrainingPeaks): carga de carbohidratos por duración del evento: 3-5 h (1 día a 7-8 g/kg +
+  desayuno 1-2 g/kg + 60-90 g/h), 5-12 h (2 días a 8-10 g/kg, 60-90 g/h, sodio 500-1.000 mg/h, sólidos desde h3),
+  24-48 h (2 días a 7-8 g/kg; plan horario ~250-350 kcal/h con comida real, proteína/grasa tras 8-10 h, sodio,
+  cafeína para la noche, entrenar el estómago). Duración desde TP si viene; si no, la app pregunta. Botón manual de respaldo.
