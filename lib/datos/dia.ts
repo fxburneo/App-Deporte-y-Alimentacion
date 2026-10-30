@@ -54,3 +54,10 @@ export async function leerSemana(fecha: string = hoyEcuador()) {
     comidas: (comidas.data ?? []) as ComidaFila[],
   };
 }
+
+// Entrenos de un rango de fechas (para estimar el ritmo de bajada en Más).
+export async function leerEntrenos(desde: string, hasta: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.from("entrenos").select("*").gte("fecha", desde).lte("fecha", hasta);
+  return (data ?? []) as EntrenoFila[];
+}
