@@ -270,3 +270,10 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   desayuno 1-2 g/kg + 60-90 g/h), 5-12 h (2 días a 8-10 g/kg, 60-90 g/h, sodio 500-1.000 mg/h, sólidos desde h3),
   24-48 h (2 días a 7-8 g/kg; plan horario ~250-350 kcal/h con comida real, proteína/grasa tras 8-10 h, sodio,
   cafeína para la noche, entrenar el estómago). Duración desde TP si viene; si no, la app pregunta. Botón manual de respaldo.
+
+## Historial en Hoy (30-oct-2026)
+
+- PR #5 (déficit elegible y víspera) juntado a main tras la prueba de Francisco.
+- Hoy acepta `?fecha=AAAA-MM-DD` (hasta 1 año atrás): flechas ‹ › junto a la fecha; modo solo lectura (sin cargar,
+  borrar, registrar ni actualizar Garmin; sin sección Mañana ni aviso de ajuste) con "Volver a hoy". Recuperación,
+  entrenos, objetivo y comidas de ese día. El objetivo de días pasados se calcula con el déficit configurado hoy.

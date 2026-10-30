@@ -37,7 +37,8 @@ export function planDelDia(args: {
   entrenosManana: EntrenoFila[];
   comidas: ComidaFila[];
 }): PlanDia | null {
-  const pesoKg = pesoReferencia(args.pesos, args.fecha);
+  // Solo pesajes hasta ese día (en el historial no cuentan los posteriores).
+  const pesoKg = pesoReferencia(args.pesos.filter((p) => p.fecha <= args.fecha), args.fecha);
   if (pesoKg == null) return null;
   const perfil = aPerfilMotor(args.perfil);
   const hoy = args.entrenosHoy.map(aEntreno);

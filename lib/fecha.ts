@@ -35,3 +35,10 @@ export function horaEcuador(iso: string): string {
 export function horasDesde(iso: string, ahora: Date = new Date()): number {
   return Math.floor((ahora.getTime() - new Date(iso).getTime()) / 3600000);
 }
+
+// Fecha pedida para el historial de Hoy: válida solo si es anterior a hoy y
+// dentro del último año; si no, hoy.
+export function fechaHistorial(pedida: string | undefined, hoy: string): string {
+  if (!pedida || !/^\d{4}-\d{2}-\d{2}$/.test(pedida)) return hoy;
+  return pedida < hoy && pedida >= sumarDias(hoy, -365) ? pedida : hoy;
+}
