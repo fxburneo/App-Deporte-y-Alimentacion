@@ -249,3 +249,8 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Si la siguiente comida no tiene un alimento de ese tipo, sugerir uno de la despensa. Pedido de Francisco.
 - (30-oct) Repetir: muestra solo la comida elegida (hasta 5 distintas), permite cambiar gramos, quitar, agregar
   con IA ("Agregar algo distinto") o elegir otra.
+
+## Etapa 3 CERRADA (30-oct-2026)
+
+- Probado por Francisco: texto, foto (cena 29-oct) y Repetir ajustado. PR #4 juntado a main. Llave ANTHROPIC_API_KEY
+  en Vercel (Production y Preview).
