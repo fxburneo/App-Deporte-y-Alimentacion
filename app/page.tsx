@@ -1,26 +1,20 @@
 // Pantalla Hoy (maqueta 2.1). Calcula el objetivo del día con el motor a
 // partir del perfil, el peso de referencia y los entrenos de hoy y mañana.
-// La recuperación (sueño, HRV) llega con Garmin en la etapa 2 y el registro
-// de comidas en la etapa 3; mientras tanto se muestra el objetivo.
+// Recuperación desde Garmin (etapa 2) y comidas registradas con el ajuste del
+// resto del día (etapa 3).
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Pantalla from "@/components/Pantalla";
 import { leerDatosDia } from "@/lib/datos/dia";
-import { aEntreno, aPerfilMotor, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
+import { planDelDia } from "@/lib/datos/planDia";
+import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
 import { diaSemana, fechaLarga, horaEcuador, horasDesde } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
-import {
-  COMIDAS,
-  entrenosQueCuentan,
-  NOMBRE_TIPO,
-  objetivoDelDia,
-  pesoReferencia,
-  repartirComidas,
-  tipoDia,
-} from "@/lib/nutricion/motor";
+import { kcalDe } from "@/lib/nutricion/ajuste";
+import { COMIDAS, entrenosQueCuentan, NOMBRE_TIPO, tipoDia } from "@/lib/nutricion/motor";
 import { borrarEntreno } from "./entreno/actions";
 
 const COLOR_TIPO = { descanso: "text-tenue", suave: "text-proteina", moderado: "text-carbo", duro: "text-marca", muy_largo: "text-mal" };
@@ -30,14 +24,13 @@ export default async function Hoy() {
   const d = await leerDatosDia();
   if (!d.perfil) redirect("/bienvenida");
 
-  const pesoKg = pesoReferencia(d.pesos, d.fecha);
-  const perfil = aPerfilMotor(d.perfil);
+  const plan = planDelDia({ ...d, perfil: d.perfil });
   const hoy = d.entrenosHoy.map(aEntreno);
   const manana = d.entrenosManana.map(aEntreno);
 
   const pesaHoy = d.perfil.dias_pesaje.includes(diaSemana(d.fecha)) && !d.pesos.some((p) => p.fecha === d.fecha);
 
-  if (pesoKg == null) {
+  if (plan == null) {
     return (
       <>
         <Pantalla>
@@ -50,12 +43,11 @@ export default async function Hoy() {
     );
   }
 
-  const obj = objetivoDelDia({ perfil, pesoKg, entrenosHoy: hoy, entrenosManana: manana });
+  const { objetivo: obj, temprano, ajuste, consumido, totalConsumido, pesoKg } = plan;
   const cuentan = new Set(entrenosQueCuentan(hoy));
-  const temprano = hoy.some((e) => e.hora != null && e.hora < perfil.horaDesayuno && e.deporte !== "descanso");
-  const reparto = repartirComidas(obj, temprano);
   const tipoManana = tipoDia(manana);
   const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
+  const siguienteCambio = ajuste.siguiente ? ajuste.cambios[ajuste.siguiente] : undefined;
   const bienestarHoy = d.bienestar.find((b) => b.fecha === d.fecha) ?? null;
   const sinDatos = d.ultimaSyncOk == null || horasDesde(d.ultimaSyncOk.inicio) >= 48;
   const filasHoy: { fila: EntrenoFila; cuenta: boolean }[] = d.entrenosHoy.map((fila, i) => ({ fila, cuenta: cuentan.has(hoy[i]) }));
@@ -162,22 +154,62 @@ export default async function Hoy() {
           </section>
         )}
 
+        {siguienteCambio && ajuste.siguiente && (
+          <section className="border-l-[3px] border-marca py-0.5 pl-3">
+            <span className="etiqueta text-marca!">Ajuste · {NOMBRE_COMIDA[ajuste.siguiente].toLowerCase()} {d.perfil.horarios_comida[ajuste.siguiente]}</span>
+            <p className="text-suave">
+              {ajuste.diferenciaKcal > 0 ? "Te pasaste" : "Te faltaron"} {miles(Math.abs(ajuste.diferenciaKcal))} kcal en lo que va del día. La siguiente comida cambia:{" "}
+              <Cambio valor={siguienteCambio.carboG} letra="C" color="text-carbo" />
+              <Cambio valor={siguienteCambio.proteinaG} letra="P" color="text-proteina" />
+              <Cambio valor={siguienteCambio.grasaG} letra="G" color="text-grasa" />.
+            </p>
+          </section>
+        )}
+
         <section className="flex flex-col">
-          <span className="etiqueta pb-1.5">Comidas · objetivo por comida</span>
-          {COMIDAS.map((c) => (
-            <div key={c} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
-              <span className="w-[42px] font-display text-base text-tenue">{d.perfil!.horarios_comida[c]}</span>
-              <div className="flex flex-1 flex-col">
-                <strong>{c === "desayuno" && temprano ? "Desayuno de recuperación" : NOMBRE_COMIDA[c]}</strong>
-                <span className="text-xs text-tenue">
-                  <span className="text-carbo">{reparto[c].carboG} g C</span> · <span className="text-proteina">{reparto[c].proteinaG} g P</span> ·{" "}
-                  <span className="text-grasa">{reparto[c].grasaG} g G</span>
-                  {c === "cena" && obj.extraCenaG > 0 && <span className="text-carbo"> · incluye +{obj.extraCenaG} g por mañana</span>}
+          <div className="flex items-baseline justify-between pb-1.5">
+            <span className="etiqueta">Comidas</span>
+            <Link href="/comidas" className="text-[13px] font-bold">
+              {miles(Math.round(kcalDe(totalConsumido)))} / {miles(obj.kcal)} kcal ›
+            </Link>
+          </div>
+          {COMIDAS.map((c) => {
+            const real = consumido[c];
+            const meta = ajuste.objetivos[c];
+            const cambio = ajuste.cambios[c];
+            return (
+              <Link key={c} href={real ? "/comidas" : `/registrar?comida=${c}`} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
+                <span className="w-[42px] font-display text-base text-tenue">{d.perfil!.horarios_comida[c]}</span>
+                <div className="flex flex-1 flex-col">
+                  <strong>
+                    {c === "desayuno" && temprano ? "Desayuno de recuperación" : NOMBRE_COMIDA[c]}
+                    {cambio && <span className="ml-2 text-[11px] font-bold uppercase text-marca">ajustada</span>}
+                  </strong>
+                  {real ? (
+                    <span className="text-xs text-tenue">
+                      Comiste <span className="text-carbo">{Math.round(real.carboG)} C</span> · <span className="text-proteina">{Math.round(real.proteinaG)} P</span> ·{" "}
+                      <span className="text-grasa">{Math.round(real.grasaG)} G</span> <span>(objetivo {meta.carboG} · {meta.proteinaG} · {meta.grasaG})</span>
+                    </span>
+                  ) : (
+                    <span className="text-xs text-tenue">
+                      <span className="text-carbo">{meta.carboG} g C</span> · <span className="text-proteina">{meta.proteinaG} g P</span> ·{" "}
+                      <span className="text-grasa">{meta.grasaG} g G</span>
+                      {c === "cena" && obj.extraCenaG > 0 && <span className="text-carbo"> · incluye +{obj.extraCenaG} g por mañana</span>}
+                    </span>
+                  )}
+                </div>
+                <span className="flex flex-col items-end leading-tight">
+                  {real ? (
+                    <span className="font-display text-lg font-semibold text-bien">{miles(Math.round(kcalDe(real)))}</span>
+                  ) : (
+                    <span className="font-display text-lg font-semibold text-suave">{miles(kcalDe(meta))}</span>
+                  )}
+                  <span className="text-[11px] text-tenue">{real ? `de ${miles(kcalDe(meta))} kcal` : "kcal · +"}</span>
                 </span>
-              </div>
-            </div>
-          ))}
-          <p className="pt-2 text-xs text-tenue">El menú con platos concretos llega en la etapa 5; el registro de lo que comes, en la etapa 3.</p>
+              </Link>
+            );
+          })}
+          <p className="pt-2 text-xs text-tenue">Toca una comida para registrarla. El menú con platos concretos llega en la etapa 5.</p>
         </section>
 
         <section className="border-l-[3px] border-marca py-0.5 pl-3">
@@ -215,6 +247,11 @@ function Dato({ valor, nombre }: { valor: string; nombre: string }) {
       <span className="text-[11px] uppercase text-tenue">{nombre}</span>
     </div>
   );
+}
+
+function Cambio({ valor, letra, color }: { valor: number; letra: string; color: string }) {
+  if (valor === 0) return null;
+  return <span className={`font-semibold ${color}`}> {valor > 0 ? "+" : ""}{valor} g {letra}</span>;
 }
 
 function Macro({ valor, nombre, color }: { valor: number; nombre: string; color: string }) {

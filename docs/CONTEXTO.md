@@ -197,3 +197,55 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   marca 1759 s en zona 4; rodajes con IF 0,64 caen en zona 3). Por eso la regla usa el IF y solo las zonas 5-7.
   Pedido a Francisco: revisar las zonas de potencia en Garmin Connect.
 - Función temporal `garmin-prueba` neutralizada (responde 410); borrarla desde el panel cuando se pueda.
+
+## Etapa 2 CERRADA (27-oct-2026)
+
+- Francisco probó en la vista previa: recuperación 91 (verde), sueño 7:17 h, HRV 56, FC reposo 51. PR #3 juntado a main.
+- Ojo: el ícono instalado en el celular abre la versión principal (main). Las vistas previas se prueban abriendo
+  el enlace de Vercel en el navegador, no desde el ícono. Avisárselo en cada etapa.
+- Siguiente: etapa 3 (registro de comidas con foto o texto + IA). TrainingPeaks (etapa 4) después del 1-nov.
+- Umbrales: TrainingPeaks no tiene API para usuarios individuales (solo socios); el iCal no trae FTP ni zonas.
+  Decisión: Francisco actualiza las zonas en Garmin Connect con los valores de TrainingPeaks cuando reactive
+  Premium (1-nov). La app sigue tomando el IF de Garmin (calculado con el FTP de Garmin); no se cargan umbrales a mano.
+  Los entrenos anteriores conservan el IF con FTP 221.
+
+## Etapa 3 (28-oct-2026): construida, falta llave de Anthropic y prueba de Francisco
+
+- Maqueta 2.3 v2 aprobada: 5 comidas, Foto/Escribir/Repetir ("Del plan" vuelve en la etapa 5), cada alimento en
+  gramos + medida casera, comida contra su objetivo y ajuste del resto del día.
+- Tabla `comidas` (migración `20261028_etapa3_comidas.sql`, aplicada): alimentos en jsonb + totales; RLS propia.
+  La foto NO se guarda.
+- IA: `lib/ia/analizarComida.ts`, SDK `@anthropic-ai/sdk` con `client.beta.messages.parse` + esquema zod
+  (`lib/comidas/alimentos.ts`), modelo `claude-opus-5-5`, effort medium, fallbacks "default" (beta
+  server-side-fallback-2026-07-01). Llave `ANTHROPIC_API_KEY` solo en Vercel (Production y Preview).
+  Costo estimado ~4-5 centavos por foto, ~6-8 USD/mes. Opción más barata: claude-haiku-5-5 (decidir con datos).
+  La foto se achica en el celular a 1280 px JPEG (límite de 1 MB de las acciones del servidor).
+- Ajuste del resto del día: `lib/nutricion/ajuste.ts` (reglas en el encabezado; tope 30 %, proteína nunca baja,
+  cena protegida si mañana es duro, umbral 60 kcal). `lib/datos/planDia.ts` arma el plan para Hoy, Registrar y Comidas.
+- Pantallas: /registrar (FormRegistrar), Hoy con comidas registradas, objetivos ajustados y aviso de la siguiente
+  comida; /comidas (2.4, vista del día: barras, dónde ajustar, últimos 7 días, registros con borrar). Pestaña
+  "Semana" de 2.4 queda para después. Más › Conexiones muestra si la IA está conectada.
+- Instructivo: `docs/instructivo-etapa3-ia.html` (https://claude.ai/artifact/WFBMXk5cfSBbhNpTfz1KrW).
+- 110 pruebas.
+
+## Pedido para la etapa 3.1 "Mi despensa" (28-oct-2026) — después de cerrar la etapa 3
+
+- Alimentos con marca: foto de la etiqueta una vez (IA lee marca, porción y macros por porción y por 100 g;
+  etiquetas de Ecuador suelen traer solo "por porción"); después se registran por unidad o gramos sin IA.
+- Platos/comidas habituales: combinación de alimentos con gramos; al registrar se elige y se ajusta la cantidad.
+- Carga: desde la app (casilla "Guardar en mi despensa" al registrar con IA) y por el chat (Francisco manda
+  etiquetas y describe sus comidas; Claude las lee y las inserta en la base con el conector, sin costo de IA).
+- En Registrar, "Repetir" pasa a "Mis comidas" con buscador: despensa + platos + recientes.
+- Requiere maqueta aprobada antes de programar.
+- (29-oct) Calculadora, también en la 3.1: (a) "Cuánto me sirvo": eliges alimentos y te dice los gramos para cumplir
+  el objetivo de la comida (usa macros por 100 g de la despensa); (b) "Probar antes de comer": como Registrar pero
+  sin guardar, con opción de guardar con un toque. Francisco eligió ambas.
+- (29-oct) Hoy muestra las kcal por comida (objetivo en pendientes; real "de" objetivo en registradas).
+- (30-oct) Ajustes en alimentos, no solo en gramos de macro: cuando exista el "menú tipo" (plato habitual asignado
+  a cada comida en la 3.1, o el menú semanal de la etapa 5), el ajuste se traduce al alimento principal de la
+  siguiente comida: proteína -> pollo/huevo/carne/queso; carbohidrato -> arroz/pan/papa/fruta; grasa -> aceite,
+  aguacate, queso. Gramos = diferencia / macro por gramo del alimento (ej. faltan 20 g de proteína -> +65 g de
+  pechuga cocida, 31 g P/100 g). Se mantienen las reglas: tope 30 %, proteína nunca baja, cena protegida.
+  Si la siguiente comida no tiene un alimento de ese tipo, sugerir uno de la despensa. Pedido de Francisco.
+- (30-oct) Repetir: muestra solo la comida elegida (hasta 5 distintas), permite cambiar gramos, quitar, agregar
+  con IA ("Agregar algo distinto") o elegir otra.
