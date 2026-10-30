@@ -50,7 +50,10 @@ function dibujar() {
       consumido={{ desayuno: reparto.desayuno, media_manana: reparto.media_manana }}
       mananaExigente={false}
       temprano
-      recientes={[{ comida: "desayuno", fecha: "2026-10-27", alimentos: [almuerzoIA.alimentos[1]], kcal: 196 }]}
+      recientes={[
+        { comida: "desayuno", fecha: "2026-10-27", alimentos: [almuerzoIA.alimentos[1]], kcal: 196 },
+        { comida: "almuerzo", fecha: "2026-10-28", alimentos: [almuerzoIA.alimentos[0]], kcal: 229 },
+      ]}
     />
   );
 }
@@ -103,12 +106,36 @@ describe("FormRegistrar", () => {
     expect((screen.getByLabelText("Qué comiste") as HTMLTextAreaElement).value).toBe("2 huevos");
   });
 
-  it("repetir carga una comida reciente sin llamar a la IA", () => {
+  it("repetir muestra solo la comida elegida y la carga sin llamar a la IA", () => {
     dibujar();
     fireEvent.click(screen.getByRole("tab", { name: /Repetir/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Arroz blanco/ }));
+    // Almuerzo elegido: aparece el almuerzo anterior, no el desayuno
+    expect(screen.queryByRole("button", { name: /Arroz blanco/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Pollo a la plancha/ }));
     expect(analizar).not.toHaveBeenCalled();
     expect(screen.getByText("Lo que vas a repetir")).toBeTruthy();
+  });
+
+  it("al cambiar a Desayuno, Repetir muestra los desayunos", () => {
+    dibujar();
+    fireEvent.click(screen.getByRole("tab", { name: /Repetir/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^Desayuno/ }));
+    expect(screen.getByRole("button", { name: /Arroz blanco/ })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Pollo a la plancha/ })).toBeNull();
+  });
+
+  it("dentro de Repetir se puede agregar algo distinto con la IA", async () => {
+    analizar.mockResolvedValue({
+      ok: true,
+      analisis: { alimentos: [{ nombre: "Banano", detalle: "", gramos: 120, medida_casera: "1 mediano", carbo_g: 27, proteina_g: 1, grasa_g: 0 }], preguntas: [], nota: "" },
+    });
+    dibujar();
+    fireEvent.click(screen.getByRole("tab", { name: /Repetir/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Pollo a la plancha/ }));
+    fireEvent.change(screen.getByLabelText("Agregar algo distinto"), { target: { value: "1 banano" } });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Agregar" })));
+    expect(screen.getByText("Pollo a la plancha")).toBeTruthy();
+    expect(screen.getByText("Banano")).toBeTruthy();
   });
 
   it("corregir los gramos escala los macros", async () => {

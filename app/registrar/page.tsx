@@ -26,15 +26,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
     .select("*")
     .gte("fecha", sumarDias(d.fecha, -30))
     .order("creado_en", { ascending: false })
-    .limit(60);
+    .limit(150);
+  // Hasta 5 registros distintos por comida: Repetir muestra solo los de la comida elegida.
   const vistos = new Set<string>();
+  const porComida = new Map<Comida, number>();
   const recientes: Reciente[] = [];
   for (const f of (data ?? []) as ComidaFila[]) {
-    const clave = f.alimentos.map((a) => `${a.nombre}:${a.gramos}`).join("|");
-    if (!clave || vistos.has(clave)) continue;
+    const clave = f.comida + "|" + f.alimentos.map((a) => `${a.nombre}:${a.gramos}`).join("|");
+    if (vistos.has(clave) || (porComida.get(f.comida) ?? 0) >= 5) continue;
     vistos.add(clave);
+    porComida.set(f.comida, (porComida.get(f.comida) ?? 0) + 1);
     recientes.push({ comida: f.comida, fecha: f.fecha, alimentos: f.alimentos, kcal: f.kcal });
-    if (recientes.length >= 8) break;
   }
 
   return (

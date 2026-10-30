@@ -43,6 +43,7 @@ export default function FormRegistrar(props: {
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [nota, setNota] = useState("");
   const [editando, setEditando] = useState<number | null>(null);
+  const [extra, setExtra] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [analizando, startAnalizar] = useTransition();
   const [guardando, startGuardar] = useTransition();
@@ -81,6 +82,27 @@ export default function FormRegistrar(props: {
     });
   };
 
+  // En Repetir: sumar algo distinto a la comida elegida, leído con la IA.
+  const agregarConIA = () => {
+    if (!alimentos || extra.trim().length < 3) return;
+    setError(null);
+    const fd = new FormData();
+    fd.set("texto", extra);
+    const base = alimentos.length;
+    startAnalizar(async () => {
+      const r = await analizar(fd);
+      if (!r.ok) return setError(r.error);
+      setAlimentos((l) => [...(l ?? []), ...r.analisis.alimentos]);
+      setPreguntas((ps) => [
+        ...ps,
+        ...r.analisis.preguntas
+          .filter((p) => p.alimento >= 0 && p.alimento < r.analisis.alimentos.length && p.opciones.length > 0)
+          .map((p) => ({ ...p, alimento: p.alimento + base })),
+      ]);
+      setExtra("");
+    });
+  };
+
   const responder = (iPregunta: number, iOpcion: number) => {
     const p = preguntas[iPregunta];
     const o = p.opciones[iOpcion];
@@ -90,6 +112,7 @@ export default function FormRegistrar(props: {
     );
   };
 
+  const recientesComida = props.recientes.filter((r) => r.comida === comida);
   const pendientePregunta = new Set(preguntas.map((p, i) => (respuestas[i] == null ? p.alimento : -1)));
   const faltanRespuestas = preguntas.some((_, i) => respuestas[i] == null);
 
@@ -140,7 +163,7 @@ export default function FormRegistrar(props: {
 
       <div className="-mx-[18px] flex gap-1.5 overflow-x-auto px-[18px] pb-0.5">
         {COMIDAS.map((c) => (
-          <button key={c} type="button" aria-pressed={comida === c} onClick={() => setComida(c)} className={`flex-none rounded-full border px-3 py-2 text-[13px] whitespace-nowrap ${chip(comida === c)}`}>
+          <button key={c} type="button" aria-pressed={comida === c} onClick={() => { setComida(c); if (modo === "repetir") limpiar(); }} className={`flex-none rounded-full border px-3 py-2 text-[13px] whitespace-nowrap ${chip(comida === c)}`}>
             {NOMBRE_COMIDA[c]}
             {props.consumido[c] ? " ✓" : ""}
           </button>
@@ -217,11 +240,13 @@ export default function FormRegistrar(props: {
 
       {modo === "repetir" && !alimentos && (
         <section className="flex flex-col">
-          <span className="etiqueta pb-1.5">Comidas recientes</span>
-          {props.recientes.length === 0 ? (
-            <p className="text-sm text-tenue">Todavía no hay comidas guardadas para repetir.</p>
+          <span className="etiqueta pb-1.5">{NOMBRE_COMIDA[comida]} · anteriores</span>
+          {recientesComida.length === 0 ? (
+            <p className="text-sm text-tenue">
+              Todavía no hay registros de {NOMBRE_COMIDA[comida].toLowerCase()} para repetir. La primera vez regístralo con Foto o Escribir.
+            </p>
           ) : (
-            props.recientes.map((r, i) => (
+            recientesComida.map((r, i) => (
               <button
                 key={i}
                 type="button"
@@ -230,7 +255,7 @@ export default function FormRegistrar(props: {
               >
                 <span className="flex flex-col">
                   <strong>{r.alimentos.map((a) => a.nombre).join(", ")}</strong>
-                  <span className="text-xs text-tenue">{NOMBRE_COMIDA[r.comida]} · {r.fecha.slice(8, 10)}/{r.fecha.slice(5, 7)}</span>
+                  <span className="text-xs text-tenue">{r.fecha.slice(8, 10)}/{r.fecha.slice(5, 7)}</span>
                 </span>
                 <span className="font-display text-lg font-semibold">{miles(r.kcal)}</span>
               </button>
@@ -254,7 +279,7 @@ export default function FormRegistrar(props: {
         <section className="flex flex-col">
           <div className="flex items-baseline justify-between pb-1">
             <span className="etiqueta">{modo === "repetir" ? "Lo que vas a repetir" : "Lo que ve la IA"}</span>
-            <span className="text-xs text-tenue">toca para corregir</span>
+            <span className="text-xs text-tenue">toca un alimento para cambiar gramos o quitarlo</span>
           </div>
           {alimentos.map((a, i) => (
             <div key={i} className="border-b border-linea py-2.5 last:border-0">
@@ -302,6 +327,31 @@ export default function FormRegistrar(props: {
             </div>
           ))}
           {nota && <p className="pt-2 text-sm text-tenue">{nota}</p>}
+          {modo === "repetir" && (
+            <div className="flex flex-col gap-2 pt-3">
+              <label htmlFor="extra" className="etiqueta">Agregar algo distinto</label>
+              <div className="flex gap-2">
+                <input
+                  id="extra"
+                  value={extra}
+                  onChange={(e) => setExtra(e.target.value)}
+                  placeholder="Ej.: 1 banano, 1 cucharada de mantequilla de maní"
+                  className="min-w-0 flex-1 rounded-[10px] border border-borde bg-superficie px-3 py-2.5 text-texto placeholder:text-tenue"
+                />
+                <button
+                  type="button"
+                  onClick={agregarConIA}
+                  disabled={analizando || extra.trim().length < 3}
+                  className="rounded-[10px] border border-marca px-3 font-bold text-marca disabled:opacity-40"
+                >
+                  {analizando ? "..." : "Agregar"}
+                </button>
+              </div>
+              <button type="button" onClick={limpiar} className="self-start text-sm text-tenue underline">
+                Elegir otro {NOMBRE_COMIDA[comida].toLowerCase()}
+              </button>
+            </div>
+          )}
         </section>
       )}
 
