@@ -9,7 +9,7 @@ import Pantalla from "@/components/Pantalla";
 import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
-import { diaSemana, fechaLarga, horaEcuador, horasDesde } from "@/lib/fecha";
+import { diaSemana, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
@@ -20,23 +20,34 @@ import { borrarEntreno } from "./entreno/actions";
 const COLOR_TIPO = { descanso: "text-tenue", suave: "text-proteina", moderado: "text-carbo", duro: "text-marca", muy_largo: "text-mal" };
 const INTENSIDAD = { suave: "Suave", moderado: "Moderado", fuerte: "Fuerte" };
 
-export default async function Hoy() {
-  const d = await leerDatosDia();
+export default async function Hoy({ searchParams }: { searchParams: Promise<{ fecha?: string }> }) {
+  // Historial: ?fecha=AAAA-MM-DD muestra un día anterior en modo solo lectura.
+  const hoyEc = hoyEcuador();
+  const pedida = (await searchParams).fecha;
+  const fecha = fechaHistorial(pedida, hoyEc);
+  const esHoy = fecha === hoyEc;
+  const d = await leerDatosDia(fecha);
   if (!d.perfil) redirect("/bienvenida");
 
   const plan = planDelDia({ ...d, perfil: d.perfil });
   const hoy = d.entrenosHoy.map(aEntreno);
   const manana = d.entrenosManana.map(aEntreno);
 
-  const pesaHoy = d.perfil.dias_pesaje.includes(diaSemana(d.fecha)) && !d.pesos.some((p) => p.fecha === d.fecha);
+  const pesaHoy = esHoy && d.perfil.dias_pesaje.includes(diaSemana(d.fecha)) && !d.pesos.some((p) => p.fecha === d.fecha);
 
   if (plan == null) {
     return (
       <>
         <Pantalla>
-          <Encabezado fecha={d.fecha} />
-          <p className="text-suave">Para calcular tu día necesito tu peso.</p>
-          <Link href="/peso" className="rounded-xl bg-marca py-4 text-center font-extrabold text-fondo">CARGAR PESO</Link>
+          <Encabezado fecha={d.fecha} esHoy={esHoy} />
+          {esHoy ? (
+            <>
+              <p className="text-suave">Para calcular tu día necesito tu peso.</p>
+              <Link href="/peso" className="rounded-xl bg-marca py-4 text-center font-extrabold text-fondo">CARGAR PESO</Link>
+            </>
+          ) : (
+            <p className="text-suave">No hay datos de ese día: todavía no tenías un peso registrado.</p>
+          )}
         </Pantalla>
         <NavBar activa="hoy" />
       </>
@@ -49,15 +60,22 @@ export default async function Hoy() {
   const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
   const siguienteCambio = ajuste.siguiente ? ajuste.cambios[ajuste.siguiente] : undefined;
   const bienestarHoy = d.bienestar.find((b) => b.fecha === d.fecha) ?? null;
-  const sinDatos = d.ultimaSyncOk == null || horasDesde(d.ultimaSyncOk.inicio) >= 48;
+  const sinDatos = esHoy && (d.ultimaSyncOk == null || horasDesde(d.ultimaSyncOk.inicio) >= 48);
   const filasHoy: { fila: EntrenoFila; cuenta: boolean }[] = d.entrenosHoy.map((fila, i) => ({ fila, cuenta: cuentan.has(hoy[i]) }));
 
   return (
     <>
       <Pantalla>
-        <Encabezado fecha={d.fecha} />
+        <Encabezado fecha={d.fecha} esHoy={esHoy} />
 
-        {d.perfil.pausa && (
+        {!esHoy && (
+          <section className="flex items-center justify-between rounded-[14px] border border-borde px-3.5 py-2.5">
+            <span className="text-sm text-suave">Historial: así quedó ese día. Solo lectura.</span>
+            <Link href="/" className="text-sm font-bold text-marca">Volver a hoy</Link>
+          </section>
+        )}
+
+        {esHoy && d.perfil.pausa && (
           <section className="rounded-[14px] border border-[#4a2a16] bg-[#1f1712] px-3.5 py-3">
             <span className="etiqueta text-marca!">Modo pausa activo</span>
             <p className="text-[#e6e9eb]">Comes a mantenimiento, sin déficit. Desactívalo en Más cuando vuelvas.</p>
@@ -78,6 +96,7 @@ export default async function Hoy() {
           r={recuperacion}
           bienestar={bienestarHoy}
           ultima={d.ultimaSyncOk ? horaEcuador(d.ultimaSyncOk.inicio) : null}
+          esHoy={esHoy}
         />
 
         {pesaHoy && (
@@ -89,12 +108,12 @@ export default async function Hoy() {
 
         <section className="flex flex-col gap-2.5">
           <div className="flex items-baseline justify-between">
-            <span className="etiqueta">Entreno de hoy</span>
-            <Link href="/entreno/nuevo?dia=hoy" className="text-[13px] font-bold">+ Cargar</Link>
+            <span className="etiqueta">{esHoy ? "Entreno de hoy" : "Entreno"}</span>
+            {esHoy && <Link href="/entreno/nuevo?dia=hoy" className="text-[13px] font-bold">+ Cargar</Link>}
           </div>
           {filasHoy.length === 0 ? (
             <div className="rounded-[14px] bg-superficie px-4 py-3.5 text-suave">
-              Sin entreno todavía: hoy cuenta como descanso. Lo que hagas con el reloj llega solo desde Garmin.
+              {esHoy ? "Sin entreno todavía: hoy cuenta como descanso. Lo que hagas con el reloj llega solo desde Garmin." : "Sin entreno ese día: contó como descanso."}
             </div>
           ) : (
             filasHoy.map(({ fila, cuenta }) => (
@@ -109,7 +128,7 @@ export default async function Hoy() {
                   <Dato valor={duracion(fila.duracion_min)} nombre="Duración" />
                   <Dato valor={INTENSIDAD[fila.intensidad]} nombre="Intensidad" />
                   {fila.kcal != null && <Dato valor={miles(fila.kcal)} nombre="Kcal reloj" />}
-                  {fila.origen === "manual" && (
+                  {esHoy && fila.origen === "manual" && (
                     <form action={borrarEntreno} className="ml-auto">
                       <input type="hidden" name="id" value={fila.id} />
                       <button type="submit" className="py-1 text-xs text-tenue underline">Borrar</button>
@@ -120,7 +139,7 @@ export default async function Hoy() {
               </div>
             ))
           )}
-          {filasHoy.some(({ fila }) => fila.estado === "planificado") && !filasHoy.some(({ fila }) => fila.estado === "hecho") && (
+          {esHoy && filasHoy.some(({ fila }) => fila.estado === "planificado") && !filasHoy.some(({ fila }) => fila.estado === "hecho") && (
             <Link href="/entreno/nuevo?dia=hoy&estado=hecho" className="text-sm font-bold">
               ¿Ya entrenaste? Carga lo que hiciste y el plan se ajusta ›
             </Link>
@@ -154,7 +173,7 @@ export default async function Hoy() {
           </section>
         )}
 
-        {siguienteCambio && ajuste.siguiente && (
+        {esHoy && siguienteCambio && ajuste.siguiente && (
           <section className="border-l-[3px] border-marca py-0.5 pl-3">
             <span className="etiqueta text-marca!">Ajuste · {NOMBRE_COMIDA[ajuste.siguiente].toLowerCase()} {d.perfil.horarios_comida[ajuste.siguiente]}</span>
             <p className="text-suave">
@@ -169,16 +188,22 @@ export default async function Hoy() {
         <section className="flex flex-col">
           <div className="flex items-baseline justify-between pb-1.5">
             <span className="etiqueta">Comidas</span>
-            <Link href="/comidas" className="text-[13px] font-bold">
-              {miles(Math.round(kcalDe(totalConsumido)))} / {miles(obj.kcal)} kcal ›
-            </Link>
+            {esHoy ? (
+              <Link href="/comidas" className="text-[13px] font-bold">
+                {miles(Math.round(kcalDe(totalConsumido)))} / {miles(obj.kcal)} kcal ›
+              </Link>
+            ) : (
+              <span className="text-[13px] font-bold">
+                {miles(Math.round(kcalDe(totalConsumido)))} / {miles(obj.kcal)} kcal
+              </span>
+            )}
           </div>
           {COMIDAS.map((c) => {
             const real = consumido[c];
             const meta = ajuste.objetivos[c];
             const cambio = ajuste.cambios[c];
             return (
-              <Link key={c} href={real ? "/comidas" : `/registrar?comida=${c}`} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
+              <Enlace key={c} href={esHoy ? (real ? "/comidas" : `/registrar?comida=${c}`) : null} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
                 <span className="w-[42px] font-display text-base text-tenue">{d.perfil!.horarios_comida[c]}</span>
                 <div className="flex flex-1 flex-col">
                   <strong>
@@ -204,14 +229,15 @@ export default async function Hoy() {
                   ) : (
                     <span className="font-display text-lg font-semibold text-suave">{miles(kcalDe(meta))}</span>
                   )}
-                  <span className="text-[11px] text-tenue">{real ? `de ${miles(kcalDe(meta))} kcal` : "kcal · +"}</span>
+                  <span className="text-[11px] text-tenue">{real ? `de ${miles(kcalDe(meta))} kcal` : esHoy ? "kcal · +" : "sin registro"}</span>
                 </span>
-              </Link>
+              </Enlace>
             );
           })}
-          <p className="pt-2 text-xs text-tenue">Toca una comida para registrarla. El menú con platos concretos llega en la etapa 5.</p>
+          {esHoy && <p className="pt-2 text-xs text-tenue">Toca una comida para registrarla. El menú con platos concretos llega en la etapa 5.</p>}
         </section>
 
+        {esHoy && (
         <section className="border-l-[3px] border-marca py-0.5 pl-3">
           <span className="etiqueta text-marca!">Mañana</span>
           {manana.length === 0 ? (
@@ -229,19 +255,34 @@ export default async function Hoy() {
             </p>
           )}
         </section>
+        )}
       </Pantalla>
       <NavBar activa="hoy" />
     </>
   );
 }
 
-function Encabezado({ fecha }: { fecha: string }) {
+function Encabezado({ fecha, esHoy }: { fecha: string; esHoy: boolean }) {
+  const flecha = "flex h-9 w-9 items-center justify-center rounded-full border border-borde text-lg";
   return (
-    <header className="flex items-center justify-between">
-      <span className="font-display text-[17px] font-extrabold tracking-[0.12em] text-marca">FXB PERFORMANCE</span>
-      <span className="text-[13px] text-tenue">{fechaLarga(fecha)}</span>
+    <header className="flex flex-wrap items-center justify-between gap-y-2">
+      <span className="font-display text-[16px] font-extrabold tracking-[0.1em] text-marca">FXB PERFORMANCE</span>
+      <nav aria-label="Cambiar de día" className="flex items-center gap-2">
+        <Link href={`/?fecha=${sumarDias(fecha, -1)}`} aria-label="Día anterior" className={flecha}>‹</Link>
+        <span className="min-w-[92px] text-center text-[13px] text-tenue">{esHoy ? `Hoy · ${fechaLarga(fecha).split(" ").slice(1).join(" ")}` : fechaLarga(fecha)}</span>
+        {esHoy ? (
+          <span aria-hidden="true" className={`${flecha} opacity-30`}>›</span>
+        ) : (
+          <Link href={sumarDias(fecha, 1) >= hoyEcuador() ? "/" : `/?fecha=${sumarDias(fecha, 1)}`} aria-label="Día siguiente" className={flecha}>›</Link>
+        )}
+      </nav>
     </header>
   );
+}
+
+// Fila que es enlace solo cuando hay adónde ir (en el historial no se registra).
+function Enlace({ href, className, children }: { href: string | null; className: string; children: React.ReactNode }) {
+  return href ? <Link href={href} className={className}>{children}</Link> : <div className={className}>{children}</div>;
 }
 
 function Dato({ valor, nombre }: { valor: string; nombre: string }) {
@@ -270,7 +311,7 @@ function Macro({ valor, nombre, color }: { valor: number; nombre: string; color:
 
 const COLOR_NIVEL = { listo: "#3ddc84", cuidado: "#ffb020", descansa: "#ff5a5f" };
 
-function BloqueRecuperacion({ r, bienestar, ultima }: { r: Recuperacion | null; bienestar: { sueno_seg: number | null; hrv_noche: number | null; fc_reposo: number | null } | null; ultima: string | null }) {
+function BloqueRecuperacion({ r, bienestar, ultima, esHoy }: { r: Recuperacion | null; bienestar: { sueno_seg: number | null; hrv_noche: number | null; fc_reposo: number | null } | null; ultima: string | null; esHoy: boolean }) {
   const sueno = bienestar?.sueno_seg != null ? duracion(Math.round(bienestar.sueno_seg / 60)) + " h" : "—";
   const circ = 2 * Math.PI * 56;
   return (
@@ -300,12 +341,14 @@ function BloqueRecuperacion({ r, bienestar, ultima }: { r: Recuperacion | null; 
           <strong style={{ color: COLOR_NIVEL[r.nivel] }}>{ETIQUETA_NIVEL[r.nivel]}.</strong> {r.mensaje.replace(/^[^:.]*[:.]\s*/, "")}
         </p>
       ) : (
-        <p className="text-[15px] text-suave">Tu noche todavía no llega: el reloj la envía cuando sincroniza con el celular al despertar.</p>
+        <p className="text-[15px] text-suave">{esHoy ? "Tu noche todavía no llega: el reloj la envía cuando sincroniza con el celular al despertar." : "No hay datos de sueño de ese día."}</p>
       )}
-      <div className="flex items-center justify-between text-xs text-tenue">
-        <span>{ultima ? `Garmin · actualizado ${ultima}` : "Garmin · sin sincronizar"}</span>
-        <BotonActualizar />
-      </div>
+      {esHoy && (
+        <div className="flex items-center justify-between text-xs text-tenue">
+          <span>{ultima ? `Garmin · actualizado ${ultima}` : "Garmin · sin sincronizar"}</span>
+          <BotonActualizar />
+        </div>
+      )}
     </section>
   );
 }
