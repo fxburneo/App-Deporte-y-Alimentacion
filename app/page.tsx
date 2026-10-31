@@ -8,6 +8,8 @@ import NavBar from "@/components/NavBar";
 import Pantalla from "@/components/Pantalla";
 import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
+import { leerDespensa } from "@/lib/datos/despensa";
+import { ajusteEnAlimentos } from "@/lib/despensa/calculos";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
 import { diaSemana, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
@@ -59,6 +61,10 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
   const tipoManana = tipoDia(manana);
   const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
   const siguienteCambio = ajuste.siguiente ? ajuste.cambios[ajuste.siguiente] : undefined;
+  // Menú tipo: el plato habitual de cada comida (Mi despensa › Platos).
+  const menuTipo = esHoy ? Object.fromEntries((await leerDespensa()).platos.filter((p) => p.menu_tipo).map((p) => [p.menu_tipo!, p])) : {};
+  const platoSiguiente = ajuste.siguiente ? menuTipo[ajuste.siguiente] : undefined;
+  const enAlimentos = platoSiguiente && siguienteCambio ? ajusteEnAlimentos(platoSiguiente.alimentos, siguienteCambio) : null;
   const bienestarHoy = d.bienestar.find((b) => b.fecha === d.fecha) ?? null;
   const sinDatos = esHoy && (d.ultimaSyncOk == null || horasDesde(d.ultimaSyncOk.inicio) >= 48);
   const filasHoy: { fila: EntrenoFila; cuenta: boolean }[] = d.entrenosHoy.map((fila, i) => ({ fila, cuenta: cuentan.has(hoy[i]) }));
@@ -182,6 +188,19 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               <Cambio valor={siguienteCambio.proteinaG} letra="P" color="text-proteina" />
               <Cambio valor={siguienteCambio.grasaG} letra="G" color="text-grasa" />.
             </p>
+            {enAlimentos && enAlimentos.cambios.length > 0 && (
+              <div className="mt-1.5 flex flex-col gap-0.5 font-display text-[17px] font-semibold">
+                <span className="font-sans text-xs font-normal text-tenue">Tu {platoSiguiente!.nombre.toLowerCase()} queda así:</span>
+                {enAlimentos.cambios.map((c) => (
+                  <span key={c.nombre}>
+                    {c.nombre} {c.antesG} → <strong>{c.despuesG} g</strong> <span className="text-[13px] text-tenue">({c.despuesG > c.antesG ? "+" : ""}{c.despuesG - c.antesG} g · {c.medida})</span>
+                  </span>
+                ))}
+              </div>
+            )}
+            {enAlimentos && enAlimentos.sinAlimento.includes("proteinaG") && (
+              <p className="mt-1 text-sm text-suave">Tu menú tipo no tiene un alimento con proteína: suma un yogur griego o 2 huevos.</p>
+            )}
           </section>
         )}
 
@@ -220,6 +239,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                       <span className="text-carbo">{meta.carboG} g C</span> · <span className="text-proteina">{meta.proteinaG} g P</span> ·{" "}
                       <span className="text-grasa">{meta.grasaG} g G</span>
                       {c === "cena" && obj.extraCenaG > 0 && <span className="text-carbo"> · incluye +{obj.extraCenaG} g por mañana</span>}
+                      {menuTipo[c] && <span className="block">{menuTipo[c].nombre}: {menuTipo[c].alimentos.map((a) => a.nombre).join(", ")}</span>}
                     </span>
                   )}
                 </div>
