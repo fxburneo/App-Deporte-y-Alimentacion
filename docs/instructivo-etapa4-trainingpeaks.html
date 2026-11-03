@@ -1,0 +1,92 @@
+<title>Instructivo TrainingPeaks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una columna de lectura de 680px; cada parte es un bloque con pasos numerados (el orden importa). Tema único oscuro, el de la app. */
+:root{
+  --bg:#0E1113; --surface:#171B1F; --line:#22282E; --border:#2A3036;
+  --fg:#F2F4F5; --soft:#D5DADE; --muted:#9AA4AD; --accent:#FF6A1A; --ok:#3DDC84; --warn:#FFB020;
+  --display:"Saira Condensed","Arial Narrow",sans-serif;
+  --body:"Archivo",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,8vw,52px);font-weight:700}
+h2{font-size:28px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 small{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
+p{margin:0}
+.brand{font-family:var(--display);font-weight:800;letter-spacing:.12em;color:var(--accent);font-size:16px}
+.lead{color:var(--soft);font-size:17px;max-width:60ch}
+section{display:flex;flex-direction:column;gap:16px}
+ol{margin:0;padding:0;list-style:none;counter-reset:paso;display:flex;flex-direction:column}
+ol>li{counter-increment:paso;display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+ol>li::before{content:counter(paso);font-family:var(--display);font-size:24px;font-weight:700;color:var(--accent);line-height:1.1}
+ol>li>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;color:var(--soft)}
+b{color:var(--fg)}
+.ui{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0 7px;font-weight:600;font-size:14px;white-space:nowrap}
+code,.code{font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1px 6px;word-break:break-all}
+.why{font-size:14px;color:var(--muted)}
+.note{border-left:3px solid var(--warn);padding:2px 0 2px 12px;color:var(--soft);font-size:15px}
+.note.ok{border-color:var(--ok)}
+.vars{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.vars div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.vars div:first-child{border-top:0;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.1em}
+.copy{font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:99px;padding:2px 10px;margin-left:6px;cursor:pointer}
+.copy:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+a{color:var(--accent)}
+footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header style="display:flex;flex-direction:column;gap:12px">
+  <span class="brand">FXB PERFORMANCE</span>
+  <h1>Etapa 4: el plan de tu coach desde TrainingPeaks</h1>
+  <p class="lead">Con Premium, TrainingPeaks te da un enlace privado de calendario (iCal) con los entrenos que te planifica tu coach. La app lo lee varias veces al día y calcula tu nutrición con anticipación: carbohidrato de la víspera, días duros y eventos. Son 2 partes y unos 5 minutos, en el computador.</p>
+</header>
+
+<section>
+  <h2>Parte 1 · Copiar el enlace del calendario <small>~3 min</small></h2>
+  <ol>
+    <li><div><p>Entra a <a href="https://app.trainingpeaks.com">app.trainingpeaks.com</a> con tu cuenta.</p></div></li>
+    <li><div><p>Arriba a la derecha toca tu nombre o tu foto y elige <span class="ui">Settings</span> (Configuración).</p></div></li>
+    <li><div><p>En el menú de la izquierda busca <span class="ui">Calendars</span> o <span class="ui">Calendar Sync</span>, y dentro la sección <b>iCal Calendar Feeds</b>.</p><p class="why">Esta opción solo aparece con Premium. Si no la ves, revisa que la suscripción ya esté activa.</p></div></li>
+    <li><div><p>Copia el enlace de <b>Workouts</b> (entrenamientos). Empieza con <code>webcal://</code> o <code>https://</code> y termina en <code>.ics</code>.</p><p class="note">Ese enlace es privado: quien lo tenga ve tu calendario. <b>No me lo mandes por el chat.</b></p></div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Parte 2 · Guardarlo en Supabase <small>~2 min</small></h2>
+  <ol>
+    <li><div><p>Entra a <a href="https://supabase.com/dashboard">supabase.com/dashboard</a> › proyecto <b>FXB Performance</b> › <span class="ui">Edge Functions</span> › <span class="ui">Secrets</span>. Es el mismo lugar donde guardaste la llave de Garmin.</p></div></li>
+    <li><div>
+      <p>Agrega un secreto nuevo:</p>
+      <div class="vars">
+        <div><span>NAME</span><span>VALUE</span></div>
+        <div><span><code>TP_ICAL_URL</code> <button class="copy" data-copy="TP_ICAL_URL">Copiar</button></span><span>el enlace que copiaste</span></div>
+      </div>
+    </div></li>
+    <li><div><p>Pulsa <span class="ui">Save</span> y avísame. Hago la primera lectura y te muestro qué entrenos llegaron.</p></div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Qué hace la app con el plan</h2>
+  <ul>
+    <li>Carga los entrenos planificados de los próximos días como "plan": deporte, duración y la intensidad que se deduce del título y la descripción del coach.</li>
+    <li>Cuando el reloj registra el entreno real, lo hecho reemplaza al plan, igual que hoy.</li>
+    <li>Si detecta una carrera o evento, te pregunta cuántas horas estimas y arma la carga de carbohidratos según la duración.</li>
+    <li>Solo lee: no cambia nada en TrainingPeaks.</li>
+  </ul>
+</section>
+
+<footer>FXB Performance · instructivo de la etapa 4 · el enlace vive solo en Supabase, nunca en el código.</footer>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(b.dataset.copy);b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar',1500)}catch{}}));
+</script>

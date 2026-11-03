@@ -293,3 +293,11 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Comidas con "Guardar como plato" y "Editar", Hoy con ajuste en gramos del menú tipo.
 - Registros desde Mis comidas y calculadora se guardan con origen 'repetida' (la restricción de la tabla no tiene
   otros valores; cambiarla requiere una migración que borra la restricción).
+
+## Etapa 3.1 CERRADA y etapa 4 iniciada (3-nov-2026)
+
+- PR #7 juntado a main sin prueba previa en la vista previa, por decisión de Francisco (la prueba en el ícono).
+- Pan tostado Naturales Grilé cargado por el chat (25 g = 4 rebanadas: 19 C, 3 P, 2 G).
+- TrainingPeaks Premium activo. Instructivo `docs/instructivo-etapa4-trainingpeaks.html`
+  (https://claude.ai/artifact/G9msNZtUwcr6wqRTNxwD62): enlace iCal "Workouts" como secreto de Supabase `TP_ICAL_URL`.
+  Pendiente: Edge Function de lectura del iCal, maqueta de eventos (pregunta de duración) y carga de carbohidratos.
