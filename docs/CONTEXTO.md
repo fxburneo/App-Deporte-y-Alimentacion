@@ -277,3 +277,19 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Hoy acepta `?fecha=AAAA-MM-DD` (hasta 1 año atrás): flechas ‹ › junto a la fecha; modo solo lectura (sin cargar,
   borrar, registrar ni actualizar Garmin; sin sección Mañana ni aviso de ajuste) con "Volver a hoy". Recuperación,
   entrenos, objetivo y comidas de ese día. El objetivo de días pasados se calcula con el déficit configurado hoy.
+
+## Etapa 3.1 (31-oct-2026): construida, falta prueba de Francisco
+
+- Historial (PR #6) juntado a main.
+- Tablas `despensa_alimentos` (macros por 100 g, porción, unidad, categoría proteina/carbo/grasa/mixto/libre, origen)
+  y `despensa_platos` (alimentos jsonb, `menu_tipo` único por comida). Migración `20261031_etapa31_despensa.sql`.
+  Cargados 18 genéricos (USDA) para Francisco: pollo, res, huevo, queso fresco, yogur griego, leche descremada, arroz,
+  papa, pan blanco/integral, avena, fideo, banano, papaya, aguacate, aceite, mantequilla de maní, ensalada (libre).
+- `lib/despensa/calculos.ts`: categoría por calorías dominantes (proteína con umbral menor), medida casera en unidades,
+  calculadora `calcularPlato` (carbo -> proteína -> grasa, dos pasadas, de 5 en 5 g), `ajusteEnAlimentos`.
+- IA: `lib/ia/claude.ts` (llamada común) y `lib/ia/leerEtiqueta.ts` (etiqueta una sola vez).
+- Pantallas: /despensa (alimentos, platos, menú tipo), /despensa/nuevo (foto de etiqueta o a mano), Registrar con
+  "Mis comidas" (despensa + platos + recientes, cantidad por unidades), /calculadora, /comidas/[id]/editar,
+  Comidas con "Guardar como plato" y "Editar", Hoy con ajuste en gramos del menú tipo.
+- Registros desde Mis comidas y calculadora se guardan con origen 'repetida' (la restricción de la tabla no tiene
+  otros valores; cambiarla requiere una migración que borra la restricción).

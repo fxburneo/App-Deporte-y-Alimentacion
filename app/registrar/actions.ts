@@ -81,3 +81,18 @@ export async function borrarComida(fd: FormData) {
   await supabase.from("comidas").delete().eq("id", id);
   revalidatePath("/", "layout");
 }
+
+// Editar un registro guardado: reemplaza sus alimentos y recalcula totales.
+export async function editarComida(id: number, alimentos: unknown): Promise<ResultadoGuardar> {
+  const p = z.array(AlimentoSchema).min(1).max(30).safeParse(alimentos);
+  if (!Number.isInteger(id) || !p.success || !p.data.every(alimentoValido)) return { ok: false, error: "Revisa los alimentos: hay un valor fuera de rango." };
+  const supabase = await createClient();
+  const t = totales(p.data);
+  const { error } = await supabase
+    .from("comidas")
+    .update({ alimentos: p.data, carbo_g: t.carboG, proteina_g: t.proteinaG, grasa_g: t.grasaG, kcal: t.kcal })
+    .eq("id", id);
+  if (error) return { ok: false, error: "No se pudo guardar el cambio." };
+  revalidatePath("/", "layout");
+  return { ok: true };
+}

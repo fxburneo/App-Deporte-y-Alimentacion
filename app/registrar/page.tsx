@@ -8,6 +8,7 @@ import { horaEcuador, sumarDias } from "@/lib/fecha";
 import { comidaQueToca } from "@/lib/comidas/queToca";
 import { COMIDAS, type Comida } from "@/lib/nutricion/motor";
 import { createClient } from "@/lib/supabase/server";
+import { leerDespensa } from "@/lib/datos/despensa";
 import FormRegistrar, { type Reciente } from "./FormRegistrar";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string }> }) {
@@ -39,8 +40,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
     recientes.push({ comida: f.comida, fecha: f.fecha, alimentos: f.alimentos, kcal: f.kcal });
   }
 
+  const { alimentos: despensa, platos } = await leerDespensa();
+
   return (
     <FormRegistrar
+      despensa={despensa}
+      platos={platos}
       inicial={inicial}
       horarios={d.perfil.horarios_comida}
       reparto={plan.reparto}

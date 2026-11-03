@@ -13,6 +13,7 @@ import { dondeAjustar, porcentajeDelObjetivo } from "@/lib/comidas/resumen";
 import { kcalDe } from "@/lib/nutricion/ajuste";
 import { COMIDAS, NOMBRE_TIPO } from "@/lib/nutricion/motor";
 import { borrarComida } from "../registrar/actions";
+import { guardarRegistroComoPlato } from "../despensa/actions";
 
 const NUTRIENTE = {
   carbo: { nombre: "Carbohidrato", color: "text-carbo" },
@@ -62,6 +63,11 @@ export default async function Comidas() {
           </div>
           <Link href="/registrar" className="pb-1 font-bold text-marca">+ Registrar</Link>
         </header>
+
+        <nav className="grid grid-cols-2 gap-2.5">
+          <Link href="/despensa" className="rounded-[12px] border border-borde px-3 py-2.5 text-center font-semibold">Mi despensa ›</Link>
+          <Link href="/calculadora" className="rounded-[12px] border border-borde px-3 py-2.5 text-center font-semibold">¿Cuánto me sirvo? ›</Link>
+        </nav>
 
         <section className="flex flex-col gap-3">
           <div className="flex items-baseline gap-2">
@@ -140,10 +146,21 @@ export default async function Comidas() {
                     </li>
                   ))}
                 </ul>
-                <form action={borrarComida} className="mt-2 text-right">
-                  <input type="hidden" name="id" value={r.id} />
-                  <button type="submit" className="text-xs text-tenue underline">Borrar este registro</button>
-                </form>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <form action={guardarRegistroComoPlato} className="flex items-center gap-1.5">
+                    <input type="hidden" name="comida_id" value={r.id} />
+                    <label htmlFor={`pl-${r.id}`} className="sr-only">Nombre del plato</label>
+                    <input id={`pl-${r.id}`} name="nombre" defaultValue={`${NOMBRE_COMIDA[r.comida]} habitual`} className="w-36 rounded-[8px] border border-borde bg-superficie px-2 py-1 text-texto" />
+                    <button type="submit" className="font-bold text-marca">Guardar como plato</button>
+                  </form>
+                  <span className="flex gap-3">
+                    <Link href={`/comidas/${r.id}/editar`} className="font-bold text-texto underline">Editar</Link>
+                    <form action={borrarComida}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <button type="submit" className="text-tenue underline">Borrar</button>
+                    </form>
+                  </span>
+                </div>
               </details>
             ))
           )}

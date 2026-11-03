@@ -50,6 +50,10 @@ function dibujar() {
       consumido={{ desayuno: reparto.desayuno, media_manana: reparto.media_manana }}
       mananaExigente={false}
       temprano
+      despensa={[
+        { id: 9, nombre: "Galletas Amor", marca: "Nestlé", tipo: "marca", categoria: "carbo", carbo_100: 68, proteina_100: 7, grasa_100: 18, porcion_g: 28, porcion_nombre: "3 galletas (28 g)", unidad_g: 9.3, unidad_nombre: "galleta" },
+      ]}
+      platos={[]}
       recientes={[
         { comida: "desayuno", fecha: "2026-10-27", alimentos: [almuerzoIA.alimentos[1]], kcal: 196 },
         { comida: "almuerzo", fecha: "2026-10-28", alimentos: [almuerzoIA.alimentos[0]], kcal: 229 },
@@ -108,33 +112,33 @@ describe("FormRegistrar", () => {
 
   it("repetir muestra solo la comida elegida y la carga sin llamar a la IA", () => {
     dibujar();
-    fireEvent.click(screen.getByRole("tab", { name: /Repetir/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /Mis comidas/ }));
     // Almuerzo elegido: aparece el almuerzo anterior, no el desayuno
     expect(screen.queryByRole("button", { name: /Arroz blanco/ })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Pollo a la plancha/ }));
     expect(analizar).not.toHaveBeenCalled();
-    expect(screen.getByText("Lo que vas a repetir")).toBeTruthy();
+    expect(screen.getByText("Lo que vas a registrar")).toBeTruthy();
   });
 
   it("al cambiar a Desayuno, Repetir muestra los desayunos", () => {
     dibujar();
-    fireEvent.click(screen.getByRole("tab", { name: /Repetir/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /Mis comidas/ }));
     fireEvent.click(screen.getByRole("button", { name: /^Desayuno/ }));
     expect(screen.getByRole("button", { name: /Arroz blanco/ })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /Pollo a la plancha/ })).toBeNull();
   });
 
-  it("dentro de Repetir se puede agregar algo distinto con la IA", async () => {
+  it("dentro de Mis comidas se puede agregar algo distinto con la IA", async () => {
     analizar.mockResolvedValue({
       ok: true,
       analisis: { alimentos: [{ nombre: "Banano", detalle: "", gramos: 120, medida_casera: "1 mediano", carbo_g: 27, proteina_g: 1, grasa_g: 0 }], preguntas: [], nota: "" },
     });
     dibujar();
-    fireEvent.click(screen.getByRole("tab", { name: /Repetir/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /Mis comidas/ }));
     fireEvent.click(screen.getByRole("button", { name: /Pollo a la plancha/ }));
     fireEvent.change(screen.getByLabelText("Agregar algo distinto"), { target: { value: "1 banano" } });
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Agregar" })));
-    expect(screen.getByText("Pollo a la plancha")).toBeTruthy();
+    expect(screen.getAllByText("Pollo a la plancha").length).toBeGreaterThan(0);
     expect(screen.getByText("Banano")).toBeTruthy();
   });
 
@@ -150,5 +154,16 @@ describe("FormRegistrar", () => {
     fireEvent.blur(g);
     expect(screen.getByText(/80 g · 1 taza/)).toBeTruthy();
     expect(screen.getByText("23 C")).toBeTruthy(); // 45 g × 80/160 = 22,5
+  });
+
+  it("Mis comidas: busca en la despensa, agrega por unidades sin IA y se puede cambiar la cantidad", () => {
+    dibujar();
+    fireEvent.click(screen.getByRole("tab", { name: /Mis comidas/ }));
+    fireEvent.change(screen.getByLabelText("Buscar en mis comidas"), { target: { value: "gall" } });
+    fireEvent.click(screen.getByRole("button", { name: /Galletas Amor/ }));
+    expect(analizar).not.toHaveBeenCalled();
+    expect(screen.getByText("3 galletas")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Más Galletas Amor" }));
+    expect(screen.getByText("4 galletas")).toBeTruthy();
   });
 });
