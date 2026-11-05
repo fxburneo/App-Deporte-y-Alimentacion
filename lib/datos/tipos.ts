@@ -1,5 +1,5 @@
 // Filas tal como vienen de Supabase y su conversión a los tipos del motor.
-import type { Comida, Deporte, Entreno, EstadoEntreno, Intensidad, PerfilMotor, Ritmo } from "@/lib/nutricion/motor";
+import type { Comida, Momento, Deporte, Entreno, EstadoEntreno, Intensidad, PerfilMotor, Ritmo } from "@/lib/nutricion/motor";
 import { edadEnAnios } from "@/lib/perfil/edad";
 
 export interface PerfilFila {
@@ -60,7 +60,7 @@ export interface AlimentoRegistrado {
 export interface ComidaFila {
   id: number;
   fecha: string;
-  comida: Comida;
+  comida: Momento;
   origen: "foto" | "texto" | "repetida";
   descripcion: string | null;
   alimentos: AlimentoRegistrado[];
@@ -116,4 +116,10 @@ export const NOMBRE_COMIDA: Record<Comida, string> = {
   almuerzo: "Almuerzo",
   media_tarde: "Media tarde",
   cena: "Cena",
+};
+
+export const NOMBRE_MOMENTO: Record<Momento, string> = {
+  pre_entreno: "Antes de entrenar",
+  ...NOMBRE_COMIDA,
+  extra: "Extra",
 };

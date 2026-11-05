@@ -293,3 +293,22 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Comidas con "Guardar como plato" y "Editar", Hoy con ajuste en gramos del menú tipo.
 - Registros desde Mis comidas y calculadora se guardan con origen 'repetida' (la restricción de la tabla no tiene
   otros valores; cambiarla requiere una migración que borra la restricción).
+
+## Etapa 3.1 CERRADA y etapa 4 iniciada (3-nov-2026)
+
+- PR #7 juntado a main sin prueba previa en la vista previa, por decisión de Francisco (la prueba en el ícono).
+- Pan tostado Naturales Grilé cargado por el chat (25 g = 4 rebanadas: 19 C, 3 P, 2 G).
+- TrainingPeaks Premium activo. Instructivo `docs/instructivo-etapa4-trainingpeaks.html`
+  (https://claude.ai/artifact/G9msNZtUwcr6wqRTNxwD62): enlace iCal "Workouts" como secreto de Supabase `TP_ICAL_URL`.
+  Pendiente: Edge Function de lectura del iCal, maqueta de eventos (pregunta de duración) y carga de carbohidratos.
+
+## Antes de entrenar, extras y menú sugerido (5-nov-2026)
+
+- Zonas de TrainingPeaks guardadas en `perfil.umbrales` (FTP 218 W; umbral de pulso 161 bici, 152 correr; zonas).
+  Observado: las zonas de correr no cuadran con el umbral 152 (parecen de ~160) y el umbral de correr es menor que el
+  de bici; Francisco lo revisa con su coach. Garmin: poner FTP 218 y las mismas zonas.
+- Intervals.icu: Francisco tiene cuenta; queda como opción para leer zonas automáticamente si cargarlas a mano molesta.
+- Registro: momentos nuevos `pre_entreno` (objetivo 25 g C que sale del desayuno cuando hay entreno exigente antes del
+  desayuno) y `extra` (sin objetivo, se suma con `extraKcal` en `ajustarResto`). Constraint de `comidas.comida` cambiada.
+- Menú sugerido (`lib/despensa/sugerencia.ts`): plantillas por comida con la despensa, rotan por día, gramos con la
+  calculadora; en Hoy para cada comida pendiente sin menú tipo y en el aviso de ajuste. Sin IA.

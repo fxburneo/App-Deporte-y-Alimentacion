@@ -97,6 +97,19 @@ describe("ajustarResto", () => {
   });
 });
 
+describe("extras fuera de horario", () => {
+  it("una golosina de 250 kcal sin otras comidas registradas baja las comidas que quedan", () => {
+    const r = ajustarResto({ objetivos, consumido: { desayuno: objetivos.desayuno }, mananaExigente: false, extraKcal: 250 });
+    expect(r.diferenciaKcal).toBe(250);
+    expect(r.cambios.almuerzo!.carboG).toBeLessThan(0);
+    expect(r.cambios.almuerzo!.proteinaG).toBe(0);
+  });
+  it("después de la cena no queda nada por compensar", () => {
+    const r = ajustarResto({ objetivos, consumido: { cena: objetivos.cena }, mananaExigente: false, extraKcal: 300 });
+    expect(r.cambios).toEqual({});
+  });
+});
+
 describe("sumarMacros", () => {
   it("suma los registros de una comida", () => {
     expect(sumarMacros([{ carboG: 10, proteinaG: 5, grasaG: 2 }, { carboG: 1, proteinaG: 1, grasaG: 1 }])).toEqual({ carboG: 11, proteinaG: 6, grasaG: 3 });

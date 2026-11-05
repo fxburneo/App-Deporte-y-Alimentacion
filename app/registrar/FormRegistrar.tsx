@@ -11,15 +11,15 @@ import { cambiarGramos, totales, type Alimento, type Pregunta } from "@/lib/comi
 import { reducirFoto } from "@/lib/comidas/foto";
 import type { PlatoFila } from "@/lib/datos/despensa";
 import { aAlimento, type AlimentoDespensa } from "@/lib/despensa/calculos";
-import { NOMBRE_COMIDA } from "@/lib/datos/tipos";
+import { NOMBRE_MOMENTO } from "@/lib/datos/tipos";
 import { ajustarResto, kcalDe, sumarMacros, type Macros } from "@/lib/nutricion/ajuste";
-import { COMIDAS, type Comida } from "@/lib/nutricion/motor";
+import { COMIDAS, type Comida, type Momento } from "@/lib/nutricion/motor";
 import { miles } from "@/lib/formato";
 import { analizar, guardarComida } from "./actions";
 
 type Modo = "foto" | "texto" | "repetir";
 export interface Reciente {
-  comida: Comida;
+  comida: Momento;
   fecha: string;
   alimentos: Alimento[];
   kcal: number;
@@ -28,18 +28,21 @@ export interface Reciente {
 const signo = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
 export default function FormRegistrar(props: {
-  inicial: Comida;
+  inicial: Momento;
   horarios: Record<Comida, string>;
   reparto: Record<Comida, Macros>;
   consumido: Partial<Record<Comida, Macros>>;
   mananaExigente: boolean;
   temprano: boolean;
   recientes: Reciente[];
+  objetivoPre?: Macros | null; // snack antes de entrenar (si hoy toca)
+  consumoPre?: Macros | null;
+  consumoExtra?: Macros | null;
   despensa?: AlimentoDespensa[];
   platos?: PlatoFila[];
 }) {
   const router = useRouter();
-  const [comida, setComida] = useState<Comida>(props.inicial);
+  const [comida, setComida] = useState<Momento>(props.inicial);
   const [modo, setModo] = useState<Modo>("foto");
   const [foto, setFoto] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
@@ -151,17 +154,31 @@ export default function FormRegistrar(props: {
   const vista = useMemo(() => {
     if (!alimentos || alimentos.length === 0) return null;
     const t = totales(alimentos);
+    // Lo ya comido fuera de las 5 comidas, en kcal por encima de su objetivo.
+    const kcalPre = (m: Macros | null | undefined) => (m ? kcalDe(m) - (props.objetivoPre ? kcalDe(props.objetivoPre) : 0) : 0);
+    const kcalExtra = (m: Macros | null | undefined) => (m ? kcalDe(m) : 0);
+    if (comida === "pre_entreno" || comida === "extra") {
+      const previo = comida === "pre_entreno" ? props.consumoPre : props.consumoExtra;
+      const conEsta = sumarMacros([t, ...(previo ? [previo] : [])]);
+      const extraKcal =
+        comida === "pre_entreno" ? kcalPre(conEsta) + kcalExtra(props.consumoExtra) : kcalPre(props.consumoPre) + kcalExtra(conEsta);
+      const despues = ajustarResto({ objetivos: props.reparto, consumido: props.consumido, mananaExigente: props.mananaExigente, extraKcal });
+      const objetivo = comida === "pre_entreno" ? (props.objetivoPre ?? null) : null;
+      return { t, objetivo, conEsta, despues, previo: previo ?? null };
+    }
+    const extraKcal = kcalPre(props.consumoPre) + kcalExtra(props.consumoExtra);
     const { [comida]: previo, ...otras } = props.consumido;
-    const antes = ajustarResto({ objetivos: props.reparto, consumido: otras, mananaExigente: props.mananaExigente });
-    const objetivo = antes.objetivos[comida];
+    const antes = ajustarResto({ objetivos: props.reparto, consumido: otras, mananaExigente: props.mananaExigente, extraKcal });
+    const objetivo: Macros | null = antes.objetivos[comida];
     const conEsta = sumarMacros([t, ...(previo ? [previo] : [])]);
     const despues = ajustarResto({
       objetivos: props.reparto,
       consumido: { ...otras, [comida]: conEsta },
       mananaExigente: props.mananaExigente,
+      extraKcal,
     });
-    return { t, objetivo, conEsta, despues, previo };
-  }, [alimentos, comida, props.consumido, props.reparto, props.mananaExigente]);
+    return { t, objetivo, conEsta, despues, previo: previo ?? null };
+  }, [alimentos, comida, props.consumido, props.reparto, props.mananaExigente, props.objetivoPre, props.consumoPre, props.consumoExtra]);
 
   const guardar = () => {
     if (!alimentos) return;
@@ -178,7 +195,10 @@ export default function FormRegistrar(props: {
     });
   };
 
-  const nombreComida = (c: Comida) => (c === "desayuno" && props.temprano ? "Desayuno de recuperación" : NOMBRE_COMIDA[c]);
+  const nombreComida = (c: Momento) => (c === "desayuno" && props.temprano ? "Desayuno de recuperación" : NOMBRE_MOMENTO[c]);
+  // Antes de entrenar solo aparece si hoy toca snack previo o ya hay uno; Extra siempre.
+  const chips: Momento[] = [...(props.objetivoPre || props.consumoPre ? (["pre_entreno"] as Momento[]) : []), ...COMIDAS, "extra"];
+  const registrado = (c: Momento) => (c === "pre_entreno" ? props.consumoPre : c === "extra" ? props.consumoExtra : props.consumido[c]);
   const chip = (activo: boolean) =>
     activo ? "border-texto bg-texto font-bold text-fondo" : "border-borde bg-transparent text-tenue";
   const modoClase = (activo: boolean) => (activo ? "bg-marca font-bold text-fondo" : "bg-superficie font-semibold text-suave");
@@ -192,10 +212,10 @@ export default function FormRegistrar(props: {
       </header>
 
       <div className="-mx-[18px] flex gap-1.5 overflow-x-auto px-[18px] pb-0.5">
-        {COMIDAS.map((c) => (
+        {chips.map((c) => (
           <button key={c} type="button" aria-pressed={comida === c} onClick={() => { setComida(c); if (modo === "repetir") limpiar(); }} className={`flex-none rounded-full border px-3 py-2 text-[13px] whitespace-nowrap ${chip(comida === c)}`}>
-            {NOMBRE_COMIDA[c]}
-            {props.consumido[c] ? " ✓" : ""}
+            {NOMBRE_MOMENTO[c]}
+            {registrado(c) && c !== "extra" ? " ✓" : ""}
           </button>
         ))}
       </div>
@@ -308,10 +328,10 @@ export default function FormRegistrar(props: {
           )}
           {!busca && (
             <div className="flex flex-col">
-              <span className="etiqueta pb-1">{NOMBRE_COMIDA[comida]} · anteriores</span>
+              <span className="etiqueta pb-1">{NOMBRE_MOMENTO[comida]} · anteriores</span>
               {recientesComida.length === 0 ? (
                 <p className="text-sm text-tenue">
-                  Todavía no hay registros de {NOMBRE_COMIDA[comida].toLowerCase()} para repetir. La primera vez regístralo con Foto o Escribir.
+                  Todavía no hay registros de {NOMBRE_MOMENTO[comida].toLowerCase()} para repetir. La primera vez regístralo con Foto o Escribir.
                 </p>
               ) : (
                 recientesComida.map((r, k) => (
@@ -453,7 +473,7 @@ export default function FormRegistrar(props: {
         </section>
       ))}
 
-      {vista && (
+      {vista && vista.objetivo && (
         <section className="flex flex-col gap-2.5 rounded-[14px] bg-superficie px-4 py-3.5">
           <div className="flex items-baseline justify-between">
             <span className="etiqueta">{nombreComida(comida)} contra el objetivo</span>
@@ -467,6 +487,13 @@ export default function FormRegistrar(props: {
             <Total nombre="Grasa" real={vista.t.grasaG} obj={vista.objetivo.grasaG} color="text-grasa" />
           </div>
           {vista.previo && <span className="text-xs text-tenue">Ya tenías {miles(kcalDe(vista.previo))} kcal registradas en esta comida; se suman.</span>}
+        </section>
+      )}
+      {vista && comida === "extra" && (
+        <section className="flex flex-col gap-1 rounded-[14px] bg-superficie px-4 py-3.5">
+          <span className="etiqueta">Extra fuera de horario</span>
+          <span className="font-display text-[26px] font-bold">{miles(vista.t.kcal)} <span className="text-base text-tenue">kcal</span></span>
+          <span className="text-sm text-suave">No tiene objetivo propio: se suma al día y se compensa en las comidas que faltan.</span>
         </section>
       )}
 
@@ -515,7 +542,7 @@ function AvisoAjuste({
 }: {
   ajuste: ReturnType<typeof ajustarResto>;
   horarios: Record<Comida, string>;
-  nombreComida: (c: Comida) => string;
+  nombreComida: (c: Momento) => string;
 }) {
   const cambios = Object.entries(ajuste.cambios) as [Comida, Macros][];
   if (cambios.length === 0) {

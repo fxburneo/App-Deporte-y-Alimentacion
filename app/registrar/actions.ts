@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hoyEcuador } from "@/lib/fecha";
 import { AlimentoSchema, alimentoValido, totales, type Analisis } from "@/lib/comidas/alimentos";
 import { analizarComida, ErrorIA } from "@/lib/ia/analizarComida";
-import { COMIDAS } from "@/lib/nutricion/motor";
+import { MOMENTOS } from "@/lib/nutricion/motor";
 
 export type ResultadoAnalisis = { ok: true; analisis: Analisis } | { ok: false; error: string };
 
@@ -39,7 +39,7 @@ export async function analizar(fd: FormData): Promise<ResultadoAnalisis> {
 }
 
 const GuardarSchema = z.object({
-  comida: z.enum(COMIDAS),
+  comida: z.enum(MOMENTOS),
   origen: z.enum(["foto", "texto", "repetida"]),
   descripcion: z.string().max(1000),
   alimentos: z.array(AlimentoSchema).min(1).max(30),

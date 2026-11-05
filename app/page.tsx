@@ -10,13 +10,14 @@ import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { ajusteEnAlimentos } from "@/lib/despensa/calculos";
+import { sugerirPlato, textoPlato } from "@/lib/despensa/sugerencia";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
 import { diaSemana, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
 import { kcalDe } from "@/lib/nutricion/ajuste";
-import { COMIDAS, entrenosQueCuentan, NOMBRE_TIPO, tipoDia } from "@/lib/nutricion/motor";
+import { COMIDAS, entrenosQueCuentan, NOMBRE_TIPO, tipoDia, type Comida } from "@/lib/nutricion/motor";
 import { borrarEntreno } from "./entreno/actions";
 
 const COLOR_TIPO = { descanso: "text-tenue", suave: "text-proteina", moderado: "text-carbo", duro: "text-marca", muy_largo: "text-mal" };
@@ -56,13 +57,17 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
     );
   }
 
-  const { objetivo: obj, temprano, ajuste, consumido, totalConsumido, pesoKg } = plan;
+  const { objetivo: obj, temprano, ajuste, consumido, totalConsumido, pesoKg, objetivoPre, consumoPre, consumoExtra } = plan;
   const cuentan = new Set(entrenosQueCuentan(hoy));
   const tipoManana = tipoDia(manana);
   const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
   const siguienteCambio = ajuste.siguiente ? ajuste.cambios[ajuste.siguiente] : undefined;
   // Menú tipo: el plato habitual de cada comida (Mi despensa › Platos).
-  const menuTipo = esHoy ? Object.fromEntries((await leerDespensa()).platos.filter((p) => p.menu_tipo).map((p) => [p.menu_tipo!, p])) : {};
+  const despensa = esHoy ? await leerDespensa() : { alimentos: [], platos: [] };
+  const menuTipo = Object.fromEntries(despensa.platos.filter((p) => p.menu_tipo).map((p) => [p.menu_tipo!, p]));
+  // Menú sugerido con la despensa para las comidas pendientes sin menú tipo; rota cada día.
+  const diaDelAnio = Math.floor(new Date(d.fecha + "T12:00:00Z").getTime() / 86400000);
+  const sugerencia = (c: Comida) => (menuTipo[c] ? [] : sugerirPlato(c, ajuste.objetivos[c], despensa.alimentos, diaDelAnio));
   const platoSiguiente = ajuste.siguiente ? menuTipo[ajuste.siguiente] : undefined;
   const enAlimentos = platoSiguiente && siguienteCambio ? ajusteEnAlimentos(platoSiguiente.alimentos, siguienteCambio) : null;
   const bienestarHoy = d.bienestar.find((b) => b.fecha === d.fecha) ?? null;
@@ -172,7 +177,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
           </p>
         </section>
 
-        {obj.snackPreEntreno && (
+        {!esHoy && obj.snackPreEntreno && (
           <section className="border-l-[3px] border-carbo py-0.5 pl-3">
             <span className="etiqueta text-carbo!">Antes de entrenar</span>
             <p className="text-suave">Snack de 20–30 g de carbohidrato al levantarte: un banano o una tostada con miel.</p>
@@ -198,6 +203,12 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                 ))}
               </div>
             )}
+            {!platoSiguiente && ajuste.siguiente && sugerencia(ajuste.siguiente).length > 0 && (
+              <p className="mt-1.5 text-sm text-suave">
+                <span className="font-semibold text-texto">Para cumplirlo: </span>
+                {textoPlato(sugerencia(ajuste.siguiente))}.
+              </p>
+            )}
             {enAlimentos && enAlimentos.sinAlimento.includes("proteinaG") && (
               <p className="mt-1 text-sm text-suave">Tu menú tipo no tiene un alimento con proteína: suma un yogur griego o 2 huevos.</p>
             )}
@@ -217,6 +228,20 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               </span>
             )}
           </div>
+          {esHoy && (objetivoPre || consumoPre) && (
+            <Enlace href={consumoPre ? "/comidas" : "/registrar?comida=pre_entreno"} className="flex items-center gap-3.5 border-b border-linea py-3">
+              <span className="w-[42px] font-display text-base text-tenue">{d.perfil.entreno_semana.slice(0, 5)}</span>
+              <div className="flex flex-1 flex-col">
+                <strong>Antes de entrenar</strong>
+                <span className="text-xs text-tenue">
+                  {consumoPre
+                    ? `Comiste ${Math.round(consumoPre.carboG)} C · ${Math.round(consumoPre.proteinaG)} P · ${Math.round(consumoPre.grasaG)} G`
+                    : `${objetivoPre!.carboG} g de carbohidrato al levantarte: un banano o 1–2 tostadas con miel`}
+                </span>
+              </div>
+              <span className="font-display text-lg font-semibold text-suave">{miles(Math.round(kcalDe(consumoPre ?? objetivoPre!)))}</span>
+            </Enlace>
+          )}
           {COMIDAS.map((c) => {
             const real = consumido[c];
             const meta = ajuste.objetivos[c];
@@ -240,6 +265,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                       <span className="text-grasa">{meta.grasaG} g G</span>
                       {c === "cena" && obj.extraCenaG > 0 && <span className="text-carbo"> · incluye +{obj.extraCenaG} g por mañana</span>}
                       {menuTipo[c] && <span className="block">{menuTipo[c].nombre}: {menuTipo[c].alimentos.map((a) => a.nombre).join(", ")}</span>}
+                      {esHoy && !menuTipo[c] && sugerencia(c).length > 0 && <span className="block text-suave">Sugerido: {textoPlato(sugerencia(c))}</span>}
                     </span>
                   )}
                 </div>
@@ -254,7 +280,21 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               </Enlace>
             );
           })}
-          {esHoy && <p className="pt-2 text-xs text-tenue">Toca una comida para registrarla. El menú con platos concretos llega en la etapa 5.</p>}
+          {consumoExtra && (
+            <Enlace href={esHoy ? "/comidas" : null} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
+              <span className="w-[42px] font-display text-base text-tenue">—</span>
+              <div className="flex flex-1 flex-col">
+                <strong>Extras fuera de horario</strong>
+                <span className="text-xs text-tenue">Se compensan en las comidas que faltan</span>
+              </div>
+              <span className="font-display text-lg font-semibold text-carbo">{miles(Math.round(kcalDe(consumoExtra)))}</span>
+            </Enlace>
+          )}
+          {esHoy && (
+            <p className="pt-2 text-xs text-tenue">
+              Toca una comida para registrarla. ¿Comiste algo fuera de horario? <Link href="/registrar?comida=extra" className="font-bold text-texto">Registrar un extra ›</Link>
+            </p>
+          )}
         </section>
 
         {esHoy && (
