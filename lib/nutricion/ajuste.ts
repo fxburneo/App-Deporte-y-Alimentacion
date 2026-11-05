@@ -41,6 +41,7 @@ export function ajustarResto(args: {
   objetivos: Record<Comida, Macros>;
   consumido: Partial<Record<Comida, Macros>>;
   mananaExigente: boolean;
+  extraKcal?: number; // lo comido fuera de las 5 comidas por encima de su objetivo (extras, snack previo)
 }): AjusteDia {
   const { objetivos, consumido } = args;
   const registradas = COMIDAS.filter((c) => consumido[c] != null);
@@ -54,6 +55,7 @@ export function ajustarResto(args: {
     proteinaFaltaG += objetivos[c].proteinaG - consumido[c]!.proteinaG;
   }
   proteinaFaltaG = Math.max(0, Math.round(proteinaFaltaG));
+  diferenciaKcal += Math.round(args.extraKcal ?? 0);
 
   const nuevos = Object.fromEntries(COMIDAS.map((c) => [c, { ...objetivos[c] }])) as Record<Comida, Macros>;
   const base = {

@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { cambiarGramos, totales, type Alimento } from "@/lib/comidas/alimentos";
-import { NOMBRE_COMIDA } from "@/lib/datos/tipos";
-import type { Comida } from "@/lib/nutricion/motor";
+import { NOMBRE_MOMENTO } from "@/lib/datos/tipos";
+import type { Momento } from "@/lib/nutricion/motor";
 import { editarComida } from "../../../registrar/actions";
 
-export default function EditarRegistro(props: { id: number; comida: Comida; alimentosIniciales: Alimento[] }) {
+export default function EditarRegistro(props: { id: number; comida: Momento; alimentosIniciales: Alimento[] }) {
   const router = useRouter();
   const [alimentos, setAlimentos] = useState(props.alimentosIniciales);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export default function EditarRegistro(props: { id: number; comida: Comida; alim
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-[18px] px-[18px] pt-[max(18px,env(safe-area-inset-top))] pb-10">
       <header className="flex items-center justify-between">
         <Link href="/comidas" className="py-2.5 font-semibold text-tenue">Cancelar</Link>
-        <h1 className="font-display text-2xl font-bold tracking-[0.04em]">EDITAR {NOMBRE_COMIDA[props.comida].toUpperCase()}</h1>
+        <h1 className="font-display text-2xl font-bold tracking-[0.04em]">EDITAR {NOMBRE_MOMENTO[props.comida].toUpperCase()}</h1>
         <span className="w-[62px]" />
       </header>
       <section className="flex flex-col">

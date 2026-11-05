@@ -212,6 +212,13 @@ export function objetivoDelDia(args: {
 export type Comida = "desayuno" | "media_manana" | "almuerzo" | "media_tarde" | "cena";
 export const COMIDAS: Comida[] = ["desayuno", "media_manana", "almuerzo", "media_tarde", "cena"];
 
+// Momentos que se pueden registrar además de las 5 comidas: el snack antes de
+// entrenar (su objetivo sale del desayuno) y los extras fuera de horario (sin
+// objetivo: se compensan en las comidas que faltan).
+export type Momento = Comida | "pre_entreno" | "extra";
+export const MOMENTOS: Momento[] = ["pre_entreno", ...COMIDAS, "extra"];
+export const SNACK_PRE_G = 25;
+
 // Reparto del objetivo entre las 5 comidas. Si se entrena antes del
 // desayuno, el desayuno es la comida de recuperación y lleva más carbohidrato.
 export function repartirComidas(

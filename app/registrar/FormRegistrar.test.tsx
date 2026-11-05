@@ -166,4 +166,19 @@ describe("FormRegistrar", () => {
     fireEvent.click(screen.getByRole("button", { name: "Más Galletas Amor" }));
     expect(screen.getByText("4 galletas")).toBeTruthy();
   });
+
+  it("Extra: no tiene objetivo propio y se compensa en el resto del día", async () => {
+    analizar.mockResolvedValue({
+      ok: true,
+      analisis: { alimentos: [{ nombre: "Chocolate", detalle: "", gramos: 50, medida_casera: "1 barra", carbo_g: 28, proteina_g: 3, grasa_g: 15 }], preguntas: [], nota: "" },
+    });
+    dibujar();
+    fireEvent.click(screen.getByRole("button", { name: /^Extra/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /Escribir/ }));
+    fireEvent.change(screen.getByLabelText("Qué comiste"), { target: { value: "un chocolate" } });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "CALCULAR CON IA" })));
+    expect(screen.getByText("Extra fuera de horario")).toBeTruthy();
+    expect(screen.getByText(/así se ajusta el resto del día/i)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Guardar Extra/i })).toBeTruthy();
+  });
 });

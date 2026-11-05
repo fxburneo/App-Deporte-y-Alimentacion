@@ -6,7 +6,7 @@ import { planDelDia } from "@/lib/datos/planDia";
 import type { ComidaFila } from "@/lib/datos/tipos";
 import { horaEcuador, sumarDias } from "@/lib/fecha";
 import { comidaQueToca } from "@/lib/comidas/queToca";
-import { COMIDAS, type Comida } from "@/lib/nutricion/motor";
+import { MOMENTOS, type Comida, type Momento } from "@/lib/nutricion/motor";
 import { createClient } from "@/lib/supabase/server";
 import { leerDespensa } from "@/lib/datos/despensa";
 import FormRegistrar, { type Reciente } from "./FormRegistrar";
@@ -18,7 +18,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
   if (!plan) redirect("/peso");
 
   const sp = await searchParams;
-  const pedida = COMIDAS.find((c) => c === sp.comida);
+  const pedida = MOMENTOS.find((c) => c === sp.comida);
   const inicial = pedida ?? comidaQueToca(d.perfil.horarios_comida, horaEcuador(new Date().toISOString()), new Set(Object.keys(plan.consumido) as Comida[]));
 
   const supabase = await createClient();
@@ -30,7 +30,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
     .limit(150);
   // Hasta 5 registros distintos por comida: Repetir muestra solo los de la comida elegida.
   const vistos = new Set<string>();
-  const porComida = new Map<Comida, number>();
+  const porComida = new Map<Momento, number>();
   const recientes: Reciente[] = [];
   for (const f of (data ?? []) as ComidaFila[]) {
     const clave = f.comida + "|" + f.alimentos.map((a) => `${a.nombre}:${a.gramos}`).join("|");
@@ -53,6 +53,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
       mananaExigente={plan.mananaExigente}
       temprano={plan.temprano}
       recientes={recientes}
+      objetivoPre={plan.objetivoPre}
+      consumoPre={plan.consumoPre}
+      consumoExtra={plan.consumoExtra}
     />
   );
 }

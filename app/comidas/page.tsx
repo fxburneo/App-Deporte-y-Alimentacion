@@ -6,12 +6,12 @@ import NavBar from "@/components/NavBar";
 import Pantalla from "@/components/Pantalla";
 import { leerDatosDia, leerSemana } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
-import { NOMBRE_COMIDA } from "@/lib/datos/tipos";
+import { NOMBRE_COMIDA, NOMBRE_MOMENTO } from "@/lib/datos/tipos";
 import { fechaLarga, horaEcuador, sumarDias } from "@/lib/fecha";
 import { miles } from "@/lib/formato";
 import { dondeAjustar, porcentajeDelObjetivo } from "@/lib/comidas/resumen";
 import { kcalDe } from "@/lib/nutricion/ajuste";
-import { COMIDAS, NOMBRE_TIPO } from "@/lib/nutricion/motor";
+import { MOMENTOS, NOMBRE_TIPO } from "@/lib/nutricion/motor";
 import { borrarComida } from "../registrar/actions";
 import { guardarRegistroComoPlato } from "../despensa/actions";
 
@@ -49,7 +49,7 @@ export default async function Comidas() {
     return { f, pct, hoy: f === d.fecha };
   });
 
-  const registros = [...d.comidas].sort((a, b) => COMIDAS.indexOf(a.comida) - COMIDAS.indexOf(b.comida) || a.creado_en.localeCompare(b.creado_en));
+  const registros = [...d.comidas].sort((a, b) => MOMENTOS.indexOf(a.comida) - MOMENTOS.indexOf(b.comida) || a.creado_en.localeCompare(b.creado_en));
 
   return (
     <>
@@ -130,7 +130,7 @@ export default async function Comidas() {
               <details key={r.id} className="border-b border-linea py-3 last:border-0">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
                   <span className="flex flex-col">
-                    <strong>{NOMBRE_COMIDA[r.comida]} <span className="text-sm font-normal text-tenue">· {ORIGEN[r.origen]} · {horaEcuador(r.creado_en)}</span></strong>
+                    <strong>{NOMBRE_MOMENTO[r.comida]} <span className="text-sm font-normal text-tenue">· {ORIGEN[r.origen]} · {horaEcuador(r.creado_en)}</span></strong>
                     <span className="text-xs text-tenue">{r.alimentos.map((a) => a.nombre).join(", ")}</span>
                   </span>
                   <span className="font-display text-xl font-semibold">{miles(r.kcal)}</span>
@@ -150,7 +150,7 @@ export default async function Comidas() {
                   <form action={guardarRegistroComoPlato} className="flex items-center gap-1.5">
                     <input type="hidden" name="comida_id" value={r.id} />
                     <label htmlFor={`pl-${r.id}`} className="sr-only">Nombre del plato</label>
-                    <input id={`pl-${r.id}`} name="nombre" defaultValue={`${NOMBRE_COMIDA[r.comida]} habitual`} className="w-36 rounded-[8px] border border-borde bg-superficie px-2 py-1 text-texto" />
+                    <input id={`pl-${r.id}`} name="nombre" defaultValue={`${NOMBRE_MOMENTO[r.comida]} habitual`} className="w-36 rounded-[8px] border border-borde bg-superficie px-2 py-1 text-texto" />
                     <button type="submit" className="font-bold text-marca">Guardar como plato</button>
                   </form>
                   <span className="flex gap-3">
