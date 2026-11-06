@@ -50,8 +50,11 @@ export function planDelDia(args: {
   const objetivo = objetivoDelDia({ perfil, pesoKg, entrenosHoy: hoy, entrenosManana: manana });
   const temprano = hoy.some((e) => e.hora != null && e.hora < perfil.horaDesayuno && e.deporte !== "descanso");
   const reparto = repartirComidas(objetivo, temprano);
-  // Entreno exigente antes del desayuno: el snack previo sale del desayuno.
-  const objetivoPre: Macros | null = objetivo.snackPreEntreno ? { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 } : null;
+  // Snack antes de entrenar: sale del desayuno cuando hay entreno exigente
+  // temprano o cuando Francisco lo registró (el entreno suele llegar de Garmin
+  // después de comerlo, así que no se puede esperar a verlo).
+  const comioPre = args.comidas.some((f) => f.fecha === args.fecha && f.comida === "pre_entreno");
+  const objetivoPre: Macros | null = objetivo.snackPreEntreno || comioPre ? { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 } : null;
   if (objetivoPre) reparto.desayuno = { ...reparto.desayuno, carboG: Math.max(0, reparto.desayuno.carboG - SNACK_PRE_G) };
   const tm = tipoDia(manana);
   const mananaExigente = tm === "duro" || tm === "muy_largo";
