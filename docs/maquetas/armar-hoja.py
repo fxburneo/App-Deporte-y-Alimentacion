@@ -23,11 +23,11 @@ secciones = [
    ("SalidaLarga","3.2 · Salida larga","Carbohidrato y líquido por hora con tu test de sudoración, y validación de lo que llevas.",False),
    ("Informe","3.3 · Informe semanal","Lo que mejoró, lo que falta y 3 temas para hablar con tu coach.",False)]),
  ("4b · Carreras (etapa 4)", "Tu carrera objetivo: desde hoy hasta la meta. La duración decide la carga de carbohidratos y el plan del día de carrera.", [
-   ("Carreras","4b.1 · Mis carreras","Desde Más. La carrera se carga a mano porque TrainingPeaks solo comparte 2 semanas; si aparece ahí, se une.",True),
+   ("Carreras","4b.1 · Mis carreras","Desde Más. Petzl 50K está en TrainingPeaks como evento; el calendario solo comparte 2 semanas, así que se carga aquí y se une cuando aparezca.",True),
    ("NuevaCarrera","4b.2 · Nueva carrera","Nombre, fecha, deporte, distancia y cuántas horas estimas. Con eso se elige el tipo de carga.",True),
-   ("CaminoCarrera","4b.3 · Camino a la carrera","Las fases con fecha: bajar de peso, entrenar el estómago, sin déficit y carga.",True),
+   ("CaminoCarrera","4b.3 · Camino a la carrera","Las fases con fecha: bajar de peso, test de sudoración, ensayo en fondos, sin déficit y carga.",True),
    ("DiaCarrera","4b.4 · Día de carrera","Desayuno y plan por horas: carbohidrato, líquido y sodio, con comida de tu despensa.",True),
-   ("HoyCarga","4b.5 · Hoy en día de carga","Así se ve Hoy el viernes y sábado antes: más carbohidrato, sin déficit, poca fibra.",True)]),
+   ("HoyCarga","4b.5 · Hoy en día de carga","Así se ve Hoy el jueves y viernes antes: más carbohidrato, sin déficit, poca fibra.",True)]),
  ("4 · Perfil y ajustes", "Tus datos, avisos, conexiones y el seguimiento del peso.", [
    ("Mas","4.1 · Más","Perfil, modo pausa, test de sudoración, avisos y conexiones.",False),
    ("Peso","4.2 · Peso","Promedio de la semana, tendencia de 6 semanas y objetivo.",False)]),
