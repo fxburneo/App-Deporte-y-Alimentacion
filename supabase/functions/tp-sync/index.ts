@@ -5,7 +5,7 @@
 // Responde solo un resumen: nunca devuelve el enlace del calendario.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { eventoAEntreno, leerEventos } from "./mapeo.ts";
+import { eventoAEntreno, leerEventos, unirCarreras } from "./mapeo.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -81,8 +81,19 @@ Deno.serve(async (req) => {
     const sobran = (guardados ?? []).filter((g) => !vigentes.has(g.tp_uid)).map((g) => g.id);
     if (sobran.length) await db.from("entrenos").delete().in("id", sobran);
 
-    await cerrar(true, filas.length, `${filas.length} entrenos planificados, ${sobran.length} quitados`);
-    return responder({ ok: true, planificados: filas.length, quitados: sobran.length });
+    // 5. Carreras cargadas en la app: se enlazan cuando aparecen en TP.
+    const { data: carreras } = await db.from("carreras").select("id, nombre, fecha, tp_uid").eq("user_id", userId).gte("fecha", hoy);
+    const unidas = unirCarreras(eventos.filter((e) => e.fecha >= hoy), carreras ?? []);
+    for (const u of unidas) await db.from("carreras").update({ tp_uid: u.tp_uid, fecha: u.fecha }).eq("id", u.id);
+
+    await cerrar(true, filas.length, `${filas.length} entrenos planificados, ${sobran.length} quitados, ${unidas.length} carreras unidas`);
+    // Resumen sin datos privados: rango de fechas del calendario y lo que no se
+    // tradujo a entreno (tipos que no cuentan, eventos o carreras).
+    const fechas = eventos.map((e) => e.fecha).sort();
+    const sinTraducir = eventos
+      .filter((e) => e.fecha >= hoy && !filas.some((f) => f.tp_uid === e.uid))
+      .map((e) => ({ fecha: e.fecha, resumen: e.resumen.slice(0, 80) }));
+    return responder({ ok: true, planificados: filas.length, quitados: sobran.length, carreras_unidas: unidas.length, desde: fechas[0] ?? null, hasta: fechas.at(-1) ?? null, sin_traducir: sinTraducir });
   } catch (e) {
     const mensaje = e instanceof Error ? e.message : String(e);
     await cerrar(false, 0, mensaje.slice(0, 500));

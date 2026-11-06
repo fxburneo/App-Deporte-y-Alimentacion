@@ -42,3 +42,12 @@ export function fechaHistorial(pedida: string | undefined, hoy: string): string 
   if (!pedida || !/^\d{4}-\d{2}-\d{2}$/.test(pedida)) return hoy;
   return pedida < hoy && pedida >= sumarDias(hoy, -365) ? pedida : hoy;
 }
+
+// "13 mar" y "Sábado 3 abr 2027", para fechas lejanas (carreras).
+export function fechaCorta(fecha: string): string {
+  const [, m, d] = fecha.split("-").map(Number);
+  return `${d} ${MESES[m - 1]}`;
+}
+export function fechaConAnio(fecha: string): string {
+  return `${fechaLarga(fecha)} ${fecha.slice(0, 4)}`;
+}

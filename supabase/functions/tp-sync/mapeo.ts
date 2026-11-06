@@ -117,3 +117,37 @@ export function eventoAEntreno(evento: EventoIcal, userId: string, horarios: Hor
     nota: evento.descripcion.slice(0, 2000) || null,
   };
 }
+
+// Carreras cargadas en la app: cuando aparecen en el calendario de TP (unas 2
+// semanas antes), se enlazan por nombre y fecha cercana (±3 días). Si el coach
+// la movió de día, la fecha de la app se actualiza.
+export interface CarreraApp {
+  id: number;
+  nombre: string;
+  fecha: string;
+  tp_uid: string | null;
+}
+
+const palabras = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .split(/[^a-z0-9]+/)
+    .filter((p) => p.length >= 3 && !/^\d+k?$/.test(p));
+
+export function unirCarreras(eventos: EventoIcal[], carreras: CarreraApp[]): { id: number; tp_uid: string; fecha: string }[] {
+  const cambios: { id: number; tp_uid: string; fecha: string }[] = [];
+  for (const c of carreras) {
+    const clave = palabras(c.nombre);
+    if (clave.length === 0) continue;
+    const ev = eventos.find((e) => {
+      if (c.tp_uid && e.uid === c.tp_uid) return true;
+      const dias = Math.abs(Date.parse(e.fecha) - Date.parse(c.fecha)) / 86400000;
+      const titulo = palabras(e.resumen);
+      return dias <= 3 && clave.some((p) => titulo.includes(p));
+    });
+    if (ev && (ev.uid !== c.tp_uid || ev.fecha !== c.fecha)) cambios.push({ id: c.id, tp_uid: ev.uid, fecha: ev.fecha });
+  }
+  return cambios;
+}

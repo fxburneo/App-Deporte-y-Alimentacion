@@ -18,6 +18,7 @@ import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
 import { kcalDe } from "@/lib/nutricion/ajuste";
 import { COMIDAS, entrenosQueCuentan, NOMBRE_TIPO, tipoDia, type Comida } from "@/lib/nutricion/motor";
+import type { CarreraDelDia } from "@/lib/nutricion/carrera";
 import { borrarEntreno } from "./entreno/actions";
 
 const COLOR_TIPO = { descanso: "text-tenue", suave: "text-proteina", moderado: "text-carbo", duro: "text-marca", muy_largo: "text-mal" };
@@ -92,6 +93,8 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
             <p className="text-[#e6e9eb]">Comes a mantenimiento, sin déficit. Desactívalo en Más cuando vuelvas.</p>
           </section>
         )}
+
+        {plan.carrera && <AvisoCarrera c={plan.carrera} />}
 
         {sinDatos && (
           <section className="rounded-[14px] border border-[#5a2326] bg-[#1f1213] px-3.5 py-3">
@@ -319,6 +322,42 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
       </Pantalla>
       <NavBar activa="hoy" />
     </>
+  );
+}
+
+// Aviso de carrera: semanas sin déficit, días de carga y el día de la carrera.
+function AvisoCarrera({ c }: { c: CarreraDelDia }) {
+  const nombre = c.carrera.nombre;
+  if (c.modo === "carga") {
+    const cuando = c.diasFaltan === 1 ? "MAÑANA" : `EN ${c.diasFaltan} DÍAS`;
+    return (
+      <section className="border-l-[3px] border-marca py-0.5 pl-3">
+        <span className="etiqueta text-marca!">
+          Carga de carbohidratos{c.diasCarga > 1 ? ` · día ${c.diaCarga} de ${c.diasCarga}` : ""} · {nombre} {cuando}
+        </span>
+        <p className="text-suave">
+          Hoy comes más carbohidrato ({String(c.cargaGKg).replace(".", ",")} g/kg) y menos fibra y grasa: arroz blanco, papa, pan, fideos, fruta sin cáscara. Nada de comida nueva.
+          {c.diasFaltan === 1 ? " Cena temprano." : ""} Sin déficit. Es normal subir 1–2 kg por agua: no es grasa.
+        </p>
+      </section>
+    );
+  }
+  if (c.modo === "carrera") {
+    return (
+      <Link href={`/carreras/${c.carrera.id}/dia`} className="flex items-center justify-between rounded-[14px] border border-[#4a2a16] bg-[#1f1712] px-4 py-3 text-texto no-underline">
+        <span>
+          <strong>Hoy es {nombre}</strong>
+          <span className="block text-sm text-tenue">Desayuno 3 h antes y comida por horas.</span>
+        </span>
+        <span className="font-bold text-marca">Plan ›</span>
+      </Link>
+    );
+  }
+  return (
+    <section className="border-l-[3px] border-carbo py-0.5 pl-3">
+      <span className="etiqueta text-carbo!">Sin déficit · {nombre} en {c.diasFaltan} días</span>
+      <p className="text-suave">Recta final: comes lo que gastas para llegar con reservas y fuerza.</p>
+    </section>
   );
 }
 

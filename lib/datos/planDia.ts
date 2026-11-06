@@ -11,7 +11,9 @@ import {
   type Comida,
   type ObjetivoDia,
 } from "@/lib/nutricion/motor";
-import { aEntreno, aPerfilMotor, type ComidaFila, type EntrenoFila, type PerfilFila, type PesoFila } from "./tipos";
+import { carreraDelDia, entrenoDeCarrera, type CarreraDelDia } from "@/lib/nutricion/carrera";
+import { sumarDias } from "@/lib/fecha";
+import { aCarrera, aEntreno, aPerfilMotor, type CarreraFila, type ComidaFila, type EntrenoFila, type PerfilFila, type PesoFila } from "./tipos";
 
 export interface PlanDia {
   pesoKg: number;
@@ -25,6 +27,7 @@ export interface PlanDia {
   consumoExtra: Macros | null; // extras fuera de horario
   totalConsumido: Macros;
   ajuste: AjusteDia;
+  carrera: CarreraDelDia | null;
 }
 
 export const macrosDeFila = (f: Pick<ComidaFila, "carbo_g" | "proteina_g" | "grasa_g">): Macros => ({
@@ -40,14 +43,30 @@ export function planDelDia(args: {
   entrenosHoy: EntrenoFila[];
   entrenosManana: EntrenoFila[];
   comidas: ComidaFila[];
+  carreras?: CarreraFila[];
 }): PlanDia | null {
   // Solo pesajes hasta ese día (en el historial no cuentan los posteriores).
   const pesoKg = pesoReferencia(args.pesos.filter((p) => p.fecha <= args.fecha), args.fecha);
   if (pesoKg == null) return null;
   const perfil = aPerfilMotor(args.perfil);
-  const hoy = args.entrenosHoy.map(aEntreno);
-  const manana = args.entrenosManana.map(aEntreno);
-  const objetivo = objetivoDelDia({ perfil, pesoKg, entrenosHoy: hoy, entrenosManana: manana });
+  // Carreras: si TrainingPeaks no trae la carrera como entreno, se agrega como
+  // plan del día (así el motor sabe que es muy largo y prepara la víspera).
+  const carreras = (args.carreras ?? []).map(aCarrera);
+  const conCarrera = (lista: EntrenoFila[], fecha: string) => {
+    const c = carreras.find((x) => x.fecha === fecha);
+    const base = lista.map(aEntreno);
+    return c && base.length === 0 ? [entrenoDeCarrera(c)] : base;
+  };
+  const hoy = conCarrera(args.entrenosHoy, args.fecha);
+  const manana = conCarrera(args.entrenosManana, sumarDias(args.fecha, 1));
+  const carrera = carreraDelDia(args.fecha, carreras);
+  const objetivo = objetivoDelDia({
+    perfil,
+    pesoKg,
+    entrenosHoy: hoy,
+    entrenosManana: manana,
+    carrera: carrera ? { modo: carrera.modo, cargaGKg: carrera.cargaGKg } : null,
+  });
   const temprano = hoy.some((e) => e.hora != null && e.hora < perfil.horaDesayuno && e.deporte !== "descanso");
   const reparto = repartirComidas(objetivo, temprano);
   // Snack antes de entrenar: sale del desayuno cuando hay entreno exigente
@@ -73,5 +92,5 @@ export function planDelDia(args: {
   const extraKcal = (consumoPre ? kcalDe(consumoPre) - (objetivoPre ? kcalDe(objetivoPre) : 0) : 0) + (consumoExtra ? kcalDe(consumoExtra) : 0);
   const totalConsumido = sumarMacros([...Object.values(consumido), ...(consumoPre ? [consumoPre] : []), ...(consumoExtra ? [consumoExtra] : [])]);
   const ajuste = ajustarResto({ objetivos: reparto, consumido, mananaExigente, extraKcal });
-  return { pesoKg, objetivo, reparto, temprano, mananaExigente, consumido, objetivoPre, consumoPre, consumoExtra, totalConsumido, ajuste };
+  return { pesoKg, objetivo, reparto, temprano, mananaExigente, consumido, objetivoPre, consumoPre, consumoExtra, totalConsumido, ajuste, carrera };
 }

@@ -1,5 +1,6 @@
 // Filas tal como vienen de Supabase y su conversión a los tipos del motor.
 import type { Comida, Momento, Deporte, Entreno, EstadoEntreno, Intensidad, PerfilMotor, Ritmo } from "@/lib/nutricion/motor";
+import type { Carrera, DeporteCarrera, Prioridad } from "@/lib/nutricion/carrera";
 import { edadEnAnios } from "@/lib/perfil/edad";
 
 export interface PerfilFila {
@@ -45,6 +46,23 @@ export interface EntrenoFila {
   origen: string;
   nombre?: string | null;
   carga?: number | null;
+}
+
+export interface CarreraFila {
+  id: number;
+  nombre: string;
+  fecha: string;
+  deporte: DeporteCarrera;
+  distancia_km: number | string | null;
+  desnivel_m: number | null;
+  horas_min: number | string;
+  horas_max: number | string;
+  prioridad: Prioridad;
+  tp_uid: string | null;
+}
+
+export function aCarrera(f: CarreraFila): Carrera {
+  return { id: f.id, nombre: f.nombre, fecha: f.fecha, deporte: f.deporte, horasMin: Number(f.horas_min), horasMax: Number(f.horas_max), prioridad: f.prioridad };
 }
 
 export interface AlimentoRegistrado {

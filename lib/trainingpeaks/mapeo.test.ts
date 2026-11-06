@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deporteTP, duracionPlanificada, eventoAEntreno, intensidadTP, leerEventos, type EventoIcal } from "@/supabase/functions/tp-sync/mapeo";
+import { deporteTP, duracionPlanificada, eventoAEntreno, intensidadTP, leerEventos, unirCarreras, type EventoIcal } from "@/supabase/functions/tp-sync/mapeo";
 
 // Fragmento con el formato real del enlace "Workouts" de TrainingPeaks.
 const ICAL = [
@@ -92,5 +92,22 @@ describe("eventoAEntreno", () => {
   });
   it("tipos que no cuentan para la nutrición no se guardan", () => {
     expect(eventoAEntreno(ev("Swim: Técnica", "Workout type: Swim"), "u1", horarios)).toBeNull();
+  });
+});
+
+describe("unirCarreras", () => {
+  const petzl = { id: 1, nombre: "Petzl 50K", fecha: "2027-04-03", tp_uid: null };
+  it("enlaza la carrera cuando aparece en el calendario con el mismo nombre", () => {
+    const evs = [ev("Run: Petzl 50K", "Workout type: Run\nPlanned Time: 9:00", "2027-04-03")].map((e) => ({ ...e, uid: "tp-9" }));
+    expect(unirCarreras(evs, [petzl])).toEqual([{ id: 1, tp_uid: "tp-9", fecha: "2027-04-03" }]);
+  });
+  it("si el coach la movió un día, actualiza la fecha", () => {
+    const evs = [{ ...ev("Race: PETZL Trail", "", "2027-04-04"), uid: "tp-9" }];
+    expect(unirCarreras(evs, [petzl])).toEqual([{ id: 1, tp_uid: "tp-9", fecha: "2027-04-04" }]);
+  });
+  it("no enlaza entrenos de otro nombre ni fechas lejanas, y no repite si ya está unida", () => {
+    expect(unirCarreras([{ ...ev("Run: Fondo 50K", "", "2027-04-03"), uid: "a" }], [petzl])).toEqual([]);
+    expect(unirCarreras([{ ...ev("Run: Petzl 50K", "", "2027-03-20"), uid: "a" }], [petzl])).toEqual([]);
+    expect(unirCarreras([{ ...ev("Run: Petzl 50K", "", "2027-04-03"), uid: "a" }], [{ ...petzl, tp_uid: "a" }])).toEqual([]);
   });
 });
