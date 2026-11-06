@@ -6,6 +6,7 @@
 // el carbohidrato sube y baja según el tipo de día, y la grasa completa lo
 // que falta dentro de un rango sano. El déficit para bajar de peso se aplica
 // sobre todo en días suaves y casi nada en días duros.
+import type { ModoCarrera } from "./carrera";
 
 export type Deporte = "rodillo" | "ruta_mtb" | "trail_correr" | "fuerza" | "descanso";
 export type Intensidad = "suave" | "moderado" | "fuerte";
@@ -46,6 +47,7 @@ export interface ObjetivoDia {
   extraCenaG: number; // carbohidrato extra en la cena porque mañana es día duro
   snackPreEntreno: boolean; // entreno exigente antes del desayuno
   vispera: boolean; // mañana es fondo de más de 3 h: hoy sin déficit y carbohidrato moderado
+  carrera: ModoCarrera | null; // semanas sin déficit, día de carga o día de carrera
 }
 
 // Rango de carbohidrato (g/kg) y déficit (kcal) por tipo de día. Rangos de
@@ -141,6 +143,7 @@ export function objetivoDelDia(args: {
   pesoKg: number;
   entrenosHoy: Entreno[];
   entrenosManana?: Entreno[];
+  carrera?: { modo: ModoCarrera; cargaGKg: number } | null;
 }): ObjetivoDia {
   const { perfil, pesoKg } = args;
   const cuentan = entrenosQueCuentan(args.entrenosHoy);
@@ -153,7 +156,8 @@ export function objetivoDelDia(args: {
   // Víspera de un fondo de más de 3 h: hoy no hay déficit y el carbohidrato
   // sube al menos a nivel moderado, para llegar con el músculo lleno.
   const vispera = tipoManana === "muy_largo" && tipo !== "duro" && tipo !== "muy_largo";
-  const deficitMeta = perfil.pausa || vispera ? 0 : deficitDelTipo(tipo, perfil.deficitDescanso) * FACTOR_RITMO[perfil.ritmo];
+  const modoCarrera = args.carrera?.modo ?? null;
+  const deficitMeta = perfil.pausa || vispera || modoCarrera ? 0 : deficitDelTipo(tipo, perfil.deficitDescanso) * FACTOR_RITMO[perfil.ritmo];
   const kcalMeta = gastoKcal - deficitMeta;
 
   const proteinaG = Math.round(PROTEINA_G_KG * pesoKg);
@@ -161,6 +165,31 @@ export function objetivoDelDia(args: {
   const [carboMin, carboMax] = NIVELES[nivelCarbo].carbo.map((x) => x * pesoKg);
   const grasaMin = GRASA_MIN_G_KG * pesoKg;
   const grasaMax = GRASA_MAX_G_KG * pesoKg;
+
+  // Día de carga de carbohidratos antes de una carrera: el carbohidrato se fija
+  // en g/kg (7,5 a 9), la proteína baja a 1,6 g/kg y la grasa a 0,7 g/kg para
+  // dejar espacio. Sin déficit: es normal un superávit esos días.
+  if (modoCarrera === "carga" && args.carrera) {
+    const carboG = Math.round(args.carrera.cargaGKg * pesoKg);
+    const prot = Math.round(1.6 * pesoKg);
+    const grasaG = Math.round(0.7 * pesoKg);
+    const kcal = Math.round((prot * 4 + carboG * 4 + grasaG * 9) / 10) * 10;
+    return {
+      tipo,
+      kcal,
+      carboG,
+      proteinaG: prot,
+      grasaG,
+      reposoKcal,
+      entrenoKcal,
+      gastoKcal,
+      deficitKcal: Math.max(0, gastoKcal - kcal),
+      extraCenaG: 0,
+      snackPreEntreno: false,
+      vispera: false,
+      carrera: "carga",
+    };
+  }
 
   // Mañana duro y hoy no: la cena sube un nivel (+0,5 g/kg de carbohidrato).
   const mananaExigente = tipoManana === "duro" || tipoManana === "muy_largo";
@@ -206,6 +235,7 @@ export function objetivoDelDia(args: {
     extraCenaG,
     snackPreEntreno,
     vispera,
+    carrera: modoCarrera,
   };
 }
 

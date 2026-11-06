@@ -11,7 +11,7 @@ import { DEFICIT_DESCANSO_BASE, DEFICIT_DESCANSO_MAX } from "@/lib/nutricion/mot
 import { kg } from "@/lib/formato";
 import { pesoReferencia } from "@/lib/nutricion/motor";
 import { edadEnAnios } from "@/lib/perfil/edad";
-import { fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
+import { fechaConAnio, fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
 import BotonActualizar from "../garmin/BotonActualizar";
 import { signOut } from "../login/actions";
 import { cambiarDeficit, cambiarPausa } from "./actions";
@@ -33,6 +33,7 @@ export default async function Page() {
   const alternativas = [deficit - 100, deficit + 100].filter((v) => v >= 0 && v <= DEFICIT_DESCANSO_MAX).map((v) => ({ v, r: estimar(v) }));
   // Solo se mira si la variable existe; la llave nunca sale del servidor.
   const iaConectada = Boolean(process.env.ANTHROPIC_API_KEY);
+  const proxima = d.carreras[0] ?? null;
 
   return (
     <>
@@ -58,6 +59,16 @@ export default async function Page() {
           </span>
           <Link href="/peso" className="font-bold">Peso y tendencia ›</Link>
         </section>
+
+        <Link href="/carreras" className="flex items-center justify-between border-t border-linea pt-3.5 text-texto no-underline">
+          <span className="flex flex-col">
+            <strong className="text-base">Mis carreras</strong>
+            <span className="text-[13px] text-tenue">
+              {proxima ? `${proxima.nombre} · ${fechaConAnio(proxima.fecha)}` : "Agrega tu próxima carrera para preparar la alimentación"}
+            </span>
+          </span>
+          <span className="font-bold text-marca">›</span>
+        </Link>
 
         <section className="flex flex-col gap-2.5 border-t border-linea pt-3.5">
           <div className="flex flex-col">
@@ -144,7 +155,7 @@ export default async function Page() {
 
         <section className="flex flex-col">
           <span className="etiqueta pb-1">Próximamente</span>
-          <Proximo nombre="Plan de TrainingPeaks y test de sudoración" etapa={4} />
+          <Proximo nombre="Test de sudoración" etapa={4} />
           <Proximo nombre="Avisos en el iPhone" etapa={7} />
         </section>
 

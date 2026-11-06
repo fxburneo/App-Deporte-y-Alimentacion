@@ -324,3 +324,16 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Strength = fuerza; Day Off = descanso; otros tipos se ignoran. Intensidad por título: FTP/umbral/VO2/tempo = fuerte;
   intervalos/series/sprint/piques/cuestas = moderado; resto suave. Hora = hora habitual del perfil (aeróbicos).
 - Pendiente etapa 4: maqueta de eventos (pregunta de horas) y carga de carbohidratos por duración.
+
+## Etapa 4 · carreras (7-nov-2026)
+- Maquetas 4b.1-4b.5 aprobadas. Francisco carga las carreras en la app (decisión suya: no por chat; TP solo comparte 2
+  semanas y el iCal no trae eventos). Tabla `carreras` (RLS). `tp-sync` las une por nombre y fecha ±3 días (`tp_uid`) y
+  actualiza la fecha si el coach la movió.
+- `lib/nutricion/carrera.ts`: tipo de carga por horas (punto medio): <3 h ninguna; 3-5 h 1 día a 7,5 g/kg; 5-12 h 2 días
+  a 9 g/kg; >12 h 2 días a 7,5 g/kg. Carrera A: sin déficit 3 semanas antes, test de sudoración antes de 12 semanas,
+  ensayo en fondos desde 8 semanas. Plan del día: desayuno 1,5 g/kg 3 h antes; 70 g/h (lo que Francisco ya tolera en
+  carreras de 5-12 h), 600 ml/h y 700 mg/h de sodio hasta el test de sudoración.
+- Motor: `objetivoDelDia({ carrera })`. Carga: carbohidrato fijo en g/kg, proteína 1,6 y grasa 0,7 g/kg, sin déficit.
+  Sin déficit y día de carrera: déficit 0. Si TP no trae la carrera como entreno, `planDelDia` la agrega como plan.
+- Carrera objetivo: Petzl 50K, sábado 3-abr-2027, trail 50 km, 8-10 h (cargada en TP como evento). Estómago entrenado
+  (70 g/h el año pasado). Pendiente: test de sudoración (diciembre).
