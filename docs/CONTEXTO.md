@@ -312,3 +312,15 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   desayuno) y `extra` (sin objetivo, se suma con `extraKcal` en `ajustarResto`). Constraint de `comidas.comida` cambiada.
 - Menú sugerido (`lib/despensa/sugerencia.ts`): plantillas por comida con la despensa, rotan por día, gramos con la
   calculadora; en Hoy para cada comida pendiente sin menú tipo y en el aviso de ajuste. Sin IA.
+
+## Etapa 4 · lectura del plan de TrainingPeaks (6-nov-2026)
+- `TP_ICAL_URL` guardado por Francisco en Supabase. Edge Function `tp-sync` (sin JWT, autentica con x-sync-token o sesión):
+  lee el iCal, guarda desde hoy como entrenos `planificado` con `origen = trainingpeaks` y `tp_uid` (único por usuario),
+  y borra los planes futuros que el coach quitó o movió. Tareas programadas 05:45, 13:00 y 19:15 (Ecuador); el botón
+  Actualizar llama a Garmin y TP en paralelo.
+- Formato real: eventos de día completo, SUMMARY "Tipo: Título", DESCRIPTION con "Workout type" y "Planned Time: H:MM".
+  Sin hora, potencia ni TSS. Traducción en `supabase/functions/tp-sync/mapeo.ts` (pruebas en `lib/trainingpeaks/`):
+  Bike entre semana = rodillo, fin de semana = ruta (salvo rodillo/ERG/Zwift en el texto); MTB = ruta; Run y Walk = trail;
+  Strength = fuerza; Day Off = descanso; otros tipos se ignoran. Intensidad por título: FTP/umbral/VO2/tempo = fuerte;
+  intervalos/series/sprint/piques/cuestas = moderado; resto suave. Hora = hora habitual del perfil (aeróbicos).
+- Pendiente etapa 4: maqueta de eventos (pregunta de horas) y carga de carbohidratos por duración.
