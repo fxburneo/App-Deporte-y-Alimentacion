@@ -146,7 +146,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                     </form>
                   )}
                 </div>
-                {!cuenta && <p className="mt-1.5 text-xs text-tenue">No cuenta: ya cargaste lo que hiciste.</p>}
+                {!cuenta && <p className="mt-1.5 text-xs text-tenue">No cuenta: ya está registrado lo que hiciste.</p>}
               </div>
             ))
           )}
