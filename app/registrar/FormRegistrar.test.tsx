@@ -167,6 +167,21 @@ describe("FormRegistrar", () => {
     expect(screen.getByText("4 galletas")).toBeTruthy();
   });
 
+  it("Antes de entrenar aparece aunque el plan no haya sugerido snack (el entreno llega de Garmin después)", async () => {
+    analizar.mockResolvedValue({
+      ok: true,
+      analisis: { alimentos: [{ nombre: "Jugo de manzana", detalle: "", gramos: 200, medida_casera: "1 vaso", carbo_g: 17, proteina_g: 0, grasa_g: 0 }], preguntas: [], nota: "" },
+    });
+    guardarComida.mockResolvedValue({ ok: true });
+    dibujar(); // sin objetivoPre
+    fireEvent.click(screen.getByRole("button", { name: /^Antes de entrenar/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /Escribir/ }));
+    fireEvent.change(screen.getByLabelText("Qué comiste"), { target: { value: "jugo de manzana" } });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "CALCULAR CON IA" })));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Guardar Antes de entrenar/i })));
+    expect(guardarComida).toHaveBeenCalledWith(expect.objectContaining({ comida: "pre_entreno" }));
+  });
+
   it("Extra: no tiene objetivo propio y se compensa en el resto del día", async () => {
     analizar.mockResolvedValue({
       ok: true,
