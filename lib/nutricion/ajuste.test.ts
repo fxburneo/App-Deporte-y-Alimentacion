@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ajustarResto, kcalDe, sumarMacros, type Macros } from "./ajuste";
+import { ajustarResto, kcalDe, kcalFueraDeComidas, sumarMacros, type Macros } from "./ajuste";
 import type { Comida } from "./motor";
 
 // Objetivos de Francisco en un día de descanso (pantalla Hoy, 27-oct).
@@ -113,5 +113,17 @@ describe("extras fuera de horario", () => {
 describe("sumarMacros", () => {
   it("suma los registros de una comida", () => {
     expect(sumarMacros([{ carboG: 10, proteinaG: 5, grasaG: 2 }, { carboG: 1, proteinaG: 1, grasaG: 1 }])).toEqual({ carboG: 11, proteinaG: 6, grasaG: 3 });
+  });
+});
+
+describe("kcalFueraDeComidas", () => {
+  const g = (carboG: number) => ({ carboG, proteinaG: 0, grasaG: 0 });
+  it("durante el entreno: solo cuenta la diferencia con el objetivo", () => {
+    expect(kcalFueraDeComidas({ objetivoDurante: g(240), consumoDurante: g(240) })).toBe(0);
+    expect(kcalFueraDeComidas({ objetivoDurante: g(240), consumoDurante: g(140) })).toBe(-400); // comió 100 g menos: las comidas suben
+  });
+  it("durante sin entreno largo cargado no mueve nada; los extras cuentan completos", () => {
+    expect(kcalFueraDeComidas({ consumoDurante: g(50) })).toBe(0);
+    expect(kcalFueraDeComidas({ consumoExtra: g(50), objetivoPre: g(25), consumoPre: g(25) })).toBe(200);
   });
 });

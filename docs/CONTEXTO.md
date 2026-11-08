@@ -337,3 +337,11 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Sin déficit y día de carrera: déficit 0. Si TP no trae la carrera como entreno, `planDelDia` la agrega como plan.
 - Carrera objetivo: Petzl 50K, sábado 3-abr-2027, trail 50 km, 8-10 h (cargada en TP como evento). Estómago entrenado
   (70 g/h el año pasado). Pendiente: test de sudoración (diciembre).
+
+## Comida durante el entreno (8-nov-2026)
+- Momento nuevo `durante` en Registrar (aprobado por Francisco sin maqueta nueva). En entrenos aeróbicos de 90 min o
+  más se reservan 60 g/h de carbohidrato (`carboDurante`, tope 50 % del carbohidrato del día) que salen del total: las
+  comidas se reparten el resto en proporción. Diferencia con lo comido → `kcalFueraDeComidas` (antes/durante: solo la
+  diferencia con el objetivo; durante sin entreno largo cargado: neutro; extras: todo).
+- Hoy muestra la fila "Durante el entreno". Despensa: gel (32 g, 25 g C), bebida isotónica (500 ml, 30 g C) y barra
+  (40 g) genéricos.

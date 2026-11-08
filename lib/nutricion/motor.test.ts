@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  carboDurante,
   deficitDelTipo,
   kcalEntreno,
   metabolismoReposo,
@@ -179,5 +180,18 @@ describe("pesoReferencia", () => {
   });
   it("sin pesajes devuelve null", () => {
     expect(pesoReferencia([], "2026-10-17")).toBeNull();
+  });
+});
+
+describe("carboDurante", () => {
+  const ruta = (min: number, estado: "hecho" | "planificado" = "hecho"): Entreno => ({ deporte: "ruta_mtb", duracionMin: min, intensidad: "moderado", estado });
+  it("60 g por hora solo en entrenos de 90 min o más", () => {
+    expect(carboDurante([ruta(256)])).toBe(256); // el fondo del 7-nov
+    expect(carboDurante([ruta(75)])).toBe(0);
+    expect(carboDurante([ruta(90)])).toBe(90);
+  });
+  it("lo hecho reemplaza al plan y la fuerza no cuenta", () => {
+    expect(carboDurante([ruta(180, "planificado"), ruta(256)])).toBe(256);
+    expect(carboDurante([{ deporte: "fuerza", duracionMin: 120, intensidad: "suave", estado: "hecho" }])).toBe(0);
   });
 });

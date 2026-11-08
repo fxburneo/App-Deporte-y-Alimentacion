@@ -197,3 +197,34 @@ describe("FormRegistrar", () => {
     expect(screen.getByRole("button", { name: /Guardar Extra/i })).toBeTruthy();
   });
 });
+
+describe("FormRegistrar · durante el entreno", () => {
+  it("con entreno largo muestra el objetivo de carbohidrato y guarda como 'durante'", async () => {
+    analizar.mockResolvedValue({
+      ok: true,
+      analisis: { alimentos: [{ nombre: "Gel", detalle: "", gramos: 96, medida_casera: "3 geles", carbo_g: 75, proteina_g: 0, grasa_g: 0 }], preguntas: [], nota: "" },
+    });
+    guardarComida.mockResolvedValue({ ok: true });
+    render(
+      <FormRegistrar inicial="durante" horarios={horarios} reparto={reparto} consumido={{}} mananaExigente={false} temprano despensa={[]} platos={[]} recientes={[]} objetivoDurante={{ carboG: 240, proteinaG: 0, grasaG: 0 }} />
+    );
+    fireEvent.click(screen.getByRole("tab", { name: /Escribir/ }));
+    fireEvent.change(screen.getByLabelText("Qué comiste"), { target: { value: "3 geles" } });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "CALCULAR CON IA" })));
+    expect(screen.getByText(/Durante el entreno contra el objetivo/i)).toBeTruthy();
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Guardar Durante el entreno/i })));
+    expect(guardarComida).toHaveBeenCalledWith(expect.objectContaining({ comida: "durante" }));
+  });
+
+  it("sin entreno largo cargado avisa que no mueve las comidas", async () => {
+    analizar.mockResolvedValue({
+      ok: true,
+      analisis: { alimentos: [{ nombre: "Gel", detalle: "", gramos: 32, medida_casera: "1 gel", carbo_g: 25, proteina_g: 0, grasa_g: 0 }], preguntas: [], nota: "" },
+    });
+    render(<FormRegistrar inicial="durante" horarios={horarios} reparto={reparto} consumido={{}} mananaExigente={false} temprano={false} despensa={[]} platos={[]} recientes={[]} />);
+    fireEvent.click(screen.getByRole("tab", { name: /Escribir/ }));
+    fireEvent.change(screen.getByLabelText("Qué comiste"), { target: { value: "1 gel" } });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "CALCULAR CON IA" })));
+    expect(screen.getByText(/se guarda sin mover las comidas/)).toBeTruthy();
+  });
+});

@@ -1,7 +1,8 @@
 // Plan del día: objetivo, reparto por comida y ajuste según lo que ya se
 // registró. Lo usan Hoy, Registrar y Comidas para que todas muestren lo mismo.
-import { ajustarResto, kcalDe, sumarMacros, type AjusteDia, type Macros } from "@/lib/nutricion/ajuste";
+import { ajustarResto, kcalFueraDeComidas, sumarMacros, type AjusteDia, type Macros } from "@/lib/nutricion/ajuste";
 import {
+  carboDurante,
   COMIDAS,
   SNACK_PRE_G,
   objetivoDelDia,
@@ -24,6 +25,8 @@ export interface PlanDia {
   consumido: Partial<Record<Comida, Macros>>;
   objetivoPre: Macros | null; // snack antes de entrenar (sale del desayuno)
   consumoPre: Macros | null;
+  objetivoDurante: Macros | null; // geles, bebida y barras en entrenos de 90 min o más
+  consumoDurante: Macros | null;
   consumoExtra: Macros | null; // extras fuera de horario
   totalConsumido: Macros;
   ajuste: AjusteDia;
@@ -69,6 +72,13 @@ export function planDelDia(args: {
   });
   const temprano = hoy.some((e) => e.hora != null && e.hora < perfil.horaDesayuno && e.deporte !== "descanso");
   const reparto = repartirComidas(objetivo, temprano);
+  // Durante el entreno: ese carbohidrato sale del total del día; las comidas
+  // se reparten lo que queda, en la misma proporción.
+  const gDurante = Math.min(carboDurante(hoy), Math.round(objetivo.carboG * 0.5));
+  if (gDurante > 0) {
+    const totalC = COMIDAS.reduce((s, c) => s + reparto[c].carboG, 0);
+    for (const c of COMIDAS) reparto[c] = { ...reparto[c], carboG: Math.round((reparto[c].carboG * (totalC - gDurante)) / totalC) };
+  }
   // Snack antes de entrenar: sale del desayuno cuando hay entreno exigente
   // temprano o cuando Francisco lo registró (el entreno suele llegar de Garmin
   // después de comerlo, así que no se puede esperar a verlo).
@@ -83,14 +93,19 @@ export function planDelDia(args: {
     const filas = args.comidas.filter((f) => f.fecha === args.fecha && f.comida === c);
     if (filas.length) consumido[c] = sumarMacros(filas.map(macrosDeFila));
   }
-  const delMomento = (m: "pre_entreno" | "extra") => {
+  const delMomento = (m: "pre_entreno" | "durante" | "extra") => {
     const filas = args.comidas.filter((f) => f.fecha === args.fecha && f.comida === m);
     return filas.length ? sumarMacros(filas.map(macrosDeFila)) : null;
   };
   const consumoPre = delMomento("pre_entreno");
   const consumoExtra = delMomento("extra");
-  const extraKcal = (consumoPre ? kcalDe(consumoPre) - (objetivoPre ? kcalDe(objetivoPre) : 0) : 0) + (consumoExtra ? kcalDe(consumoExtra) : 0);
-  const totalConsumido = sumarMacros([...Object.values(consumido), ...(consumoPre ? [consumoPre] : []), ...(consumoExtra ? [consumoExtra] : [])]);
+  const consumoDurante = delMomento("durante");
+  const objetivoDurante: Macros | null = gDurante > 0 ? { carboG: gDurante, proteinaG: 0, grasaG: 0 } : null;
+  const extraKcal = kcalFueraDeComidas({ objetivoPre, consumoPre, objetivoDurante, consumoDurante, consumoExtra });
+  const totalConsumido = sumarMacros([
+    ...Object.values(consumido),
+    ...[consumoPre, consumoDurante, consumoExtra].filter((m): m is Macros => m != null),
+  ]);
   const ajuste = ajustarResto({ objetivos: reparto, consumido, mananaExigente, extraKcal });
-  return { pesoKg, objetivo, reparto, temprano, mananaExigente, consumido, objetivoPre, consumoPre, consumoExtra, totalConsumido, ajuste, carrera };
+  return { pesoKg, objetivo, reparto, temprano, mananaExigente, consumido, objetivoPre, consumoPre, objetivoDurante, consumoDurante, consumoExtra, totalConsumido, ajuste, carrera };
 }
