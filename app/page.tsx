@@ -17,6 +17,7 @@ import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/r
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
 import { kcalDe } from "@/lib/nutricion/ajuste";
+import { balanceReal } from "@/lib/nutricion/balance";
 import { COMIDAS, entrenosQueCuentan, NOMBRE_TIPO, tipoDia, type Comida } from "@/lib/nutricion/motor";
 import type { CarreraDelDia } from "@/lib/nutricion/carrera";
 import { borrarEntreno } from "./entreno/actions";
@@ -60,6 +61,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
 
   const { objetivo: obj, temprano, ajuste, consumido, totalConsumido, pesoKg, objetivoPre, consumoPre, objetivoDurante, consumoDurante, consumoExtra } = plan;
   const cuentan = new Set(entrenosQueCuentan(hoy));
+  const balance = balanceReal(obj.gastoKcal, kcalDe(totalConsumido), esHoy);
   const tipoManana = tipoDia(manana);
   const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
   const siguienteCambio = ajuste.siguiente ? ajuste.cambios[ajuste.siguiente] : undefined;
@@ -175,9 +177,12 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
             <Macro valor={obj.grasaG} nombre="Grasa" color="bg-grasa" />
           </div>
           <p className="text-sm text-tenue">
-            Gastas ~{miles(obj.gastoKcal)} kcal ({miles(obj.entrenoKcal)} del entreno). Déficit de {miles(obj.deficitKcal)} kcal
-            para tu objetivo. Peso de referencia: {kg(pesoKg)} kg.
+            Gastas ~{miles(obj.gastoKcal)} kcal ({miles(obj.entrenoKcal)} del entreno). Déficit planificado: {miles(obj.deficitKcal)} kcal
+            {obj.deficitKcal === 0 && obj.tipo === "muy_largo" ? " (día muy largo: sin déficit)" : ""}. Peso de referencia: {kg(pesoKg)} kg.
           </p>
+          {balance && (
+            <p className={`text-sm font-semibold ${balance.kcal > 0 ? "text-carbo" : "text-suave"}`}>{balance.texto}</p>
+          )}
         </section>
 
         {!esHoy && obj.snackPreEntreno && (
