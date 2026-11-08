@@ -12,7 +12,7 @@ import { reducirFoto } from "@/lib/comidas/foto";
 import type { PlatoFila } from "@/lib/datos/despensa";
 import { aAlimento, type AlimentoDespensa } from "@/lib/despensa/calculos";
 import { NOMBRE_MOMENTO } from "@/lib/datos/tipos";
-import { ajustarResto, kcalDe, sumarMacros, type Macros } from "@/lib/nutricion/ajuste";
+import { ajustarResto, kcalDe, kcalFueraDeComidas, sumarMacros, type Macros } from "@/lib/nutricion/ajuste";
 import { COMIDAS, SNACK_PRE_G, type Comida, type Momento } from "@/lib/nutricion/motor";
 import { miles } from "@/lib/formato";
 import { analizar, guardarComida } from "./actions";
@@ -37,6 +37,8 @@ export default function FormRegistrar(props: {
   recientes: Reciente[];
   objetivoPre?: Macros | null; // snack antes de entrenar (si hoy toca)
   consumoPre?: Macros | null;
+  objetivoDurante?: Macros | null; // geles y bebida en entrenos de 90 min o más
+  consumoDurante?: Macros | null;
   consumoExtra?: Macros | null;
   despensa?: AlimentoDespensa[];
   platos?: PlatoFila[];
@@ -154,24 +156,32 @@ export default function FormRegistrar(props: {
   const vista = useMemo(() => {
     if (!alimentos || alimentos.length === 0) return null;
     const t = totales(alimentos);
-    // Lo ya comido fuera de las 5 comidas, en kcal por encima de su objetivo.
-    const kcalPre = (m: Macros | null | undefined) => (m ? kcalDe(m) - (props.objetivoPre ? kcalDe(props.objetivoPre) : 0) : 0);
-    const kcalExtra = (m: Macros | null | undefined) => (m ? kcalDe(m) : 0);
-    if (comida === "pre_entreno" || comida === "extra") {
+    // Lo ya comido fuera de las 5 comidas (antes, durante y extras), con la
+    // misma regla que usa el servidor (kcalFueraDeComidas).
+    const fuera = {
+      objetivoPre: props.objetivoPre,
+      consumoPre: props.consumoPre,
+      objetivoDurante: props.objetivoDurante,
+      consumoDurante: props.consumoDurante,
+      consumoExtra: props.consumoExtra,
+    };
+    if (comida === "pre_entreno" || comida === "durante" || comida === "extra") {
       // Primer snack previo del día: su objetivo (25 g C) sale del desayuno, igual que hará el servidor al guardar.
       const preNuevo = comida === "pre_entreno" && !props.objetivoPre;
       const objPre = props.objetivoPre ?? { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 };
       const reparto = preNuevo ? { ...props.reparto, desayuno: { ...props.reparto.desayuno, carboG: Math.max(0, props.reparto.desayuno.carboG - SNACK_PRE_G) } } : props.reparto;
-      const kcalPreEf = (m: Macros | null | undefined) => (m ? kcalDe(m) - kcalDe(objPre) : 0);
-      const previo = comida === "pre_entreno" ? props.consumoPre : props.consumoExtra;
+      const previo = comida === "pre_entreno" ? props.consumoPre : comida === "durante" ? props.consumoDurante : props.consumoExtra;
       const conEsta = sumarMacros([t, ...(previo ? [previo] : [])]);
-      const extraKcal =
-        comida === "pre_entreno" ? kcalPreEf(conEsta) + kcalExtra(props.consumoExtra) : kcalPre(props.consumoPre) + kcalExtra(conEsta);
+      const extraKcal = kcalFueraDeComidas({
+        ...fuera,
+        objetivoPre: objPre,
+        ...(comida === "pre_entreno" ? { consumoPre: conEsta } : comida === "durante" ? { consumoDurante: conEsta } : { consumoExtra: conEsta }),
+      });
       const despues = ajustarResto({ objetivos: reparto, consumido: props.consumido, mananaExigente: props.mananaExigente, extraKcal });
-      const objetivo = comida === "pre_entreno" ? objPre : null;
+      const objetivo = comida === "pre_entreno" ? objPre : comida === "durante" ? (props.objetivoDurante ?? null) : null;
       return { t, objetivo, conEsta, despues, previo: previo ?? null };
     }
-    const extraKcal = kcalPre(props.consumoPre) + kcalExtra(props.consumoExtra);
+    const extraKcal = kcalFueraDeComidas(fuera);
     const { [comida]: previo, ...otras } = props.consumido;
     const antes = ajustarResto({ objetivos: props.reparto, consumido: otras, mananaExigente: props.mananaExigente, extraKcal });
     const objetivo: Macros | null = antes.objetivos[comida];
@@ -183,7 +193,7 @@ export default function FormRegistrar(props: {
       extraKcal,
     });
     return { t, objetivo, conEsta, despues, previo: previo ?? null };
-  }, [alimentos, comida, props.consumido, props.reparto, props.mananaExigente, props.objetivoPre, props.consumoPre, props.consumoExtra]);
+  }, [alimentos, comida, props.consumido, props.reparto, props.mananaExigente, props.objetivoPre, props.consumoPre, props.objetivoDurante, props.consumoDurante, props.consumoExtra]);
 
   const guardar = () => {
     if (!alimentos) return;
@@ -201,10 +211,11 @@ export default function FormRegistrar(props: {
   };
 
   const nombreComida = (c: Momento) => (c === "desayuno" && props.temprano ? "Desayuno de recuperación" : NOMBRE_MOMENTO[c]);
-  // Antes de entrenar y Extra siempre están: el entreno de la mañana llega de
-  // Garmin después de que comes el snack.
-  const chips: Momento[] = ["pre_entreno", ...COMIDAS, "extra"];
-  const registrado = (c: Momento) => (c === "pre_entreno" ? props.consumoPre : c === "extra" ? props.consumoExtra : props.consumido[c]);
+  // Antes, durante y Extra siempre están: el entreno llega de Garmin después
+  // de que comes.
+  const chips: Momento[] = ["pre_entreno", "durante", ...COMIDAS, "extra"];
+  const registrado = (c: Momento) =>
+    c === "pre_entreno" ? props.consumoPre : c === "durante" ? props.consumoDurante : c === "extra" ? props.consumoExtra : props.consumido[c];
   const chip = (activo: boolean) =>
     activo ? "border-texto bg-texto font-bold text-fondo" : "border-borde bg-transparent text-tenue";
   const modoClase = (activo: boolean) => (activo ? "bg-marca font-bold text-fondo" : "bg-superficie font-semibold text-suave");
@@ -493,6 +504,13 @@ export default function FormRegistrar(props: {
             <Total nombre="Grasa" real={vista.t.grasaG} obj={vista.objetivo.grasaG} color="text-grasa" />
           </div>
           {vista.previo && <span className="text-xs text-tenue">Ya tenías {miles(kcalDe(vista.previo))} kcal registradas en esta comida; se suman.</span>}
+        </section>
+      )}
+      {vista && comida === "durante" && !vista.objetivo && (
+        <section className="flex flex-col gap-1 rounded-[14px] bg-superficie px-4 py-3.5">
+          <span className="etiqueta">Durante el entreno</span>
+          <span className="font-display text-[26px] font-bold">{miles(vista.t.kcal)} <span className="text-base text-tenue">kcal</span></span>
+          <span className="text-sm text-suave">Hoy no hay un entreno de 90 min o más cargado: se guarda sin mover las comidas. Cuando llegue el entreno de Garmin, el plan se ajusta.</span>
         </section>
       )}
       {vista && comida === "extra" && (

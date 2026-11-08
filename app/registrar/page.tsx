@@ -55,6 +55,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
       recientes={recientes}
       objetivoPre={plan.objetivoPre}
       consumoPre={plan.consumoPre}
+      objetivoDurante={plan.objetivoDurante}
+      consumoDurante={plan.consumoDurante}
       consumoExtra={plan.consumoExtra}
     />
   );

@@ -245,9 +245,21 @@ export const COMIDAS: Comida[] = ["desayuno", "media_manana", "almuerzo", "media
 // Momentos que se pueden registrar además de las 5 comidas: el snack antes de
 // entrenar (su objetivo sale del desayuno) y los extras fuera de horario (sin
 // objetivo: se compensan en las comidas que faltan).
-export type Momento = Comida | "pre_entreno" | "extra";
-export const MOMENTOS: Momento[] = ["pre_entreno", ...COMIDAS, "extra"];
+export type Momento = Comida | "pre_entreno" | "durante" | "extra";
+export const MOMENTOS: Momento[] = ["pre_entreno", "durante", ...COMIDAS, "extra"];
 export const SNACK_PRE_G = 25;
+
+// Comida durante el entreno (geles, bebida, barras): en entrenos aeróbicos de
+// 90 min o más, 60 g de carbohidrato por hora (decisión de Francisco, 7-nov).
+// Sale del total del día: las comidas se reparten lo que queda.
+export const DURANTE_MIN = 90;
+export const DURANTE_G_HORA = 60;
+export function carboDurante(entrenos: Entreno[]): number {
+  const largos = entrenosQueCuentan(entrenos).filter(
+    (e) => e.deporte !== "descanso" && e.deporte !== "fuerza" && e.duracionMin >= DURANTE_MIN
+  );
+  return Math.round(largos.reduce((s, e) => s + (DURANTE_G_HORA * e.duracionMin) / 60, 0));
+}
 
 // Reparto del objetivo entre las 5 comidas. Si se entrena antes del
 // desayuno, el desayuno es la comida de recuperación y lleva más carbohidrato.

@@ -138,6 +138,7 @@ export const NOMBRE_COMIDA: Record<Comida, string> = {
 
 export const NOMBRE_MOMENTO: Record<Momento, string> = {
   pre_entreno: "Antes de entrenar",
+  durante: "Durante el entreno",
   ...NOMBRE_COMIDA,
   extra: "Extra",
 };

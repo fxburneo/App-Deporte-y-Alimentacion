@@ -58,7 +58,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
     );
   }
 
-  const { objetivo: obj, temprano, ajuste, consumido, totalConsumido, pesoKg, objetivoPre, consumoPre, consumoExtra } = plan;
+  const { objetivo: obj, temprano, ajuste, consumido, totalConsumido, pesoKg, objetivoPre, consumoPre, objetivoDurante, consumoDurante, consumoExtra } = plan;
   const cuentan = new Set(entrenosQueCuentan(hoy));
   const tipoManana = tipoDia(manana);
   const recuperacion = calcularRecuperacion(d.bienestar, d.fecha);
@@ -243,6 +243,27 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                 </span>
               </div>
               <span className="font-display text-lg font-semibold text-suave">{miles(Math.round(kcalDe(consumoPre ?? objetivoPre!)))}</span>
+            </Enlace>
+          )}
+          {(objetivoDurante || consumoDurante) && (esHoy || consumoDurante) && (
+            <Enlace href={esHoy ? (consumoDurante ? "/comidas" : "/registrar?comida=durante") : null} className="flex items-center gap-3.5 border-b border-linea py-3">
+              <span className="w-[42px] font-display text-base text-tenue">—</span>
+              <div className="flex flex-1 flex-col">
+                <strong>Durante el entreno</strong>
+                <span className="text-xs text-tenue">
+                  {consumoDurante ? (
+                    <>
+                      Comiste <span className="text-carbo">{Math.round(consumoDurante.carboG)} g C</span>
+                      {objetivoDurante ? ` (objetivo ${objetivoDurante.carboG} g)` : ""}
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-carbo">{objetivoDurante!.carboG} g de carbohidrato</span> (60 g por hora): geles, bebida isotónica, barras
+                    </>
+                  )}
+                </span>
+              </div>
+              <span className="font-display text-lg font-semibold text-suave">{miles(Math.round(kcalDe(consumoDurante ?? objetivoDurante!)))}</span>
             </Enlace>
           )}
           {COMIDAS.map((c) => {

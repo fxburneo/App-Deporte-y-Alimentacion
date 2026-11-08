@@ -118,3 +118,23 @@ export function sumarMacros(lista: Macros[]): Macros {
     { carboG: 0, proteinaG: 0, grasaG: 0 }
   );
 }
+
+
+// Lo comido fuera de las 5 comidas, en kcal por encima de su objetivo, para
+// compensar en las comidas que quedan:
+// - antes de entrenar y durante el entreno: solo cuenta la diferencia con su
+//   objetivo (si comiste justo lo previsto, no se mueve nada);
+// - durante sin objetivo (no hay entreno largo cargado todavía): neutro;
+// - extras: todo.
+export function kcalFueraDeComidas(m: {
+  objetivoPre?: Macros | null;
+  consumoPre?: Macros | null;
+  objetivoDurante?: Macros | null;
+  consumoDurante?: Macros | null;
+  consumoExtra?: Macros | null;
+}): number {
+  const pre = m.consumoPre ? kcalDe(m.consumoPre) - (m.objetivoPre ? kcalDe(m.objetivoPre) : 0) : 0;
+  const durante = m.consumoDurante && m.objetivoDurante ? kcalDe(m.consumoDurante) - kcalDe(m.objetivoDurante) : 0;
+  const extra = m.consumoExtra ? kcalDe(m.consumoExtra) : 0;
+  return pre + durante + extra;
+}
