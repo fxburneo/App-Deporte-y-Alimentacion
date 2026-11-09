@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/NavBar";
+import FranjaDias from "@/components/FranjaDias";
 import Pantalla from "@/components/Pantalla";
 import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
@@ -12,7 +13,7 @@ import { leerDespensa } from "@/lib/datos/despensa";
 import { ajusteEnAlimentos } from "@/lib/despensa/calculos";
 import { sugerirPlato, textoPlato } from "@/lib/despensa/sugerencia";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
-import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
+import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
@@ -393,19 +394,13 @@ function AvisoCarrera({ c }: { c: CarreraDelDia }) {
 }
 
 function Encabezado({ fecha, esHoy }: { fecha: string; esHoy: boolean }) {
-  const flecha = "flex h-9 w-9 items-center justify-center rounded-full border border-borde text-lg";
   return (
-    <header className="flex flex-wrap items-center justify-between gap-y-2">
-      <span className="font-display text-[16px] font-extrabold tracking-[0.1em] text-marca">FXB PERFORMANCE</span>
-      <nav aria-label="Cambiar de día" className="flex items-center gap-2">
-        <Link href={`/?fecha=${sumarDias(fecha, -1)}`} aria-label="Día anterior" className={flecha}>‹</Link>
-        <span className="min-w-[92px] text-center text-[13px] text-tenue">{esHoy ? `Hoy · ${fechaLarga(fecha).split(" ").slice(1).join(" ")}` : fechaLarga(fecha)}</span>
-        {esHoy ? (
-          <span aria-hidden="true" className={`${flecha} opacity-30`}>›</span>
-        ) : (
-          <Link href={sumarDias(fecha, 1) >= hoyEcuador() ? "/" : `/?fecha=${sumarDias(fecha, 1)}`} aria-label="Día siguiente" className={flecha}>›</Link>
-        )}
-      </nav>
+    <header className="flex flex-col gap-2.5">
+      <div className="flex items-baseline justify-between">
+        <span className="font-display text-[16px] font-extrabold tracking-[0.1em] text-marca">FXB PERFORMANCE</span>
+        <span className={`text-[13px] ${esHoy ? "text-tenue" : "font-bold text-carbo"}`}>{esHoy ? `Hoy · ${fechaLarga(fecha).split(" ").slice(1).join(" ")}` : fechaLarga(fecha)}</span>
+      </div>
+      <FranjaDias fecha={fecha} hoy={hoyEcuador()} ruta="/" />
     </header>
   );
 }

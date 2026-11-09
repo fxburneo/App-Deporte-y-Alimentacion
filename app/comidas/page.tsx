@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/NavBar";
+import FranjaDias from "@/components/FranjaDias";
 import Pantalla from "@/components/Pantalla";
 import { leerDatosDia, leerSemana } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
@@ -62,17 +63,14 @@ export default async function Comidas({ searchParams }: { searchParams: Promise<
       <Pantalla>
         <header className="flex items-end justify-between">
           <div className="flex flex-col">
-            <span className="flex items-center gap-2 text-[13px] text-tenue">
-              <Link href={`/comidas?fecha=${sumarDias(fecha, -1)}`} aria-label="Día anterior" className="px-1 text-base font-bold text-texto">‹</Link>
-              <span className={esHoy ? "" : "font-bold text-carbo"}>{esHoy ? "Hoy" : fechaLarga(d.fecha)} · {NOMBRE_TIPO[objetivo.tipo].toLowerCase()}</span>
-              {!esHoy && (
-                <Link href={sumarDias(fecha, 1) >= hoyEc ? "/comidas" : `/comidas?fecha=${sumarDias(fecha, 1)}`} aria-label="Día siguiente" className="px-1 text-base font-bold text-texto">›</Link>
-              )}
+            <span className={`text-[13px] ${esHoy ? "text-tenue" : "font-bold text-carbo"}`}>
+              {esHoy ? "Hoy" : fechaLarga(d.fecha)} · {NOMBRE_TIPO[objetivo.tipo].toLowerCase()}
             </span>
             <h1 className="font-display text-[28px] font-bold leading-tight tracking-[0.04em]">COMIDAS</h1>
           </div>
           {editable && <Link href={`/registrar${q}`} className="pb-1 font-bold text-marca">+ Registrar</Link>}
         </header>
+        <FranjaDias fecha={fecha} hoy={hoyEc} ruta="/comidas" />
         {!esHoy && (
           <p className="-mt-2 text-sm text-suave">
             {editable ? "Día anterior: puedes registrar, corregir o borrar comidas." : "Solo lectura: se puede corregir hasta 7 días atrás."}{" "}
@@ -144,43 +142,43 @@ export default async function Comidas({ searchParams }: { searchParams: Promise<
             </p>
           ) : (
             registros.map((r) => (
-              <details key={r.id} className="border-b border-linea py-3 last:border-0">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                  <span className="flex flex-col">
-                    <strong>{NOMBRE_MOMENTO[r.comida]} <span className="text-sm font-normal text-tenue">· {ORIGEN[r.origen]} · {horaEcuador(r.creado_en)}</span></strong>
-                    <span className="text-xs text-tenue">{r.alimentos.map((a) => a.nombre).join(", ")}</span>
-                  </span>
+              <article key={r.id} className="flex flex-col gap-2 border-b border-linea py-3 last:border-0">
+                <div className="flex items-baseline justify-between gap-3">
+                  <strong>
+                    {NOMBRE_MOMENTO[r.comida]} <span className="text-sm font-normal text-tenue">· {ORIGEN[r.origen]} · {horaEcuador(r.creado_en)}</span>
+                  </strong>
                   <span className="font-display text-xl font-semibold">{miles(r.kcal)}</span>
-                </summary>
-                <ul className="mt-2 flex flex-col gap-1 text-sm">
+                </div>
+                <ul className="flex flex-col gap-0.5 text-[13px]">
                   {r.alimentos.map((a, i) => (
                     <li key={i} className="flex justify-between gap-3">
-                      <span>{a.nombre} <span className="text-tenue">· {Math.round(a.gramos)} g · {a.medida_casera}</span></span>
+                      <span>{a.nombre} <span className="text-tenue">· {a.medida_casera || `${Math.round(a.gramos)} g`}</span></span>
                       <span className="whitespace-nowrap font-display">
-                        <span className="text-carbo">{Math.round(a.carbo_g)}</span> <span className="text-proteina">{Math.round(a.proteina_g)}</span>{" "}
-                        <span className="text-grasa">{Math.round(a.grasa_g)}</span>
+                        <span className="text-carbo">{Math.round(a.carbo_g)} C</span> <span className="text-proteina">{Math.round(a.proteina_g)} P</span>{" "}
+                        <span className="text-grasa">{Math.round(a.grasa_g)} G</span>
                       </span>
                     </li>
                   ))}
                 </ul>
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <form action={guardarRegistroComoPlato} className="flex items-center gap-1.5">
-                    <input type="hidden" name="comida_id" value={r.id} />
-                    <label htmlFor={`pl-${r.id}`} className="sr-only">Nombre del plato</label>
-                    <input id={`pl-${r.id}`} name="nombre" defaultValue={`${NOMBRE_MOMENTO[r.comida]} habitual`} className="w-36 rounded-[8px] border border-borde bg-superficie px-2 py-1 text-texto" />
-                    <button type="submit" className="font-bold text-marca">Guardar como plato</button>
-                  </form>
-                  {editable && (
-                  <span className="flex gap-3">
-                    <Link href={`/comidas/${r.id}/editar`} className="font-bold text-texto underline">Editar</Link>
+                {editable && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href={`/comidas/${r.id}/editar`} className="rounded-[10px] border border-borde py-2 text-center font-bold text-texto no-underline">Editar</Link>
                     <form action={borrarComida}>
                       <input type="hidden" name="id" value={r.id} />
-                      <button type="submit" className="text-tenue underline">Borrar</button>
+                      <button type="submit" className="w-full rounded-[10px] border border-borde py-2 font-semibold text-tenue">Borrar</button>
                     </form>
-                  </span>
-                  )}
-                </div>
-              </details>
+                  </div>
+                )}
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-tenue">Guardar como plato habitual</summary>
+                  <form action={guardarRegistroComoPlato} className="mt-1.5 flex items-center gap-1.5">
+                    <input type="hidden" name="comida_id" value={r.id} />
+                    <label htmlFor={`pl-${r.id}`} className="sr-only">Nombre del plato</label>
+                    <input id={`pl-${r.id}`} name="nombre" defaultValue={`${NOMBRE_MOMENTO[r.comida]} habitual`} className="w-40 rounded-[8px] border border-borde bg-superficie px-2 py-1 text-texto" />
+                    <button type="submit" className="font-bold text-marca">Guardar</button>
+                  </form>
+                </details>
+              </article>
             ))
           )}
         </section>

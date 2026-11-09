@@ -36,6 +36,9 @@ export function inferirCategoria(c100: number, p100: number, g100: number): Cate
   return "mixto";
 }
 
+// Plural en español: "galleta" → "galletas", "pan" → "panes"; si ya termina en s, igual.
+const plural = (p: string) => (p.endsWith("s") ? p : /[aeiouáéíóú]$/i.test(p) ? `${p}s` : `${p}es`);
+
 // Medida casera para unos gramos: en unidades si el alimento las tiene
 // (con medios), si no, en fracción de su porción.
 export function medidaCasera(a: Pick<AlimentoDespensa, "porcion_g" | "porcion_nombre" | "unidad_g" | "unidad_nombre">, gramos: number): string {
@@ -44,7 +47,7 @@ export function medidaCasera(a: Pick<AlimentoDespensa, "porcion_g" | "porcion_no
   const fraccion = (x: number) => (x === 0.5 ? "½" : Number.isInteger(x) ? String(x) : `${Math.floor(x)} ½`);
   if (a.unidad_g && a.unidad_nombre) {
     if (n <= 0) return "un poco";
-    return `${fraccion(n)} ${a.unidad_nombre}${n > 1 && !a.unidad_nombre.endsWith("s") ? "s" : ""}`;
+    return `${fraccion(n)} ${n > 1 ? plural(a.unidad_nombre) : a.unidad_nombre}`;
   }
   if (n <= 0) return "un poco";
   return n === 1 ? a.porcion_nombre : `${fraccion(n)} × ${a.porcion_nombre}`;
