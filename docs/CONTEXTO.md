@@ -345,3 +345,10 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   diferencia con el objetivo; durante sin entreno largo cargado: neutro; extras: todo).
 - Hoy muestra la fila "Durante el entreno". Despensa: gel (32 g, 25 g C), bebida isotónica (500 ml, 30 g C) y barra
   (40 g) genéricos.
+
+## Días anteriores y recordatorio (9-nov-2026)
+- Registrar, corregir y borrar comidas hasta 7 días atrás (`esEditable`, `DIAS_EDITABLES`); más atrás, solo lectura.
+  `guardarComida` acepta `fecha`; editar/borrar validan la fecha en el servidor. Hoy (con flechas) y Comidas
+  (`?fecha=`, flechas y barras de 7 días clicables) llevan a Registrar con esa fecha.
+- Recordatorio de pesaje (tarea programada de Claude, lun/mié/vie 05:04) fallaba porque el script de arranque del
+  entorno "Nube FXB" hacía `npm ci` sin proyecto. Script corregido (sale sin hacer nada si no hay package.json).

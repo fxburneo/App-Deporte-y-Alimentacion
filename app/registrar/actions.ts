@@ -4,7 +4,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { hoyEcuador } from "@/lib/fecha";
+import { DIAS_EDITABLES, esEditable, hoyEcuador } from "@/lib/fecha";
 import { AlimentoSchema, alimentoValido, totales, type Analisis } from "@/lib/comidas/alimentos";
 import { analizarComida, ErrorIA } from "@/lib/ia/analizarComida";
 import { MOMENTOS } from "@/lib/nutricion/motor";
@@ -43,6 +43,7 @@ const GuardarSchema = z.object({
   origen: z.enum(["foto", "texto", "repetida"]),
   descripcion: z.string().max(1000),
   alimentos: z.array(AlimentoSchema).min(1).max(30),
+  fecha: z.string().optional(), // día anterior (hasta 7 días atrás); sin fecha = hoy
 });
 
 export type ResultadoGuardar = { ok: true } | { ok: false; error: string };
@@ -56,10 +57,13 @@ export async function guardarComida(datos: unknown): Promise<ResultadoGuardar> {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "La sesión expiró, vuelve a entrar." };
 
+  const hoy = hoyEcuador();
+  const fecha = p.data.fecha ?? hoy;
+  if (!esEditable(fecha, hoy)) return { ok: false, error: `Solo puedes registrar comidas de hasta ${DIAS_EDITABLES} días atrás.` };
   const t = totales(p.data.alimentos);
   const { error } = await supabase.from("comidas").insert({
     user_id: user.id,
-    fecha: hoyEcuador(),
+    fecha,
     comida: p.data.comida,
     origen: p.data.origen,
     descripcion: p.data.descripcion || null,
@@ -78,6 +82,8 @@ export async function borrarComida(fd: FormData) {
   const id = Number(fd.get("id"));
   if (!Number.isInteger(id)) return;
   const supabase = await createClient();
+  const { data } = await supabase.from("comidas").select("fecha").eq("id", id).maybeSingle();
+  if (!data || !esEditable(data.fecha, hoyEcuador())) return;
   await supabase.from("comidas").delete().eq("id", id);
   revalidatePath("/", "layout");
 }
@@ -87,6 +93,8 @@ export async function editarComida(id: number, alimentos: unknown): Promise<Resu
   const p = z.array(AlimentoSchema).min(1).max(30).safeParse(alimentos);
   if (!Number.isInteger(id) || !p.success || !p.data.every(alimentoValido)) return { ok: false, error: "Revisa los alimentos: hay un valor fuera de rango." };
   const supabase = await createClient();
+  const { data } = await supabase.from("comidas").select("fecha").eq("id", id).maybeSingle();
+  if (!data || !esEditable(data.fecha, hoyEcuador())) return { ok: false, error: `Solo puedes corregir comidas de hasta ${DIAS_EDITABLES} días atrás.` };
   const t = totales(p.data);
   const { error } = await supabase
     .from("comidas")

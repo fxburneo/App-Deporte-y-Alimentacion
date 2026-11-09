@@ -228,3 +228,23 @@ describe("FormRegistrar · durante el entreno", () => {
     expect(screen.getByText(/se guarda sin mover las comidas/)).toBeTruthy();
   });
 });
+
+describe("FormRegistrar · día anterior", () => {
+  it("muestra la fecha, guarda con esa fecha y vuelve a las comidas de ese día", async () => {
+    analizar.mockResolvedValue({
+      ok: true,
+      analisis: { alimentos: [{ nombre: "Yogurt natural", detalle: "", gramos: 200, medida_casera: "1 taza", carbo_g: 9, proteina_g: 7, grasa_g: 7 }], preguntas: [], nota: "" },
+    });
+    guardarComida.mockResolvedValue({ ok: true });
+    render(
+      <FormRegistrar inicial="cena" horarios={horarios} reparto={reparto} consumido={{}} mananaExigente={false} temprano={false} despensa={[]} platos={[]} recientes={[]} fecha="2026-11-08" fechaTexto="Domingo 8 nov" />
+    );
+    expect(screen.getByText("Domingo 8 nov")).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: /Escribir/ }));
+    fireEvent.change(screen.getByLabelText("Qué comiste"), { target: { value: "yogur" } });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "CALCULAR CON IA" })));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Guardar Cena/i })));
+    expect(guardarComida).toHaveBeenCalledWith(expect.objectContaining({ comida: "cena", fecha: "2026-11-08" }));
+    expect(push).toHaveBeenCalledWith("/comidas?fecha=2026-11-08");
+  });
+});

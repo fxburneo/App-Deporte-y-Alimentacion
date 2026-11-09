@@ -9,7 +9,7 @@ import { NOMBRE_MOMENTO } from "@/lib/datos/tipos";
 import type { Momento } from "@/lib/nutricion/motor";
 import { editarComida } from "../../../registrar/actions";
 
-export default function EditarRegistro(props: { id: number; comida: Momento; alimentosIniciales: Alimento[] }) {
+export default function EditarRegistro(props: { id: number; comida: Momento; alimentosIniciales: Alimento[]; volver?: string }) {
   const router = useRouter();
   const [alimentos, setAlimentos] = useState(props.alimentosIniciales);
   const [error, setError] = useState<string | null>(null);
@@ -20,13 +20,13 @@ export default function EditarRegistro(props: { id: number; comida: Momento; ali
     start(async () => {
       const r = await editarComida(props.id, alimentos);
       if (!r.ok) return setError(r.error);
-      router.push("/comidas");
+      router.push(props.volver ?? "/comidas");
     });
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-[18px] px-[18px] pt-[max(18px,env(safe-area-inset-top))] pb-10">
       <header className="flex items-center justify-between">
-        <Link href="/comidas" className="py-2.5 font-semibold text-tenue">Cancelar</Link>
+        <Link href={props.volver ?? "/comidas"} className="py-2.5 font-semibold text-tenue">Cancelar</Link>
         <h1 className="font-display text-2xl font-bold tracking-[0.04em]">EDITAR {NOMBRE_MOMENTO[props.comida].toUpperCase()}</h1>
         <span className="w-[62px]" />
       </header>

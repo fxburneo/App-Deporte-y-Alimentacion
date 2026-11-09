@@ -38,3 +38,15 @@ describe("fechaHistorial", () => {
     expect(fechaHistorial(undefined, "2026-10-30")).toBe("2026-10-30");
   });
 });
+
+import { esEditable } from "./fecha";
+describe("esEditable", () => {
+  it("hoy y hasta 7 días atrás se pueden corregir; más atrás o el futuro, no", () => {
+    expect(esEditable("2026-11-09", "2026-11-09")).toBe(true);
+    expect(esEditable("2026-11-08", "2026-11-09")).toBe(true);
+    expect(esEditable("2026-11-02", "2026-11-09")).toBe(true);
+    expect(esEditable("2026-11-01", "2026-11-09")).toBe(false);
+    expect(esEditable("2026-11-10", "2026-11-09")).toBe(false);
+    expect(esEditable("8-nov", "2026-11-09")).toBe(false);
+  });
+});

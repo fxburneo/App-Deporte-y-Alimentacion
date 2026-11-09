@@ -4,22 +4,26 @@ import { redirect } from "next/navigation";
 import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
 import type { ComidaFila } from "@/lib/datos/tipos";
-import { horaEcuador, sumarDias } from "@/lib/fecha";
+import { esEditable, fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { comidaQueToca } from "@/lib/comidas/queToca";
-import { MOMENTOS, type Comida, type Momento } from "@/lib/nutricion/motor";
+import { COMIDAS, MOMENTOS, type Comida, type Momento } from "@/lib/nutricion/motor";
 import { createClient } from "@/lib/supabase/server";
 import { leerDespensa } from "@/lib/datos/despensa";
 import FormRegistrar, { type Reciente } from "./FormRegistrar";
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string }> }) {
-  const d = await leerDatosDia();
+export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string; fecha?: string }> }) {
+  const sp = await searchParams;
+  // Día anterior: hasta 7 días atrás; si no, hoy.
+  const hoyEc = hoyEcuador();
+  const fecha = sp.fecha && sp.fecha !== hoyEc && esEditable(sp.fecha, hoyEc) ? sp.fecha : null;
+  const d = await leerDatosDia(fecha ?? hoyEc);
   if (!d.perfil) redirect("/bienvenida");
   const plan = planDelDia({ ...d, perfil: d.perfil });
   if (!plan) redirect("/peso");
 
-  const sp = await searchParams;
   const pedida = MOMENTOS.find((c) => c === sp.comida);
-  const inicial = pedida ?? comidaQueToca(d.perfil.horarios_comida, horaEcuador(new Date().toISOString()), new Set(Object.keys(plan.consumido) as Comida[]));
+  const sinRegistro = COMIDAS.find((c) => !plan.consumido[c]) ?? "cena";
+  const inicial = pedida ?? (fecha ? sinRegistro : comidaQueToca(d.perfil.horarios_comida, horaEcuador(new Date().toISOString()), new Set(Object.keys(plan.consumido) as Comida[])));
 
   const supabase = await createClient();
   const { data } = await supabase
@@ -58,6 +62,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
       objetivoDurante={plan.objetivoDurante}
       consumoDurante={plan.consumoDurante}
       consumoExtra={plan.consumoExtra}
+      fecha={fecha ?? undefined}
+      fechaTexto={fecha ? fechaLarga(fecha) : undefined}
     />
   );
 }
