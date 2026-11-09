@@ -51,3 +51,10 @@ export function fechaCorta(fecha: string): string {
 export function fechaConAnio(fecha: string): string {
   return `${fechaLarga(fecha)} ${fecha.slice(0, 4)}`;
 }
+
+// Días anteriores en los que se puede registrar o corregir comidas (hoy
+// incluido). Más atrás, el historial es solo para revisar.
+export const DIAS_EDITABLES = 7;
+export function esEditable(fecha: string, hoy: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(fecha) && fecha <= hoy && fecha >= sumarDias(hoy, -DIAS_EDITABLES);
+}

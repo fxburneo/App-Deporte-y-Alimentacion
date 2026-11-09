@@ -7,7 +7,7 @@ import Pantalla from "@/components/Pantalla";
 import { leerDatosDia, leerSemana } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
 import { NOMBRE_COMIDA, NOMBRE_MOMENTO } from "@/lib/datos/tipos";
-import { fechaLarga, horaEcuador, sumarDias } from "@/lib/fecha";
+import { esEditable, fechaHistorial, fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { miles } from "@/lib/formato";
 import { dondeAjustar, porcentajeDelObjetivo } from "@/lib/comidas/resumen";
 import { kcalDe } from "@/lib/nutricion/ajuste";
@@ -23,8 +23,14 @@ const NUTRIENTE = {
 const ORIGEN = { foto: "foto", texto: "texto", repetida: "repetida" };
 const DIA_CORTO = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-export default async function Comidas() {
-  const d = await leerDatosDia();
+export default async function Comidas({ searchParams }: { searchParams: Promise<{ fecha?: string }> }) {
+  // ?fecha= muestra un día anterior: se puede corregir hasta 7 días atrás.
+  const hoyEc = hoyEcuador();
+  const fecha = fechaHistorial((await searchParams).fecha, hoyEc);
+  const esHoy = fecha === hoyEc;
+  const editable = esEditable(fecha, hoyEc);
+  const q = esHoy ? "" : `?fecha=${fecha}`;
+  const d = await leerDatosDia(fecha);
   if (!d.perfil) redirect("/bienvenida");
   const plan = planDelDia({ ...d, perfil: d.perfil });
   if (!plan) redirect("/peso");
@@ -46,7 +52,7 @@ export default async function Comidas() {
       comidas: comidasDia,
     });
     const pct = p && comidasDia.length ? porcentajeDelObjetivo(kcalDe(p.totalConsumido), p.objetivo.kcal) : null;
-    return { f, pct, hoy: f === d.fecha };
+    return { f, pct, hoy: f === hoyEc, elegido: f === d.fecha };
   });
 
   const registros = [...d.comidas].sort((a, b) => MOMENTOS.indexOf(a.comida) - MOMENTOS.indexOf(b.comida) || a.creado_en.localeCompare(b.creado_en));
@@ -56,13 +62,23 @@ export default async function Comidas() {
       <Pantalla>
         <header className="flex items-end justify-between">
           <div className="flex flex-col">
-            <span className="text-[13px] text-tenue">
-              {fechaLarga(d.fecha)} · {NOMBRE_TIPO[objetivo.tipo].toLowerCase()}
+            <span className="flex items-center gap-2 text-[13px] text-tenue">
+              <Link href={`/comidas?fecha=${sumarDias(fecha, -1)}`} aria-label="Día anterior" className="px-1 text-base font-bold text-texto">‹</Link>
+              <span className={esHoy ? "" : "font-bold text-carbo"}>{esHoy ? "Hoy" : fechaLarga(d.fecha)} · {NOMBRE_TIPO[objetivo.tipo].toLowerCase()}</span>
+              {!esHoy && (
+                <Link href={sumarDias(fecha, 1) >= hoyEc ? "/comidas" : `/comidas?fecha=${sumarDias(fecha, 1)}`} aria-label="Día siguiente" className="px-1 text-base font-bold text-texto">›</Link>
+              )}
             </span>
             <h1 className="font-display text-[28px] font-bold leading-tight tracking-[0.04em]">COMIDAS</h1>
           </div>
-          <Link href="/registrar" className="pb-1 font-bold text-marca">+ Registrar</Link>
+          {editable && <Link href={`/registrar${q}`} className="pb-1 font-bold text-marca">+ Registrar</Link>}
         </header>
+        {!esHoy && (
+          <p className="-mt-2 text-sm text-suave">
+            {editable ? "Día anterior: puedes registrar, corregir o borrar comidas." : "Solo lectura: se puede corregir hasta 7 días atrás."}{" "}
+            <Link href="/comidas" className="font-bold text-marca">Volver a hoy</Link>
+          </p>
+        )}
 
         <nav className="grid grid-cols-2 gap-2.5">
           <Link href="/despensa" className="rounded-[12px] border border-borde px-3 py-2.5 text-center font-semibold">Mi despensa ›</Link>
@@ -79,7 +95,7 @@ export default async function Comidas() {
           <Barra nombre="Grasa" real={totalConsumido.grasaG} obj={objetivo.grasaG} color="bg-grasa" />
         </section>
 
-        {desvios.length > 0 && (
+        {esHoy && desvios.length > 0 && (
           <section className="flex flex-col gap-2.5">
             <span className="etiqueta">Dónde ajustar</span>
             {desvios.map((x) => (
@@ -106,24 +122,25 @@ export default async function Comidas() {
           </div>
           <div className="grid h-[120px] grid-cols-7 items-end gap-2">
             {dias.map((x) => (
-              <div key={x.f} className="flex h-full flex-col items-center justify-end gap-1">
+              <Link key={x.f} href={x.hoy ? "/comidas" : `/comidas?fecha=${x.f}`} aria-label={`Ver ${fechaLarga(x.f)}`} className="flex h-full flex-col items-center justify-end gap-1 text-texto no-underline">
                 <span className="text-[11px] text-tenue">{x.pct != null ? `${x.pct}` : ""}</span>
                 <div
                   className={`w-full rounded-t-[4px] ${x.pct == null ? "bg-linea" : x.pct > 110 || x.pct < 80 ? "bg-carbo" : "bg-bien"} ${x.hoy ? "opacity-100" : "opacity-80"}`}
                   style={{ height: `${x.pct == null ? 4 : Math.max(6, Math.min(100, x.pct) * 0.8)}px` }}
                 />
-                <span className={`text-[11px] ${x.hoy ? "font-bold text-texto" : "text-tenue"}`}>{x.hoy ? "Hoy" : DIA_CORTO[new Date(x.f + "T12:00:00Z").getUTCDay()]}</span>
-              </div>
+                <span className={`text-[11px] ${x.elegido ? "font-bold text-texto underline" : "text-tenue"}`}>{x.hoy ? "Hoy" : DIA_CORTO[new Date(x.f + "T12:00:00Z").getUTCDay()]}</span>
+              </Link>
             ))}
           </div>
-          <span className="text-xs text-tenue">Verde: entre 80 y 110 % del objetivo. El día de hoy sube a medida que registras.</span>
+          <span className="text-xs text-tenue">Verde: entre 80 y 110 % del objetivo. Toca un día para ver o corregir sus comidas.</span>
         </section>
 
         <section className="flex flex-col">
-          <span className="etiqueta pb-1.5">Registros de hoy</span>
+          <span className="etiqueta pb-1.5">{esHoy ? "Registros de hoy" : `Registros del ${fechaLarga(d.fecha).toLowerCase()}`}</span>
           {registros.length === 0 ? (
             <p className="text-sm text-tenue">
-              Todavía no registras nada hoy. <Link href="/registrar" className="font-bold text-texto">Registrar comida ›</Link>
+              {esHoy ? "Todavía no registras nada hoy." : "No hay registros ese día."}{" "}
+              {editable && <Link href={`/registrar${q}`} className="font-bold text-texto">Registrar comida ›</Link>}
             </p>
           ) : (
             registros.map((r) => (
@@ -153,6 +170,7 @@ export default async function Comidas() {
                     <input id={`pl-${r.id}`} name="nombre" defaultValue={`${NOMBRE_MOMENTO[r.comida]} habitual`} className="w-36 rounded-[8px] border border-borde bg-superficie px-2 py-1 text-texto" />
                     <button type="submit" className="font-bold text-marca">Guardar como plato</button>
                   </form>
+                  {editable && (
                   <span className="flex gap-3">
                     <Link href={`/comidas/${r.id}/editar`} className="font-bold text-texto underline">Editar</Link>
                     <form action={borrarComida}>
@@ -160,6 +178,7 @@ export default async function Comidas() {
                       <button type="submit" className="text-tenue underline">Borrar</button>
                     </form>
                   </span>
+                  )}
                 </div>
               </details>
             ))

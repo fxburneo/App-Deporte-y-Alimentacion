@@ -12,7 +12,7 @@ import { leerDespensa } from "@/lib/datos/despensa";
 import { ajusteEnAlimentos } from "@/lib/despensa/calculos";
 import { sugerirPlato, textoPlato } from "@/lib/despensa/sugerencia";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
-import { diaSemana, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
+import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
@@ -31,6 +31,11 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
   const pedida = (await searchParams).fecha;
   const fecha = fechaHistorial(pedida, hoyEc);
   const esHoy = fecha === hoyEc;
+  // Hasta 7 días atrás se puede registrar y corregir; más atrás, solo lectura.
+  const editable = esEditable(fecha, hoyEc);
+  const fq = esHoy ? "" : `fecha=${fecha}`;
+  const reg = (m: string) => `/registrar?comida=${m}${fq ? `&${fq}` : ""}`;
+  const verComidas = esHoy ? "/comidas" : `/comidas?${fq}`;
   const d = await leerDatosDia(fecha);
   if (!d.perfil) redirect("/bienvenida");
 
@@ -84,7 +89,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
 
         {!esHoy && (
           <section className="flex items-center justify-between rounded-[14px] border border-borde px-3.5 py-2.5">
-            <span className="text-sm text-suave">Historial: así quedó ese día. Solo lectura.</span>
+            <span className="text-sm text-suave">{editable ? "Día anterior: toca una comida para registrarla o corregirla." : "Historial: así quedó ese día. Solo lectura."}</span>
             <Link href="/" className="text-sm font-bold text-marca">Volver a hoy</Link>
           </section>
         )}
@@ -226,8 +231,8 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
         <section className="flex flex-col">
           <div className="flex items-baseline justify-between pb-1.5">
             <span className="etiqueta">Comidas</span>
-            {esHoy ? (
-              <Link href="/comidas" className="text-[13px] font-bold">
+            {editable ? (
+              <Link href={verComidas} className="text-[13px] font-bold">
                 {miles(Math.round(kcalDe(totalConsumido)))} / {miles(obj.kcal)} kcal ›
               </Link>
             ) : (
@@ -236,8 +241,8 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               </span>
             )}
           </div>
-          {esHoy && (objetivoPre || consumoPre) && (
-            <Enlace href={consumoPre ? "/comidas" : "/registrar?comida=pre_entreno"} className="flex items-center gap-3.5 border-b border-linea py-3">
+          {(consumoPre || (editable && objetivoPre)) && (
+            <Enlace href={editable ? (consumoPre ? verComidas : reg("pre_entreno")) : null} className="flex items-center gap-3.5 border-b border-linea py-3">
               <span className="w-[42px] font-display text-base text-tenue">{d.perfil.entreno_semana.slice(0, 5)}</span>
               <div className="flex flex-1 flex-col">
                 <strong>Antes de entrenar</strong>
@@ -250,8 +255,8 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               <span className="font-display text-lg font-semibold text-suave">{miles(Math.round(kcalDe(consumoPre ?? objetivoPre!)))}</span>
             </Enlace>
           )}
-          {(objetivoDurante || consumoDurante) && (esHoy || consumoDurante) && (
-            <Enlace href={esHoy ? (consumoDurante ? "/comidas" : "/registrar?comida=durante") : null} className="flex items-center gap-3.5 border-b border-linea py-3">
+          {(objetivoDurante || consumoDurante) && (editable || consumoDurante) && (
+            <Enlace href={editable ? (consumoDurante ? verComidas : reg("durante")) : null} className="flex items-center gap-3.5 border-b border-linea py-3">
               <span className="w-[42px] font-display text-base text-tenue">—</span>
               <div className="flex flex-1 flex-col">
                 <strong>Durante el entreno</strong>
@@ -276,7 +281,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
             const meta = ajuste.objetivos[c];
             const cambio = ajuste.cambios[c];
             return (
-              <Enlace key={c} href={esHoy ? (real ? "/comidas" : `/registrar?comida=${c}`) : null} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
+              <Enlace key={c} href={editable ? (real ? verComidas : reg(c)) : null} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
                 <span className="w-[42px] font-display text-base text-tenue">{d.perfil!.horarios_comida[c]}</span>
                 <div className="flex flex-1 flex-col">
                   <strong>
@@ -304,13 +309,13 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                   ) : (
                     <span className="font-display text-lg font-semibold text-suave">{miles(kcalDe(meta))}</span>
                   )}
-                  <span className="text-[11px] text-tenue">{real ? `de ${miles(kcalDe(meta))} kcal` : esHoy ? "kcal · +" : "sin registro"}</span>
+                  <span className="text-[11px] text-tenue">{real ? `de ${miles(kcalDe(meta))} kcal` : editable ? "kcal · +" : "sin registro"}</span>
                 </span>
               </Enlace>
             );
           })}
           {consumoExtra && (
-            <Enlace href={esHoy ? "/comidas" : null} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
+            <Enlace href={editable ? verComidas : null} className="flex items-center gap-3.5 border-b border-linea py-3 last:border-0">
               <span className="w-[42px] font-display text-base text-tenue">—</span>
               <div className="flex flex-1 flex-col">
                 <strong>Extras fuera de horario</strong>
@@ -319,9 +324,9 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               <span className="font-display text-lg font-semibold text-carbo">{miles(Math.round(kcalDe(consumoExtra)))}</span>
             </Enlace>
           )}
-          {esHoy && (
+          {editable && (
             <p className="pt-2 text-xs text-tenue">
-              Toca una comida para registrarla. ¿Comiste algo fuera de horario? <Link href="/registrar?comida=extra" className="font-bold text-texto">Registrar un extra ›</Link>
+              Toca una comida para registrarla. ¿Comiste algo fuera de horario? <Link href={reg("extra")} className="font-bold text-texto">Registrar un extra ›</Link>
             </p>
           )}
         </section>

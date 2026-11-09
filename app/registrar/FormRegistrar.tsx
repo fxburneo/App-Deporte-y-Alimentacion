@@ -42,6 +42,8 @@ export default function FormRegistrar(props: {
   consumoExtra?: Macros | null;
   despensa?: AlimentoDespensa[];
   platos?: PlatoFila[];
+  fecha?: string; // día anterior; sin fecha = hoy
+  fechaTexto?: string; // "Domingo 8 nov"
 }) {
   const router = useRouter();
   const [comida, setComida] = useState<Momento>(props.inicial);
@@ -204,9 +206,10 @@ export default function FormRegistrar(props: {
         origen: modo === "repetir" ? "repetida" : modo,
         descripcion: texto.trim(),
         alimentos,
+        ...(props.fecha ? { fecha: props.fecha } : {}),
       });
       if (!r.ok) return setError(r.error);
-      router.push("/comidas");
+      router.push(props.fecha ? `/comidas?fecha=${props.fecha}` : "/comidas");
     });
   };
 
@@ -223,8 +226,11 @@ export default function FormRegistrar(props: {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-[18px] px-[18px] pt-[max(18px,env(safe-area-inset-top))] pb-10">
       <header className="flex items-center justify-between">
-        <Link href="/" className="py-2.5 font-semibold text-tenue">Cancelar</Link>
-        <h1 className="font-display text-2xl font-bold tracking-[0.04em]">REGISTRAR</h1>
+        <Link href={props.fecha ? `/?fecha=${props.fecha}` : "/"} className="py-2.5 font-semibold text-tenue">Cancelar</Link>
+        <div className="flex flex-col items-center">
+          <h1 className="font-display text-2xl font-bold tracking-[0.04em]">REGISTRAR</h1>
+          {props.fechaTexto && <span className="text-xs font-bold text-carbo">{props.fechaTexto}</span>}
+        </div>
         <span className="w-[62px]" />
       </header>
 
