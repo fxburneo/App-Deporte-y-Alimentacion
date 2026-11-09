@@ -18,16 +18,19 @@ secciones = [
    ("MisComidas","2b.3 · Registrar · Mis comidas","Reemplaza a Repetir: buscas en tu despensa, eliges cantidad y guardas sin usar IA.",False),
    ("Calculadora","2b.4 · ¿Cuánto me sirvo?","Eliges qué hay en el plato y te dice los gramos de cada alimento para cumplir el objetivo de la comida.",False),
    ("AjusteAlimentos","2b.5 · Ajuste en alimentos","Si te pasaste o te faltó, la siguiente comida se ajusta en gramos de tu menú tipo: pollo, arroz, aguacate.",False)]),
+ ("2c · Corregir días anteriores", "Hasta 7 días atrás: elegir el día con un toque, ver los registros con Editar y Borrar a la vista y editar completo.", [
+   ("CorregirDia","2c.1 · Comidas de un día anterior","Franja con los últimos días arriba (también en Hoy). Cada registro muestra sus alimentos con Editar y Borrar visibles.",True),
+   ("EditarComida","2c.2 · Editar comida","Cambiar la comida a la que pertenece, ajustar cantidades, quitar y agregar alimentos (IA o despensa) y borrar el registro.",True)]),
  ("3 · Entreno", "El análisis de entrenador en lenguaje simple y la comida de las salidas largas.", [
    ("Entreno","3.1 · Cómo vas","Base física, cansancio y frescura, la semana del coach y cuánto entrenas suave y fuerte.",False),
    ("SalidaLarga","3.2 · Salida larga","Carbohidrato y líquido por hora con tu test de sudoración, y validación de lo que llevas.",False),
    ("Informe","3.3 · Informe semanal","Lo que mejoró, lo que falta y 3 temas para hablar con tu coach.",False)]),
  ("4b · Carreras (etapa 4)", "Tu carrera objetivo: desde hoy hasta la meta. La duración decide la carga de carbohidratos y el plan del día de carrera.", [
-   ("Carreras","4b.1 · Mis carreras","Desde Más. Petzl 50K está en TrainingPeaks como evento; el calendario solo comparte 2 semanas, así que se carga aquí y se une cuando aparezca.",True),
-   ("NuevaCarrera","4b.2 · Nueva carrera","Nombre, fecha, deporte, distancia y cuántas horas estimas. Con eso se elige el tipo de carga.",True),
-   ("CaminoCarrera","4b.3 · Camino a la carrera","Las fases con fecha: bajar de peso, test de sudoración, ensayo en fondos, sin déficit y carga.",True),
-   ("DiaCarrera","4b.4 · Día de carrera","Desayuno y plan por horas: carbohidrato, líquido y sodio, con comida de tu despensa.",True),
-   ("HoyCarga","4b.5 · Hoy en día de carga","Así se ve Hoy el jueves y viernes antes: más carbohidrato, sin déficit, poca fibra.",True)]),
+   ("Carreras","4b.1 · Mis carreras","Desde Más. Petzl 50K está en TrainingPeaks como evento; el calendario solo comparte 2 semanas, así que se carga aquí y se une cuando aparezca.",False),
+   ("NuevaCarrera","4b.2 · Nueva carrera","Nombre, fecha, deporte, distancia y cuántas horas estimas. Con eso se elige el tipo de carga.",False),
+   ("CaminoCarrera","4b.3 · Camino a la carrera","Las fases con fecha: bajar de peso, test de sudoración, ensayo en fondos, sin déficit y carga.",False),
+   ("DiaCarrera","4b.4 · Día de carrera","Desayuno y plan por horas: carbohidrato, líquido y sodio, con comida de tu despensa.",False),
+   ("HoyCarga","4b.5 · Hoy en día de carga","Así se ve Hoy el jueves y viernes antes: más carbohidrato, sin déficit, poca fibra.",False)]),
  ("4 · Perfil y ajustes", "Tus datos, avisos, conexiones y el seguimiento del peso.", [
    ("Mas","4.1 · Más","Perfil, modo pausa, test de sudoración, avisos y conexiones.",False),
    ("Peso","4.2 · Peso","Promedio de la semana, tendencia de 6 semanas y objetivo.",False)]),
