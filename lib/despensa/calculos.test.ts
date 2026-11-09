@@ -69,3 +69,12 @@ describe("ajusteEnAlimentos", () => {
     expect(r.sinAlimento).toEqual(["proteinaG"]);
   });
 });
+
+import { medidaCasera as medida } from "./calculos";
+describe("medidaCasera · plural", () => {
+  it("pan → panes, galleta → galletas, gel → geles", () => {
+    expect(medida({ porcion_g: 35, porcion_nombre: "1 pan", unidad_g: 35, unidad_nombre: "pan" }, 70)).toBe("2 panes");
+    expect(medida({ porcion_g: 28, porcion_nombre: "3 galletas", unidad_g: 9.3, unidad_nombre: "galleta" }, 28)).toBe("3 galletas");
+    expect(medida({ porcion_g: 32, porcion_nombre: "1 gel", unidad_g: 32, unidad_nombre: "gel" }, 64)).toBe("2 geles");
+  });
+});

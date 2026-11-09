@@ -89,16 +89,18 @@ export async function borrarComida(fd: FormData) {
 }
 
 // Editar un registro guardado: reemplaza sus alimentos y recalcula totales.
-export async function editarComida(id: number, alimentos: unknown): Promise<ResultadoGuardar> {
+export async function editarComida(id: number, alimentos: unknown, momento?: unknown): Promise<ResultadoGuardar> {
   const p = z.array(AlimentoSchema).min(1).max(30).safeParse(alimentos);
   if (!Number.isInteger(id) || !p.success || !p.data.every(alimentoValido)) return { ok: false, error: "Revisa los alimentos: hay un valor fuera de rango." };
+  const m = z.enum(MOMENTOS).optional().safeParse(momento ?? undefined);
+  if (!m.success) return { ok: false, error: "Elige a qué comida pertenece." };
   const supabase = await createClient();
   const { data } = await supabase.from("comidas").select("fecha").eq("id", id).maybeSingle();
   if (!data || !esEditable(data.fecha, hoyEcuador())) return { ok: false, error: `Solo puedes corregir comidas de hasta ${DIAS_EDITABLES} días atrás.` };
   const t = totales(p.data);
   const { error } = await supabase
     .from("comidas")
-    .update({ alimentos: p.data, carbo_g: t.carboG, proteina_g: t.proteinaG, grasa_g: t.grasaG, kcal: t.kcal })
+    .update({ alimentos: p.data, carbo_g: t.carboG, proteina_g: t.proteinaG, grasa_g: t.grasaG, kcal: t.kcal, ...(m.data ? { comida: m.data } : {}) })
     .eq("id", id);
   if (error) return { ok: false, error: "No se pudo guardar el cambio." };
   revalidatePath("/", "layout");

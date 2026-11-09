@@ -352,3 +352,6 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   (`?fecha=`, flechas y barras de 7 días clicables) llevan a Registrar con esa fecha.
 - Recordatorio de pesaje (tarea programada de Claude, lun/mié/vie 05:04) fallaba porque el script de arranque del
   entorno "Nube FXB" hacía `npm ci` sin proyecto. Script corregido (sale sin hacer nada si no hay package.json).
+- Maquetas 2c aprobadas (9-nov): franja de 8 días (`components/FranjaDias.tsx`) en Hoy y Comidas; registros con Editar y
+  Borrar visibles; edición completa (`EditarRegistro`): mover de comida (`editarComida(id, alimentos, momento)`), − y +
+  por unidad de despensa o un cuarto de la cantidad, quitar, agregar con IA o despensa, borrar.

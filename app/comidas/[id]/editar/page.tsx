@@ -2,7 +2,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { ComidaFila } from "@/lib/datos/tipos";
-import { esEditable, hoyEcuador } from "@/lib/fecha";
+import { esEditable, fechaLarga, hoyEcuador } from "@/lib/fecha";
+import { leerDespensa } from "@/lib/datos/despensa";
 import EditarRegistro from "./EditarRegistro";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -15,5 +16,15 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const hoy = hoyEcuador();
   if (!esEditable(fila.fecha, hoy)) notFound();
   const volver = fila.fecha === hoy ? "/comidas" : `/comidas?fecha=${fila.fecha}`;
-  return <EditarRegistro id={fila.id} comida={fila.comida} alimentosIniciales={fila.alimentos} volver={volver} />;
+  const { alimentos: despensa } = await leerDespensa();
+  return (
+    <EditarRegistro
+      id={fila.id}
+      comida={fila.comida}
+      alimentosIniciales={fila.alimentos}
+      volver={volver}
+      fechaTexto={fila.fecha === hoy ? "Hoy" : fechaLarga(fila.fecha)}
+      despensa={despensa}
+    />
+  );
 }
