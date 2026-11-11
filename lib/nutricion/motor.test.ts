@@ -154,7 +154,15 @@ describe("repartirComidas", () => {
     expect(r.desayuno.carboG).toBeGreaterThan(r.almuerzo.carboG);
     const suma = Object.values(r).reduce((s, c) => s + c.carboG, 0);
     expect(Math.abs(suma - o.carboG)).toBeLessThanOrEqual(2);
-    expect(r.cena.proteinaG).toBe(30);
+    expect(r.cena.proteinaG).toBe(Math.round(o.proteinaG * 0.23));
+  });
+  it("los snacks llevan menos proteína que las comidas principales y el total cuadra", () => {
+    const o = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: [] });
+    const r = repartirComidas(o, false);
+    expect(r.media_manana.proteinaG).toBeLessThan(20);
+    expect(r.almuerzo.proteinaG).toBeGreaterThan(35);
+    const p = Object.values(r).reduce((s, c) => s + c.proteinaG, 0);
+    expect(Math.abs(p - o.proteinaG)).toBeLessThanOrEqual(2);
   });
   it("el extra de la cena va solo a la cena", () => {
     const o = objetivoDelDia({

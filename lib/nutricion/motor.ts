@@ -261,6 +261,12 @@ export function carboDurante(entrenos: Entreno[]): number {
   return Math.round(largos.reduce((s, e) => s + (DURANTE_G_HORA * e.duracionMin) / 60, 0));
 }
 
+// Proteína y grasa: más en las comidas principales y menos en los snacks
+// (antes iban 1/5 a cada comida y un snack pedía 30 g de proteína: 2 vasos de
+// yogur griego). Con 151 g: 38 · 18 · 42 · 18 · 35.
+const PROTEINA_COMIDA: Record<Comida, number> = { desayuno: 0.25, media_manana: 0.12, almuerzo: 0.28, media_tarde: 0.12, cena: 0.23 };
+const GRASA_COMIDA: Record<Comida, number> = { desayuno: 0.2, media_manana: 0.15, almuerzo: 0.25, media_tarde: 0.15, cena: 0.25 };
+
 // Reparto del objetivo entre las 5 comidas. Si se entrena antes del
 // desayuno, el desayuno es la comida de recuperación y lleva más carbohidrato.
 export function repartirComidas(
@@ -275,8 +281,8 @@ export function repartirComidas(
   for (const c of COMIDAS) {
     r[c] = {
       carboG: Math.round(base * pesos[c]) + (c === "cena" ? objetivo.extraCenaG : 0),
-      proteinaG: Math.round(objetivo.proteinaG / 5),
-      grasaG: Math.round(objetivo.grasaG / 5),
+      proteinaG: Math.round(objetivo.proteinaG * PROTEINA_COMIDA[c]),
+      grasaG: Math.round(objetivo.grasaG * GRASA_COMIDA[c]),
     };
   }
   return r;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sugerirPlato, textoPlato } from "./sugerencia";
+import { sugerirDia, sugerirPlato, textoPlato } from "./sugerencia";
 import { totales } from "@/lib/comidas/alimentos";
 import type { AlimentoDespensa } from "./calculos";
 
@@ -30,10 +30,40 @@ describe("sugerirPlato", () => {
     const b = sugerirPlato("cena", { carboG: 46, proteinaG: 30, grasaG: 10 }, despensa, 1);
     expect(a[0].nombre).not.toBe(b[0].nombre);
   });
-  it("media tarde con yogur y fruta", () => {
-    const plato = sugerirPlato("media_tarde", { carboG: 23, proteinaG: 30, grasaG: 10 }, despensa, 0);
+  it("media mañana con yogur y fruta", () => {
+    const plato = sugerirPlato("media_manana", { carboG: 25, proteinaG: 18, grasaG: 7 }, despensa, 0);
     expect(plato.map((a) => a.nombre)).toEqual(["Yogur griego natural", "Banano"]);
     expect(textoPlato(plato)).toMatch(/Yogur griego natural \d+ g/);
+  });
+  it("media mañana y media tarde no sugieren lo mismo", () => {
+    const conPan = [...despensa, g(9, "Pan de agua precocido", "carbo", 51.4, 8.6, 5.7, 35, "pan"), g(10, "Queso fresco", "proteina", 3, 18, 15, 30, "tajada")];
+    const m = { carboG: 25, proteinaG: 18, grasaG: 7 };
+    for (let dia = 0; dia < 6; dia++) {
+      const a = sugerirPlato("media_manana", m, conPan, dia).map((x) => x.nombre);
+      const b = sugerirPlato("media_tarde", m, conPan, dia).map((x) => x.nombre);
+      expect(a).not.toEqual(b);
+    }
+  });
+  it("el menú del día no repite proteína entre almuerzo y cena ni yogur entre desayuno y media mañana", () => {
+    const conMas = [...despensa, g(11, "Huevo entero", "proteina", 1.1, 12.6, 9.5, 50, "huevo"), g(12, "Papaya", "carbo", 11, 0.5, 0.3, 150, "taza")];
+    const objetivos = {
+      desayuno: { carboG: 33, proteinaG: 38, grasaG: 9 },
+      media_manana: { carboG: 25, proteinaG: 18, grasaG: 7 },
+      almuerzo: { carboG: 49, proteinaG: 43, grasaG: 11 },
+      media_tarde: { carboG: 25, proteinaG: 18, grasaG: 7 },
+      cena: { carboG: 71, proteinaG: 35, grasaG: 11 },
+    };
+    for (let dia = 0; dia < 6; dia++) {
+      const m = sugerirDia(objetivos, conMas, dia);
+      expect(m.almuerzo![0].nombre).not.toBe(m.cena![0].nombre);
+      expect(m.almuerzo![0].nombre).not.toBe("Huevo entero");
+      expect(m.desayuno![0].nombre).not.toBe(m.media_manana![0].nombre);
+    }
+  });
+  it("ninguna porción pasa el tope: 3 tajadas de queso aunque falte proteína", () => {
+    const queso = g(10, "Queso fresco", "proteina", 3, 18, 15, 30, "tajada");
+    const plato = sugerirPlato("media_tarde", { carboG: 20, proteinaG: 30, grasaG: 9 }, [queso, g(9, "Pan de agua precocido", "carbo", 51.4, 8.6, 5.7, 35, "pan")], 0);
+    expect(plato.find((a) => a.nombre === "Queso fresco")!.gramos).toBeLessThanOrEqual(90);
   });
   it("sin despensa no sugiere nada", () => expect(sugerirPlato("almuerzo", { carboG: 50, proteinaG: 30, grasaG: 10 }, [], 0)).toEqual([]));
 });
