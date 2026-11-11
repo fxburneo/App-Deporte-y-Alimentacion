@@ -70,7 +70,7 @@ describe("motor con carrera", () => {
   it("semanas sin déficit: come lo que gasta", () => {
     const normal = objetivoDelDia({ perfil: francisco, pesoKg: 73, entrenosHoy: [] });
     const sin = objetivoDelDia({ perfil: francisco, pesoKg: 73, entrenosHoy: [], carrera: { modo: "sin_deficit", cargaGKg: 9 } });
-    expect(normal.deficitKcal).toBeGreaterThan(400);
+    expect(normal.deficitKcal).toBeGreaterThan(300);
     expect(sin.deficitKcal).toBeLessThan(30);
     expect(sin.carrera).toBe("sin_deficit");
   });

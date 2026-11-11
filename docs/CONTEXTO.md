@@ -362,3 +362,13 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   Plantillas: desayuno huevo/queso + pan de agua/integral/avena + fruta; media mañana yogur/leche + fruta; almuerzo
   pollo/carne + carbohidrato + grasa + ensalada; media tarde pan + queso/huevo/yogur; cena pollo/carne/huevo.
 - Topes: proteína 1½ porción (3 unidades chicas), carbohidrato 2½ porciones, resto 2.
+
+## Plan de la nutricionista adoptado (11-nov-2026)
+- Francisco compartió la planilla de su nutricionista (semana 19-25 abr) y decidió que la app la siga.
+- Motor: gasto = reposo (Mifflin) + 500 kcal de actividad diaria (`NEAT_KCAL`) + entreno medido por Garmin;
+  déficit por tipo de día: descanso 300, suave (Z2) 500, moderado 400, duro 350, muy largo 500 (`deficitDelTipo`,
+  escalable desde Más con tope 450 en descanso); proteína 2,3 g/kg y grasa 0,8 g/kg fijas; carbohidrato = lo que queda
+  (piso 2 g/kg). Sin víspera ni cena extra. Se mantienen: carga de carbohidratos y semanas sin déficit de las carreras,
+  reserva "durante" (60 g/h, tope 50 %), snack previo de 25 g.
+- Reparto por comida de la planilla: proteína 38 · 15 · 75 · 8 · 55 y grasa 16 · 11 · 9 · 10 · 6 (en proporción).
+- `perfil.deficit_descanso` = 300. Diferencia conocida: 2 h suave cuenta como "duro" (−350) y la planilla usa −400.

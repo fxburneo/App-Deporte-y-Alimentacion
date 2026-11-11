@@ -25,9 +25,9 @@ function dibujar() {
 afterEach(cleanup);
 
 describe("FormEntreno", () => {
-  it("por defecto (rodillo moderado 1:15 a las 05:00) muestra el día moderado de 2.630 kcal", () => {
+  it("por defecto (rodillo moderado 1:15 a las 05:00) muestra el día moderado de 2.390 kcal (plan de la nutricionista)", () => {
     dibujar();
-    expect(screen.getByText("2.630")).toBeTruthy();
+    expect(screen.getByText("2.390")).toBeTruthy();
     expect(screen.getByText("Día moderado")).toBeTruthy();
     expect(screen.getByText(/snack de 25 g/)).toBeTruthy();
   });
@@ -36,7 +36,7 @@ describe("FormEntreno", () => {
     dibujar();
     fireEvent.click(screen.getByRole("button", { name: /Fuerte/ }));
     expect(screen.getByText("Día duro")).toBeTruthy();
-    expect(screen.queryByText("2.630")).toBeNull();
+    expect(screen.queryByText("2.390")).toBeNull();
   });
 
   it("'Lo que hice' no se puede elegir para mañana", () => {

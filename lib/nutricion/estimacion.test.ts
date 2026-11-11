@@ -11,12 +11,12 @@ const semana = [[rodillo], [rodillo], [rodillo], [rodillo], [rodillo], [mtb], [t
 const dias = [...semana, ...semana, ...semana, ...semana, [rodillo]];
 
 describe("estimarRitmo", () => {
-  it("con el déficit por defecto baja poco (víspera y fondo sin déficit)", () => {
+  it("con el plan de la nutricionista el déficit promedio queda entre 300 y 500 kcal por día", () => {
     const r = estimarRitmo({ perfil: francisco, pesoKg: 76, objetivoKg: 73, dias });
-    expect(r.deficitPromedio).toBeGreaterThan(150);
-    expect(r.deficitPromedio).toBeLessThan(320);
+    expect(r.deficitPromedio).toBeGreaterThan(300);
+    expect(r.deficitPromedio).toBeLessThan(500);
     expect(r.kgSemana).toBeGreaterThan(0.1);
-    expect(r.semanasAlObjetivo).toBeGreaterThan(8);
+    expect(r.semanasAlObjetivo).toBeGreaterThan(5); // 3 kg a ~0,4 kg por semana
   });
   it("subir el déficit de descanso acelera la bajada", () => {
     const base = estimarRitmo({ perfil: francisco, pesoKg: 76, objetivoKg: 73, dias });
