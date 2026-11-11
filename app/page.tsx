@@ -11,7 +11,7 @@ import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { ajusteEnAlimentos } from "@/lib/despensa/calculos";
-import { sugerirPlato, textoPlato } from "@/lib/despensa/sugerencia";
+import { sugerirDia, textoPlato } from "@/lib/despensa/sugerencia";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
 import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
@@ -76,7 +76,9 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
   const menuTipo = Object.fromEntries(despensa.platos.filter((p) => p.menu_tipo).map((p) => [p.menu_tipo!, p]));
   // Menú sugerido con la despensa para las comidas pendientes sin menú tipo; rota cada día.
   const diaDelAnio = Math.floor(new Date(d.fecha + "T12:00:00Z").getTime() / 86400000);
-  const sugerencia = (c: Comida) => (menuTipo[c] ? [] : sugerirPlato(c, ajuste.objetivos[c], despensa.alimentos, diaDelAnio));
+  // Menú del día armado de una vez: las comidas no repiten proteína ni carbohidrato.
+  const menuDia = sugerirDia(ajuste.objetivos, despensa.alimentos, diaDelAnio, COMIDAS.filter((c) => !menuTipo[c] && !consumido[c]));
+  const sugerencia = (c: Comida) => menuDia[c] ?? [];
   const platoSiguiente = ajuste.siguiente ? menuTipo[ajuste.siguiente] : undefined;
   const enAlimentos = platoSiguiente && siguienteCambio ? ajusteEnAlimentos(platoSiguiente.alimentos, siguienteCambio) : null;
   const bienestarHoy = d.bienestar.find((b) => b.fecha === d.fecha) ?? null;

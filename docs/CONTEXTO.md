@@ -355,3 +355,10 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Maquetas 2c aprobadas (9-nov): franja de 8 días (`components/FranjaDias.tsx`) en Hoy y Comidas; registros con Editar y
   Borrar visibles; edición completa (`EditarRegistro`): mover de comida (`editarComida(id, alimentos, momento)`), − y +
   por unidad de despensa o un cuarto de la cantidad, quitar, agregar con IA o despensa, borrar.
+
+## Sugerencias corregidas (11-nov-2026)
+- Reparto de proteína y grasa por comida (antes 1/5 cada una): proteína 25 · 12 · 28 · 12 · 23 %, grasa 20 · 15 · 25 · 15 · 25 %.
+- `sugerirDia`: arma el menú del día en orden y cada comida evita la proteína y el carbohidrato ya sugeridos.
+  Plantillas: desayuno huevo/queso + pan de agua/integral/avena + fruta; media mañana yogur/leche + fruta; almuerzo
+  pollo/carne + carbohidrato + grasa + ensalada; media tarde pan + queso/huevo/yogur; cena pollo/carne/huevo.
+- Topes: proteína 1½ porción (3 unidades chicas), carbohidrato 2½ porciones, resto 2.
