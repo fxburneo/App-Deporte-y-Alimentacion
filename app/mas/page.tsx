@@ -73,7 +73,7 @@ export default async function Page() {
         <section className="flex flex-col gap-2.5 border-t border-linea pt-3.5">
           <div className="flex flex-col">
             <strong className="text-base">Déficit en días de descanso</strong>
-            <span className="text-[13px] text-tenue">Los demás días bajan en proporción. Víspera y día del fondo largo van sin déficit.</span>
+            <span className="text-[13px] text-tenue">Plan de la nutricionista: descanso 300, día intenso 350, salida media 400, Z2 y salida larga 500. Si cambias el de descanso, los demás se mueven en la misma proporción.</span>
           </div>
           <div className="flex items-center gap-3">
             <form action={cambiarDeficit}>
@@ -99,7 +99,7 @@ export default async function Page() {
           )}
           {alternativas.length > 0 && (
             <span className="text-xs text-tenue">
-              {alternativas.map(({ v, r }) => (r ? `Con ${v}: ${kg(r.kgSemana)} kg/sem` : "")).join(" · ")}. El tope es {DEFICIT_DESCANSO_MAX}: la proteína y un mínimo de carbohidrato no se tocan.
+              {alternativas.map(({ v, r }) => (r ? `Con ${v}: ${kg(r.kgSemana)} kg/sem` : "")).join(" · ")}. El tope es {DEFICIT_DESCANSO_MAX}: la proteína (2,3 g/kg), la grasa (0,8 g/kg) y un mínimo de carbohidrato no se tocan.
             </span>
           )}
         </section>

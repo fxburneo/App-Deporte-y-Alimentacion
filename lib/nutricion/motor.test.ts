@@ -67,110 +67,82 @@ describe("tipoDia", () => {
   });
 });
 
-describe("objetivoDelDia", () => {
-  it("día moderado con rodillo a las 05:00: 2.630 kcal, 405 C, 151 P, 45 G y snack previo", () => {
-    const o = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: [rodillo75] });
-    expect(o).toMatchObject({
-      tipo: "moderado", reposoKcal: 1680, entrenoKcal: 613, gastoKcal: 2881,
-      kcal: 2630, carboG: 405, proteinaG: 151, grasaG: 45, snackPreEntreno: true, extraCenaG: 0,
-    });
-    expect(o.deficitKcal).toBe(251);
+// Planilla de la nutricionista (19-25 abr): 75 kg, 41 años, 181 cm.
+// Reposo 1.681 (la planilla redondea a 1.684) + 500 de actividad diaria.
+const planilla: PerfilMotor = { ...francisco, edad: 41 };
+const sesion = (deporte: Entreno["deporte"], min: number, intensidad: Entreno["intensidad"], kcal: number, hora: string | null = null): Entreno => ({
+  deporte, duracionMin: min, intensidad, estado: "planificado", kcal, hora,
+});
+
+describe("objetivoDelDia · plan de la nutricionista", () => {
+  it("lunes de descanso: gasto 2.181 − 300 = 1.881; 173 P, 60 G y 162 C (planilla: 163)", () => {
+    const o = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [] });
+    expect(o).toMatchObject({ tipo: "descanso", reposoKcal: 1681, gastoKcal: 2181, proteinaG: 173, grasaG: 60, carboG: 162, snackPreEntreno: false });
+    expect(o.deficitKcal).toBeGreaterThanOrEqual(295);
+    expect(o.deficitKcal).toBeLessThanOrEqual(305);
   });
 
-  it("día de descanso: déficit cercano a 450 kcal sin bajar la grasa del mínimo", () => {
-    const o = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: [] });
-    expect(o).toMatchObject({ tipo: "descanso", kcal: 1820, carboG: 202, proteinaG: 151, grasaG: 45, snackPreEntreno: false });
-    expect(o.grasaG).toBeGreaterThanOrEqual(Math.round(0.6 * PESO));
+  it("martes duro (rodillo 1:10 de 650 kcal a las 05:15): −350 y 312 C (planilla: 313) con snack previo", () => {
+    const o = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [sesion("rodillo", 70, "fuerte", 650, "05:15")] });
+    expect(o).toMatchObject({ tipo: "duro", gastoKcal: 2831, carboG: 312, proteinaG: 173, grasaG: 60, snackPreEntreno: true });
   });
 
-  it("la proteína no cambia entre días: siempre 2 g/kg", () => {
-    const suave = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: [] });
-    const duro = objetivoDelDia({
-      perfil: francisco, pesoKg: PESO,
-      entrenosHoy: [{ deporte: "ruta_mtb", duracionMin: 240, intensidad: "suave", estado: "planificado" }],
-    });
-    expect(suave.proteinaG).toBe(duro.proteinaG);
-    expect(duro.carboG).toBeGreaterThan(suave.carboG * 2);
+  it("miércoles Z2 (rodillo 1:10 de 450 kcal): −500 y 225 C (planilla: 226)", () => {
+    const o = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [sesion("rodillo", 70, "suave", 450)] });
+    expect(o).toMatchObject({ tipo: "suave", carboG: 225 });
   });
 
-  it("modo pausa come a mantenimiento, sin déficit", () => {
-    const o = objetivoDelDia({ perfil: { ...francisco, pausa: true }, pesoKg: PESO, entrenosHoy: [] });
-    expect(o).toMatchObject({ kcal: 2260, carboG: 246, grasaG: 75 });
+  it("sábado de 4 h (2.000 kcal): −500 y 612 C, que incluyen lo que se come en la bici (planilla: 613)", () => {
+    const o = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [sesion("rodillo", 240, "suave", 2000)] });
+    expect(o).toMatchObject({ tipo: "muy_largo", gastoKcal: 4181, carboG: 612 });
+  });
+
+  it("la proteína (2,3 g/kg) y la grasa (0,8 g/kg) no cambian entre días; sin víspera ni cena extra", () => {
+    const descanso = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [], entrenosManana: [sesion("rodillo", 240, "suave", 2000)] });
+    const largo = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [sesion("rodillo", 240, "suave", 2000)] });
+    expect(descanso.proteinaG).toBe(largo.proteinaG);
+    expect(descanso.grasaG).toBe(largo.grasaG);
+    expect(descanso).toMatchObject({ vispera: false, extraCenaG: 0 });
+  });
+
+  it("modo pausa come a mantenimiento", () => {
+    const o = objetivoDelDia({ perfil: { ...planilla, pausa: true }, pesoKg: 75, entrenosHoy: [] });
     expect(o.deficitKcal).toBeLessThanOrEqual(10);
   });
 
-  it("si mañana es duro (trail 2 h), la cena de hoy sube 0,5 g/kg y el día sigue con su déficit", () => {
-    const o = objetivoDelDia({
-      perfil: francisco, pesoKg: PESO, entrenosHoy: [],
-      entrenosManana: [{ deporte: "trail_correr", duracionMin: 120, intensidad: "suave", estado: "planificado" }],
-    });
-    expect(o.vispera).toBe(false);
-    expect(o.extraCenaG).toBe(38);
-    expect(o.carboG).toBe(202 + 38);
+  it("el déficit de descanso elegido mueve todos los días en proporción, con tope", () => {
+    expect(deficitDelTipo("descanso")).toBe(300);
+    expect(deficitDelTipo("duro")).toBe(350);
+    expect(deficitDelTipo("moderado")).toBe(400);
+    expect(deficitDelTipo("suave", 450)).toBe(750);
+    expect(deficitDelTipo("descanso", 2000)).toBe(450);
   });
 
-  it("víspera del fondo de 4 h: sin déficit y carbohidrato de día moderado (≥ 5 g/kg) más la cena", () => {
-    const o = objetivoDelDia({
-      perfil: francisco, pesoKg: PESO, entrenosHoy: [],
-      entrenosManana: [{ deporte: "ruta_mtb", duracionMin: 240, intensidad: "suave", estado: "planificado" }],
-    });
-    expect(o.vispera).toBe(true);
-    expect(o.deficitKcal).toBeLessThanOrEqual(10);
-    expect(o.carboG).toBeGreaterThanOrEqual(Math.round(5 * PESO) + 38);
-  });
-
-  it("el déficit de descanso elegido cambia el de todos los días en proporción", () => {
-    const suave = [{ deporte: "rodillo" as const, duracionMin: 45, intensidad: "suave" as const, estado: "planificado" as const }];
-    const base = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: suave });
-    const mas = objetivoDelDia({ perfil: { ...francisco, deficitDescanso: 600 }, pesoKg: PESO, entrenosHoy: suave });
-    expect(base.kcal - mas.kcal).toBeGreaterThanOrEqual(100); // suave: 350 -> 467
-    expect(base.kcal - mas.kcal).toBeLessThanOrEqual(130);
-    expect(deficitDelTipo("descanso", 600)).toBe(600);
-    expect(deficitDelTipo("suave", 600)).toBe(467);
-    expect(deficitDelTipo("muy_largo", 600)).toBe(0);
-    expect(deficitDelTipo("descanso", 2000)).toBe(750); // tope de seguridad
-  });
-
-  it("en descanso el piso de macros (proteína 2 g/kg, carbo 2 g/kg, grasa 0,6 g/kg) limita el déficit real", () => {
-    const o = objetivoDelDia({ perfil: { ...francisco, deficitDescanso: 750 }, pesoKg: PESO, entrenosHoy: [] });
-    const piso = Math.round(2 * PESO) * 4 + 2 * PESO * 4 + 0.6 * PESO * 9;
-    expect(o.kcal).toBeGreaterThanOrEqual(Math.floor(piso / 10) * 10);
-    expect(o.deficitKcal).toBeLessThan(750);
+  it("el carbohidrato no baja de 2 g/kg aunque el déficit lo pida", () => {
+    const o = objetivoDelDia({ perfil: { ...planilla, deficitDescanso: 450, factorActividad: 1 }, pesoKg: 75, entrenosHoy: [] });
+    expect(o.carboG).toBeGreaterThanOrEqual(150);
   });
 
   it("un trote suave temprano no pide snack previo", () => {
-    const o = objetivoDelDia({
-      perfil: francisco, pesoKg: PESO,
-      entrenosHoy: [{ deporte: "trail_correr", duracionMin: 45, intensidad: "suave", estado: "planificado", hora: "05:00" }],
-    });
+    const o = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [{ deporte: "trail_correr", duracionMin: 45, intensidad: "suave", estado: "planificado", hora: "05:00" }] });
     expect(o.snackPreEntreno).toBe(false);
   });
 });
 
 describe("repartirComidas", () => {
-  it("con entreno temprano el desayuno lleva la mayor parte del carbohidrato", () => {
+  it("con entreno temprano el desayuno lleva la mayor parte del carbohidrato y el total cuadra", () => {
     const o = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: [rodillo75] });
     const r = repartirComidas(o, true);
     expect(r.desayuno.carboG).toBeGreaterThan(r.almuerzo.carboG);
     const suma = Object.values(r).reduce((s, c) => s + c.carboG, 0);
     expect(Math.abs(suma - o.carboG)).toBeLessThanOrEqual(2);
-    expect(r.cena.proteinaG).toBe(Math.round(o.proteinaG * 0.23));
   });
-  it("los snacks llevan menos proteína que las comidas principales y el total cuadra", () => {
-    const o = objetivoDelDia({ perfil: francisco, pesoKg: PESO, entrenosHoy: [] });
+  it("proteína como la planilla: 38 · 15 · 75 · 8 · 55 g en proporción", () => {
+    const o = objetivoDelDia({ perfil: planilla, pesoKg: 75, entrenosHoy: [] });
     const r = repartirComidas(o, false);
-    expect(r.media_manana.proteinaG).toBeLessThan(20);
-    expect(r.almuerzo.proteinaG).toBeGreaterThan(35);
+    expect([r.desayuno, r.media_manana, r.almuerzo, r.media_tarde, r.cena].map((m) => m.proteinaG)).toEqual([34, 14, 68, 7, 50]);
     const p = Object.values(r).reduce((s, c) => s + c.proteinaG, 0);
     expect(Math.abs(p - o.proteinaG)).toBeLessThanOrEqual(2);
-  });
-  it("el extra de la cena va solo a la cena", () => {
-    const o = objetivoDelDia({
-      perfil: francisco, pesoKg: PESO, entrenosHoy: [],
-      entrenosManana: [{ deporte: "trail_correr", duracionMin: 120, intensidad: "suave", estado: "planificado" }],
-    });
-    const r = repartirComidas(o, false);
-    expect(r.cena.carboG).toBe(Math.round(202 * 0.2) + 38);
   });
 });
 

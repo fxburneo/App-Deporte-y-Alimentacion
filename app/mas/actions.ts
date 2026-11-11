@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFICIT_DESCANSO_MAX } from "@/lib/nutricion/motor";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { hoyEcuador } from "@/lib/fecha";
@@ -18,10 +19,10 @@ export async function cambiarPausa(fd: FormData) {
   revalidatePath("/", "layout");
 }
 
-// Déficit en días de descanso: de 0 a 750 kcal, en pasos de 50.
+// Déficit en días de descanso: de 0 a 450 kcal, en pasos de 50 (plan de la nutricionista: 300).
 export async function cambiarDeficit(fd: FormData) {
   const valor = Math.round(Number(fd.get("deficit")) / 50) * 50;
-  if (!Number.isFinite(valor) || valor < 0 || valor > 750) return;
+  if (!Number.isFinite(valor) || valor < 0 || valor > DEFICIT_DESCANSO_MAX) return;
   const supabase = await createClient();
   const {
     data: { user },

@@ -50,37 +50,26 @@ export interface ObjetivoDia {
   carrera: ModoCarrera | null; // semanas sin déficit, día de carga o día de carrera
 }
 
-// Rango de carbohidrato (g/kg) y déficit (kcal) por tipo de día. Rangos de
-// las guías del ACSM e ISSN, ajustados a la baja porque el objetivo incluye
-// perder grasa (blueprint, sección 04).
-export const NIVELES: Record<TipoDia, { carbo: [number, number]; deficit: number }> = {
-  descanso: { carbo: [2.5, 3.5], deficit: 450 },
-  suave: { carbo: [3.5, 4.5], deficit: 350 },
-  moderado: { carbo: [5, 6], deficit: 250 },
-  duro: { carbo: [6, 8], deficit: 75 },
-  muy_largo: { carbo: [8, 10], deficit: 0 },
-};
+// Plan de la nutricionista (planilla del 19-25 abr, adoptada el 11-nov):
+// gasto = reposo + 500 kcal de actividad diaria + entreno; objetivo = gasto
+// menos un déficit por tipo de día; proteína 2,3 g/kg y grasa 0,8 g/kg fijas;
+// el carbohidrato es lo que queda.
+export const NEAT_KCAL = 500;
+const DEFICIT_PLAN: Record<TipoDia, number> = { descanso: 300, suave: 500, moderado: 400, duro: 350, muy_largo: 500 };
 
-// El déficit del día sale del déficit de descanso elegido, en la misma
-// proporción de la tabla: suave 78 %, moderado 56 %, duro 17 %, muy largo 0.
-export const DEFICIT_DESCANSO_BASE = 450;
-export const DEFICIT_DESCANSO_MAX = 750;
-const PROPORCION_DEFICIT: Record<TipoDia, number> = Object.fromEntries(
-  (Object.keys(NIVELES) as TipoDia[]).map((t) => [t, NIVELES[t].deficit / DEFICIT_DESCANSO_BASE])
-) as Record<TipoDia, number>;
-
+// El déficit de descanso se puede subir o bajar en Más: los demás días se
+// mueven en la misma proporción de la planilla.
+export const DEFICIT_DESCANSO_BASE = 300;
+export const DEFICIT_DESCANSO_MAX = 450;
 export function deficitDelTipo(tipo: TipoDia, deficitDescanso?: number | null): number {
   const base = Math.min(DEFICIT_DESCANSO_MAX, Math.max(0, deficitDescanso ?? DEFICIT_DESCANSO_BASE));
-  return Math.round(base * PROPORCION_DEFICIT[tipo]);
+  return Math.round((DEFICIT_PLAN[tipo] * base) / DEFICIT_DESCANSO_BASE);
 }
 
-// Piso de seguridad del carbohidrato (g/kg): si para cumplir el déficit el
-// carbohidrato tiene que bajar del rango, baja hasta aquí y no más
-// (decisión de Francisco, 30-oct: el déficit manda sobre el rango).
-const CARBO_PISO: Record<TipoDia, number> = { descanso: 2, suave: 3, moderado: 4, duro: 5.5, muy_largo: 7 };
-const PROTEINA_G_KG = 2.0;
-const GRASA_MIN_G_KG = 0.6;
-const GRASA_MAX_G_KG = 1.0;
+export const PROTEINA_G_KG = 2.3;
+export const GRASA_G_KG = 0.8;
+// Piso de seguridad: el carbohidrato no baja de 2 g/kg aunque el déficit lo pida.
+const CARBO_PISO_G_KG = 2;
 const FACTOR_RITMO: Record<Ritmo, number> = { moderado: 1, recomponer: 0.4, mantener: 0 };
 
 // Equivalente metabólico (MET) por deporte e intensidad, para estimar el
@@ -148,23 +137,13 @@ export function objetivoDelDia(args: {
   const { perfil, pesoKg } = args;
   const cuentan = entrenosQueCuentan(args.entrenosHoy);
   const tipo = tipoDia(args.entrenosHoy);
-  const tipoManana = tipoDia(args.entrenosManana ?? []);
 
   const reposoKcal = metabolismoReposo(pesoKg, perfil.estaturaCm, perfil.edad, perfil.grasaPct);
   const entrenoKcal = cuentan.reduce((s, e) => s + kcalEntreno(e, pesoKg), 0);
-  const gastoKcal = Math.round(reposoKcal * perfil.factorActividad) + entrenoKcal;
-  // Víspera de un fondo de más de 3 h: hoy no hay déficit y el carbohidrato
-  // sube al menos a nivel moderado, para llegar con el músculo lleno.
-  const vispera = tipoManana === "muy_largo" && tipo !== "duro" && tipo !== "muy_largo";
+  const gastoKcal = reposoKcal + NEAT_KCAL + entrenoKcal;
   const modoCarrera = args.carrera?.modo ?? null;
-  const deficitMeta = perfil.pausa || vispera || modoCarrera ? 0 : deficitDelTipo(tipo, perfil.deficitDescanso) * FACTOR_RITMO[perfil.ritmo];
+  const deficitMeta = perfil.pausa || modoCarrera ? 0 : deficitDelTipo(tipo, perfil.deficitDescanso) * FACTOR_RITMO[perfil.ritmo];
   const kcalMeta = gastoKcal - deficitMeta;
-
-  const proteinaG = Math.round(PROTEINA_G_KG * pesoKg);
-  const nivelCarbo = vispera && (tipo === "descanso" || tipo === "suave") ? "moderado" : tipo;
-  const [carboMin, carboMax] = NIVELES[nivelCarbo].carbo.map((x) => x * pesoKg);
-  const grasaMin = GRASA_MIN_G_KG * pesoKg;
-  const grasaMax = GRASA_MAX_G_KG * pesoKg;
 
   // Día de carga de carbohidratos antes de una carrera: el carbohidrato se fija
   // en g/kg (7,5 a 9), la proteína baja a 1,6 g/kg y la grasa a 0,7 g/kg para
@@ -191,27 +170,10 @@ export function objetivoDelDia(args: {
     };
   }
 
-  // Mañana duro y hoy no: la cena sube un nivel (+0,5 g/kg de carbohidrato).
-  const mananaExigente = tipoManana === "duro" || tipoManana === "muy_largo";
-  const hoyExigente = tipo === "duro" || tipo === "muy_largo";
-  const extraCenaG = mananaExigente && !hoyExigente ? Math.round(0.5 * pesoKg) : 0;
-
-  // Carbohidrato al medio del rango; la grasa completa las calorías. Si la
-  // grasa se sale de su rango, se fija en el borde y el carbohidrato se
-  // ajusta sin salir del suyo.
-  let carbo = (carboMin + carboMax) / 2;
-  let grasa = (kcalMeta - proteinaG * 4 - carbo * 4) / 9;
-  if (grasa < grasaMin) {
-    grasa = grasaMin;
-    // En la víspera el carbohidrato no baja del rango aunque quede un pequeño superávit.
-    const piso = vispera ? carboMin : CARBO_PISO[nivelCarbo] * pesoKg;
-    carbo = Math.max(piso, (kcalMeta - proteinaG * 4 - grasa * 9) / 4);
-  } else if (grasa > grasaMax) {
-    grasa = grasaMax;
-    carbo = Math.min(carboMax, (kcalMeta - proteinaG * 4 - grasa * 9) / 4);
-  }
-  const carboG = Math.round(carbo) + extraCenaG;
-  const grasaG = Math.round(grasa);
+  // Proteína y grasa fijas; el carbohidrato completa las calorías.
+  const proteinaG = Math.round(PROTEINA_G_KG * pesoKg);
+  const grasaG = Math.round(GRASA_G_KG * pesoKg);
+  const carboG = Math.round(Math.max(CARBO_PISO_G_KG * pesoKg, (kcalMeta - proteinaG * 4 - grasaG * 9) / 4));
   const kcal = Math.round((proteinaG * 4 + carboG * 4 + grasaG * 9) / 10) * 10;
 
   const snackPreEntreno = cuentan.some(
@@ -232,9 +194,9 @@ export function objetivoDelDia(args: {
     entrenoKcal,
     gastoKcal,
     deficitKcal: Math.max(0, gastoKcal - kcal),
-    extraCenaG,
+    extraCenaG: 0, // la planilla no usa cena extra ni víspera
     snackPreEntreno,
-    vispera,
+    vispera: false,
     carrera: modoCarrera,
   };
 }
@@ -261,11 +223,10 @@ export function carboDurante(entrenos: Entreno[]): number {
   return Math.round(largos.reduce((s, e) => s + (DURANTE_G_HORA * e.duracionMin) / 60, 0));
 }
 
-// Proteína y grasa: más en las comidas principales y menos en los snacks
-// (antes iban 1/5 a cada comida y un snack pedía 30 g de proteína: 2 vasos de
-// yogur griego). Con 151 g: 38 · 18 · 42 · 18 · 35.
-const PROTEINA_COMIDA: Record<Comida, number> = { desayuno: 0.25, media_manana: 0.12, almuerzo: 0.28, media_tarde: 0.12, cena: 0.23 };
-const GRASA_COMIDA: Record<Comida, number> = { desayuno: 0.2, media_manana: 0.15, almuerzo: 0.25, media_tarde: 0.15, cena: 0.25 };
+// Reparto de la planilla de la nutricionista (día alto en carbohidrato):
+// proteína 38 · 15 · 75 · 8 · 55 g y grasa 16 · 11 · 9 · 10 · 6 g, en proporción.
+const PROTEINA_COMIDA: Record<Comida, number> = { desayuno: 38 / 191, media_manana: 15 / 191, almuerzo: 75 / 191, media_tarde: 8 / 191, cena: 55 / 191 };
+const GRASA_COMIDA: Record<Comida, number> = { desayuno: 16 / 52, media_manana: 11 / 52, almuerzo: 9 / 52, media_tarde: 10 / 52, cena: 6 / 52 };
 
 // Reparto del objetivo entre las 5 comidas. Si se entrena antes del
 // desayuno, el desayuno es la comida de recuperación y lleva más carbohidrato.
