@@ -12,6 +12,7 @@ import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { ajusteEnAlimentos } from "@/lib/despensa/calculos";
 import { sugerirDia, textoPlato } from "@/lib/despensa/sugerencia";
+import { escalarPlato, textoMenu } from "@/lib/menu/escalar";
 import { aEntreno, NOMBRE_COMIDA, NOMBRE_DEPORTE, type EntrenoFila } from "@/lib/datos/tipos";
 import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL, type Recuperacion } from "@/lib/recuperacion";
@@ -301,7 +302,16 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
                       <span className="text-carbo">{meta.carboG} g C</span> · <span className="text-proteina">{meta.proteinaG} g P</span> ·{" "}
                       <span className="text-grasa">{meta.grasaG} g G</span>
                       {c === "cena" && obj.extraCenaG > 0 && <span className="text-carbo"> · incluye +{obj.extraCenaG} g por mañana</span>}
-                      {menuTipo[c] && <span className="block">{menuTipo[c].nombre}: {menuTipo[c].alimentos.map((a) => a.nombre).join(", ")}</span>}
+                      {menuTipo[c] && (() => {
+                        // Menú tipo con las cantidades de hoy: lo que cambia según el día, en amarillo.
+                        const items = escalarPlato(menuTipo[c].alimentos, meta, despensa.alimentos, obj.tipo, plan.carrera?.modo === "carga");
+                        return (
+                          <span className="block text-suave">
+                            {textoMenu(items.filter((i) => !i.varia))}
+                            {items.some((i) => i.varia) && <span className="font-bold text-carbo"> · {textoMenu(items.filter((i) => i.varia))}</span>}
+                          </span>
+                        );
+                      })()}
                       {esHoy && !menuTipo[c] && sugerencia(c).length > 0 && <span className="block text-suave">Sugerido: {textoPlato(sugerencia(c))}</span>}
                     </span>
                   )}

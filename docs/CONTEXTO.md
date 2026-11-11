@@ -372,3 +372,17 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   reserva "durante" (60 g/h, tope 50 %), snack previo de 25 g.
 - Reparto por comida de la planilla: proteína 38 · 15 · 75 · 8 · 55 y grasa 16 · 11 · 9 · 10 · 6 (en proporción).
 - `perfil.deficit_descanso` = 300. Diferencia conocida: 2 h suave cuenta como "duro" (−350) y la planilla usa −400.
+
+## Etapa 5 · menú de la semana (12-nov-2026)
+- Menú tipo de Francisco cargado como platos (despensa_platos.menu_tipo) con cantidades del día Z2: desayuno (2 huevos,
+  2 panes de agua, queso light, batido de leche con papaya, café pintado), media mañana (4 galletas integrales + 2 tajadas
+  de queso light), almuerzo (pollo 200 g + 1¼ taza arroz integral + ensalada + aceite), media tarde (piña + 10 almendras
+  + banano "solo en días con entreno"), cena (wrap: tortilla + pollo 150 g + queso light + tomate).
+- `lib/menu/escalar.ts`: lo fijo no cambia; los alimentos de categoría carbo se escalan al carbohidrato de la comida,
+  en unidades (pan, galleta, tortilla) o cuartos (taza, banano), mínimo una unidad y máximo el doble del menú tipo; lo
+  "solo en días con entreno" sale en descanso. Arroz integral en descanso/Z2, blanco en moderado/duro/largo/carga.
+  `menuPre` (pan de agua + miel) y `menuDurante` (1 isotónica cada 2 h + geles).
+- `lib/menu/semana.ts` (`menuDelDia`) y `lib/datos/menu.ts` (`leerMenuSemana`): plan de cada día con los entrenos de TP.
+- `lib/menu/compras.ts`: suma y pasa a compra (carnes y arroz en crudo, panes en fundas de 6, fruta entera, leche en L).
+- Pantallas: /menu (7 o 14 días), /menu/[fecha], /menu/compras (casillas en localStorage). Hoy muestra el menú tipo con
+  las cantidades del día (lo que cambia en amarillo). Acceso desde Comidas.

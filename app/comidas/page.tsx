@@ -79,6 +79,7 @@ export default async function Comidas({ searchParams }: { searchParams: Promise<
         )}
 
         <nav className="grid grid-cols-2 gap-2.5">
+          <Link href="/menu" className="col-span-2 rounded-[12px] bg-superficie px-3 py-2.5 text-center font-bold text-marca">Menú de la semana y compras ›</Link>
           <Link href="/despensa" className="rounded-[12px] border border-borde px-3 py-2.5 text-center font-semibold">Mi despensa ›</Link>
           <Link href="/calculadora" className="rounded-[12px] border border-borde px-3 py-2.5 text-center font-semibold">¿Cuánto me sirvo? ›</Link>
         </nav>

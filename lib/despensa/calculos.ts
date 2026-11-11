@@ -43,8 +43,15 @@ const plural = (p: string) => (p.endsWith("s") ? p : /[aeiouáéíóú]$/i.test(
 // (con medios), si no, en fracción de su porción.
 export function medidaCasera(a: Pick<AlimentoDespensa, "porcion_g" | "porcion_nombre" | "unidad_g" | "unidad_nombre">, gramos: number): string {
   const base = a.unidad_g ?? a.porcion_g;
-  const n = Math.round((gramos / base) * 2) / 2;
-  const fraccion = (x: number) => (x === 0.5 ? "½" : Number.isInteger(x) ? String(x) : `${Math.floor(x)} ½`);
+  // Unidades grandes (taza, pechuga) en cuartos: ¾ taza, 1 ¼ taza; chicas, en medios.
+  const paso = base > 60 ? 4 : 2;
+  const n = Math.round((gramos / base) * paso) / paso;
+  const FR: Record<number, string> = { 0.25: "¼", 0.5: "½", 0.75: "¾" };
+  const fraccion = (x: number) => {
+    const ent = Math.floor(x), dec = Math.round((x - ent) * 100) / 100;
+    if (dec === 0) return String(ent);
+    return ent === 0 ? FR[dec] : `${ent} ${FR[dec]}`;
+  };
   if (a.unidad_g && a.unidad_nombre) {
     if (n <= 0) return "un poco";
     return `${fraccion(n)} ${n > 1 ? plural(a.unidad_nombre) : a.unidad_nombre}`;
