@@ -38,9 +38,18 @@ describe("leerEventos", () => {
   it("lee fecha, título y descripción, y junta las líneas plegadas", () => {
     const e = leerEventos(ICAL);
     expect(e).toHaveLength(3);
-    expect(e[0]).toMatchObject({ uid: "abc-1", fecha: "2026-11-13", resumen: "Bike: Potencia Cadencia Aeróbico Intervalos 10min 2" });
+    expect(e[0]).toMatchObject({ uid: "2026-11-13|Bike: Potencia Cadencia Aeróbico Intervalos 10min 2", fecha: "2026-11-13", resumen: "Bike: Potencia Cadencia Aeróbico Intervalos 10min 2" });
     expect(e[1].descripcion).toContain("Trekking con la mochila, ir a paso suave, no correr.");
     expect(e[1].descripcion).toContain("Planned Time: 5:00");
+  });
+});
+
+describe("clave estable", () => {
+  it("la clave no depende del UID de TrainingPeaks (cambia en cada lectura) y numera títulos repetidos el mismo día", () => {
+    const otraLectura = ICAL.replace(/UID:abc-/g, "UID:zzz-");
+    expect(leerEventos(otraLectura).map((e) => e.uid)).toEqual(leerEventos(ICAL).map((e) => e.uid));
+    const doble = ICAL.replace("SUMMARY:Day Off: Descanso Total", "SUMMARY:Walk: Trekking 1500m+ AR").replace("DTSTART;VALUE=DATE:20261116", "DTSTART;VALUE=DATE:20261115");
+    expect(leerEventos(doble).map((e) => e.uid).slice(1)).toEqual(["2026-11-15|Walk: Trekking 1500m+ AR", "2026-11-15|Walk: Trekking 1500m+ AR|2"]);
   });
 });
 
@@ -86,7 +95,7 @@ describe("intensidadTP", () => {
 describe("eventoAEntreno", () => {
   it("arma la fila del plan con la hora habitual del perfil", () => {
     const [bici, trekking, descanso] = leerEventos(ICAL).map((e) => eventoAEntreno(e, "u1", horarios));
-    expect(bici).toMatchObject({ tp_uid: "abc-1", fecha: "2026-11-13", hora: "05:00", estado: "planificado", deporte: "rodillo", duracion_min: 75, intensidad: "moderado", origen: "trainingpeaks" });
+    expect(bici).toMatchObject({ tp_uid: "2026-11-13|Bike: Potencia Cadencia Aeróbico Intervalos 10min 2", fecha: "2026-11-13", hora: "05:00", estado: "planificado", deporte: "rodillo", duracion_min: 75, intensidad: "moderado", origen: "trainingpeaks" });
     expect(trekking).toMatchObject({ hora: "06:30", deporte: "trail_correr", duracion_min: 300, intensidad: "suave" });
     expect(descanso).toMatchObject({ hora: null, deporte: "descanso", duracion_min: 0 });
   });

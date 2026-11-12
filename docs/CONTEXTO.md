@@ -386,3 +386,8 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - `lib/menu/compras.ts`: suma y pasa a compra (carnes y arroz en crudo, panes en fundas de 6, fruta entera, leche en L).
 - Pantallas: /menu (7 o 14 días), /menu/[fecha], /menu/compras (casillas en localStorage). Hoy muestra el menú tipo con
   las cantidades del día (lo que cambia en amarillo). Acceso desde Comidas.
+
+## TrainingPeaks: clave estable (12-nov-2026)
+- El iCal de TP genera UIDs nuevos en cada lectura: cada sincronización borraba y recreaba todo el plan (15-16 "quitados"
+  por lectura). `leerEventos` ahora identifica cada entreno por fecha + título (numerado si se repite ese día).
+  Verificado: segunda lectura con 0 quitados.

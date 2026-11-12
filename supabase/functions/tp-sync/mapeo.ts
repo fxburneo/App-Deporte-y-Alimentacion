@@ -36,13 +36,23 @@ export function leerEventos(ical: string): EventoIcal[] {
       if (m) campos[m[1]] = m[2];
     }
     const d = /^(\d{4})(\d{2})(\d{2})/.exec(campos.DTSTART ?? "");
-    if (!campos.UID || !d) continue;
+    if (!d) continue;
     eventos.push({
-      uid: campos.UID.trim(),
+      uid: "",
       fecha: `${d[1]}-${d[2]}-${d[3]}`,
       resumen: desescapar(campos.SUMMARY ?? ""),
       descripcion: desescapar(campos.DESCRIPTION ?? ""),
     });
+  }
+  // Clave estable: TrainingPeaks genera un UID nuevo cada vez que arma el
+  // calendario (visto el 12-nov), así que se identifica cada entreno por fecha
+  // y título; si se repite el mismo título ese día, se numera.
+  const vistos = new Map<string, number>();
+  for (const e of eventos) {
+    const base = `${e.fecha}|${e.resumen}`;
+    const n = (vistos.get(base) ?? 0) + 1;
+    vistos.set(base, n);
+    e.uid = n === 1 ? base : `${base}|${n}`;
   }
   return eventos;
 }
