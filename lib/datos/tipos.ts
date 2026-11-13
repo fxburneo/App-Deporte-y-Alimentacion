@@ -20,6 +20,7 @@ export interface PerfilFila {
   entreno_finde: string;
   dias_pesaje: number[];
   factor_actividad: number;
+  avisos?: Record<string, boolean> | null;
   pausa: boolean;
   pausa_desde: string | null;
   garmin_llave_vence?: string | null;

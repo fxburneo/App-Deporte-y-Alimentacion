@@ -15,6 +15,8 @@ import { fechaConAnio, fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/
 import BotonActualizar from "../garmin/BotonActualizar";
 import { signOut } from "../login/actions";
 import { cambiarDeficit, cambiarPausa } from "./actions";
+import Avisos from "./Avisos";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Page() {
   const d = await leerDatosDia();
@@ -34,6 +36,9 @@ export default async function Page() {
   // Solo se mira si la variable existe; la llave nunca sale del servidor.
   const iaConectada = Boolean(process.env.ANTHROPIC_API_KEY);
   const proxima = d.carreras[0] ?? null;
+  // Clave pública de los avisos (la privada nunca sale de la base de datos).
+  const supabase = await createClient();
+  const { data: clavePublica } = await supabase.rpc("vapid_publica");
 
   return (
     <>
@@ -121,6 +126,8 @@ export default async function Page() {
           </button>
         </form>
 
+        <Avisos preferencias={(p.avisos as Record<string, boolean> | null) ?? {}} clavePublica={clavePublica} />
+
         <section className="flex flex-col gap-1">
           <span className="etiqueta pb-1">Conexiones</span>
           <div className="flex items-start gap-3 py-2">
@@ -156,7 +163,6 @@ export default async function Page() {
         <section className="flex flex-col">
           <span className="etiqueta pb-1">Próximamente</span>
           <Proximo nombre="Test de sudoración" etapa={4} />
-          <Proximo nombre="Avisos en el iPhone" etapa={7} />
         </section>
 
         <form action={signOut}>

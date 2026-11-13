@@ -5,7 +5,7 @@
 // Responde solo un resumen: nunca devuelve el enlace del calendario.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { eventoAEntreno, leerEventos, unirCarreras } from "./mapeo.ts";
+import { avisoPlanCambia, eventoAEntreno, leerEventos, unirCarreras } from "./mapeo.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -64,6 +64,15 @@ Deno.serve(async (req) => {
       .map((e) => eventoAEntreno(e, userId!, horarios))
       .filter((x) => x != null);
 
+    // Plan de hoy y mañana antes de esta lectura, para avisar si el coach lo cambia.
+    const manana = new Date(new Date(hoy + "T12:00:00Z").getTime() + 86400000).toISOString().slice(0, 10);
+    const { data: previo } = await db
+      .from("entrenos")
+      .select("tp_uid, fecha, nombre")
+      .eq("user_id", userId)
+      .eq("origen", "trainingpeaks")
+      .in("fecha", [hoy, manana]);
+
     if (filas.length) {
       const { error } = await db.from("entrenos").upsert(filas, { onConflict: "user_id,tp_uid" });
       if (error) throw new Error("No se pudieron guardar los entrenos: " + error.message);
@@ -81,6 +90,16 @@ Deno.serve(async (req) => {
     const sobran = (guardados ?? []).filter((g) => !vigentes.has(g.tp_uid)).map((g) => g.id);
     if (sobran.length) await db.from("entrenos").delete().in("id", sobran);
 
+    // Aviso al iPhone si cambió algo de hoy o mañana (no en la primera lectura).
+    const cambio = (previo ?? []).length ? avisoPlanCambia(previo ?? [], filas, hoy, manana) : null;
+    if (cambio) {
+      await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/avisos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-sync-token": (await db.from("app_config").select("valor").eq("clave", "sync_token").single()).data?.valor ?? "" },
+        body: JSON.stringify({ tipo: "plan_cambia", aviso: cambio }),
+      }).catch(() => null);
+    }
+
     // 5. Carreras cargadas en la app: se enlazan cuando aparecen en TP.
     const { data: carreras } = await db.from("carreras").select("id, nombre, fecha, tp_uid").eq("user_id", userId).gte("fecha", hoy);
     const unidas = unirCarreras(eventos.filter((e) => e.fecha >= hoy), carreras ?? []);
@@ -93,7 +112,7 @@ Deno.serve(async (req) => {
     const sinTraducir = eventos
       .filter((e) => e.fecha >= hoy && !filas.some((f) => f.tp_uid === e.uid))
       .map((e) => ({ fecha: e.fecha, resumen: e.resumen.slice(0, 80) }));
-    return responder({ ok: true, planificados: filas.length, quitados: sobran.length, carreras_unidas: unidas.length, desde: fechas[0] ?? null, hasta: fechas.at(-1) ?? null, sin_traducir: sinTraducir });
+    return responder({ ok: true, planificados: filas.length, quitados: sobran.length, carreras_unidas: unidas.length, aviso_cambio: cambio != null, desde: fechas[0] ?? null, hasta: fechas.at(-1) ?? null, sin_traducir: sinTraducir });
   } catch (e) {
     const mensaje = e instanceof Error ? e.message : String(e);
     await cerrar(false, 0, mensaje.slice(0, 500));
