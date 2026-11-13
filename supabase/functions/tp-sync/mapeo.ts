@@ -161,3 +161,31 @@ export function unirCarreras(eventos: EventoIcal[], carreras: CarreraApp[]): { i
   }
   return cambios;
 }
+
+// Cambios del coach en hoy o mañana: compara el plan antes y después de leer TP.
+export interface Aviso {
+  titulo: string;
+  cuerpo: string;
+  url: string;
+}
+export interface PlanAviso {
+  tp_uid: string;
+  fecha: string;
+  nombre: string | null;
+}
+export function avisoPlanCambia(antes: PlanAviso[], despues: PlanAviso[], hoy: string, manana: string): Aviso | null {
+  const enVentana = (p: PlanAviso) => p.fecha === hoy || p.fecha === manana;
+  const a = new Set(antes.filter(enVentana).map((p) => p.tp_uid));
+  const d = new Set(despues.filter(enVentana).map((p) => p.tp_uid));
+  const nuevos = despues.filter((p) => enVentana(p) && !a.has(p.tp_uid));
+  const quitados = antes.filter((p) => enVentana(p) && !d.has(p.tp_uid));
+  if (nuevos.length === 0 && quitados.length === 0) return null;
+  const dia = (f: string) => (f === hoy ? "hoy" : "mañana");
+  const limpio = (n: string | null) => (n ?? "entreno").replace(/^[^:]+:\s*/, "");
+  const partes = [
+    ...nuevos.map((p) => `nuevo ${dia(p.fecha)}: ${limpio(p.nombre)}`),
+    ...quitados.map((p) => `quitado ${dia(p.fecha)}: ${limpio(p.nombre)}`),
+  ];
+  const fecha = (nuevos[0] ?? quitados[0]).fecha;
+  return { titulo: "El coach cambió tu plan", cuerpo: `${partes.join(" · ")}. La comida ya está ajustada.`, url: fecha === hoy ? "/" : `/menu/${fecha}` };
+}

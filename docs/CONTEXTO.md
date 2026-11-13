@@ -391,3 +391,14 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - El iCal de TP genera UIDs nuevos en cada lectura: cada sincronización borraba y recreaba todo el plan (15-16 "quitados"
   por lectura). `leerEventos` ahora identifica cada entreno por fecha + título (numerado si se repite ese día).
   Verificado: segunda lectura con 0 quitados.
+
+## Etapa 7 · avisos en el iPhone (13-nov-2026)
+- Web Push desde Supabase. Edge Function `avisos` (x-sync-token o sesión para la prueba): genera las claves VAPID la
+  primera vez y las guarda en `app_config` (la privada nunca sale de la base; la pública por `rpc vapid_publica`).
+  Textos en `supabase/functions/avisos/mensajes.ts` (pruebas en `lib/avisos/`). Suscripciones en `push_suscripciones`
+  (las vencidas se borran al fallar con 404/410); preferencias en `perfil.avisos`.
+- Tareas programadas (Ecuador): peso L·M·V 05:00, resumen 06:40 (con alerta de fatiga si HRV < rango o sueño < 6 h),
+  registrar 15:00 (si falta el almuerzo), comidas de mañana 19:30 (enlace a /menu/fecha), dormir 21:00. tp-sync avisa
+  si cambian los entrenos de hoy o mañana (`avisoPlanCambia`).
+- App: `public/sw.js` (sin caché), sección Avisos en Más (activar en este iPhone, prueba, interruptores). iOS exige
+  la app agregada a la pantalla de inicio. La tarea programada de Claude (pesaje) queda hasta confirmar los avisos.
