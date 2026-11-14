@@ -26,7 +26,7 @@ export function tipoDelDia(lista: EntrenoAviso[]): TipoDia {
   if (cuentan.length === 0) return "descanso";
   const total = cuentan.reduce((s, e) => s + e.duracion_min, 0);
   if (total > 180) return "muy_largo";
-  if (total >= 120 || cuentan.some((e) => e.intensidad === "fuerte")) return "duro";
+  if (cuentan.some((e) => e.intensidad === "fuerte")) return "duro";
   if (total >= 90 || cuentan.some((e) => e.intensidad === "moderado")) return "moderado";
   return "suave";
 }

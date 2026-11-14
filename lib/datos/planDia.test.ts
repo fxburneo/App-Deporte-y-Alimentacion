@@ -28,6 +28,14 @@ describe("planDelDia · durante el entreno", () => {
     expect(corto.ajuste.diferenciaKcal).toBeLessThan(0);
     expect(corto.consumoDurante?.carboG).toBe(100);
   });
+  it("salida de 4 h a las 06:35: snack grande antes (84 C · 23 P · 15 G) que sale del desayuno", () => {
+    const p = planDelDia({ ...base, comidas: [] })!;
+    expect(p.objetivoPre).toEqual({ carboG: 84, proteinaG: 23, grasaG: 15 });
+  });
+  it("entreno corto temprano: snack de 25 g", () => {
+    const corto = { ...fondo, duracion_min: 70, intensidad: "fuerte" } as EntrenoFila;
+    expect(planDelDia({ ...base, entrenosHoy: [corto], comidas: [] })!.objetivoPre).toEqual({ carboG: 25, proteinaG: 0, grasaG: 0 });
+  });
   it("sin entreno largo no hay reserva", () => {
     expect(planDelDia({ ...base, entrenosHoy: [], comidas: [] })!.objetivoDurante).toBeNull();
   });

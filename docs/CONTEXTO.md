@@ -402,3 +402,11 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   si cambian los entrenos de hoy o mañana (`avisoPlanCambia`).
 - App: `public/sw.js` (sin caché), sección Avisos en Más (activar en este iPhone, prueba, interruptores). iOS exige
   la app agregada a la pantalla de inicio. La tarea programada de Claude (pesaje) queda hasta confirmar los avisos.
+
+## Pendientes chicos del bloque A (13-nov-2026; test de sudoración queda para después)
+- Hoy ya no ofrece "Cargar el plan de mañana" (el plan viene de TrainingPeaks).
+- `tipoDia`: "duro" (intenso) solo si hay intensidad fuerte; 90 min a 3 h sin fuerte es "moderado" (salida media,
+  −400, como la planilla). Misma regla en los avisos.
+- Salida de 2 h o más antes del desayuno: snack previo grande 84 C · 23 P · 15 G (`SNACK_PRE_LARGO`), sale del
+  desayuno y, si no alcanza, de las demás comidas en proporción. Menú: 2 panes de agua, 2 tajadas de queso light,
+  miel y banano.

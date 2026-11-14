@@ -31,7 +31,7 @@ export function menuDelDia(args: {
   const { plan, despensa } = args;
   const carga = plan.carrera?.modo === "carga";
   const comidas: ComidaMenu[] = [];
-  if (plan.objetivoPre) comidas.push({ momento: "pre_entreno", items: menuPre(plan.objetivoPre.carboG, despensa), deMenuTipo: false });
+  if (plan.objetivoPre) comidas.push({ momento: "pre_entreno", items: menuPre(plan.objetivoPre.carboG, despensa, plan.objetivoPre.proteinaG), deMenuTipo: false });
   if (plan.objetivoDurante) comidas.push({ momento: "durante", items: menuDurante(plan.objetivoDurante.carboG, args.horasLargas, despensa), deMenuTipo: false });
   const sinMenu = COMIDAS.filter((c) => !args.menuTipo[c]?.length);
   const sugeridas = sinMenu.length ? sugerirDia(plan.reparto, despensa, args.dia, sinMenu) : {};

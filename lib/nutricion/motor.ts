@@ -116,8 +116,9 @@ export function tipoDia(lista: Entreno[]): TipoDia {
   if (aerobicos.length === 0) return "descanso";
   const total = aerobicos.reduce((s, e) => s + e.duracionMin, 0);
   if (total > 180) return "muy_largo";
-  if (total >= 120 || aerobicos.some((e) => e.intensidad === "fuerte")) return "duro";
-  // Una hora suave es "liviano" (ACSM 3-5 g/kg): moderado desde 90 min o con intensidad moderada.
+  // Planilla de la nutricionista: "intenso" es la sesión fuerte; una salida de
+  // 90 min a 3 h sin intensidad fuerte es "salida media" (moderado, −400).
+  if (aerobicos.some((e) => e.intensidad === "fuerte")) return "duro";
   if (total >= 90 || aerobicos.some((e) => e.intensidad === "moderado")) return "moderado";
   return "suave";
 }
@@ -210,6 +211,8 @@ export const COMIDAS: Comida[] = ["desayuno", "media_manana", "almuerzo", "media
 export type Momento = Comida | "pre_entreno" | "durante" | "extra";
 export const MOMENTOS: Momento[] = ["pre_entreno", "durante", ...COMIDAS, "extra"];
 export const SNACK_PRE_G = 25;
+// Antes de una salida de 2 h o más temprano (planilla, "pre entreno 2"): sale del desayuno.
+export const SNACK_PRE_LARGO = { carboG: 84, proteinaG: 23, grasaG: 15 };
 
 // Comida durante el entreno (geles, bebida, barras): en entrenos aeróbicos de
 // 90 min o más, 60 g de carbohidrato por hora (decisión de Francisco, 7-nov).

@@ -69,7 +69,21 @@ export function escalarPlato(alimentos: Alimento[], objetivo: Macros, despensa: 
 
 // Snack antes de entrenar: ~25 g de carbohidrato con pan de agua y miel (o
 // banano si no hay pan en la despensa).
-export function menuPre(gramosC: number, despensa: AlimentoDespensa[]): ItemMenu[] {
+export function menuPre(gramosC: number, despensa: AlimentoDespensa[], proteinaG = 0): ItemMenu[] {
+  // Snack grande (salida de 2 h o más): 2 panes de agua con queso light, miel y banano.
+  if (proteinaG >= 15) {
+    const busca = (n: string) => despensa.find((d) => normal(d.nombre).startsWith(n));
+    const pan = busca("pan de agua") ?? busca("pan");
+    const queso = busca("queso light") ?? busca("queso");
+    const miel = busca("miel");
+    const banano = busca("banano");
+    const items: ItemMenu[] = [];
+    if (pan) items.push({ ...aAlimento(pan, (pan.unidad_g ?? pan.porcion_g) * 2), varia: true });
+    if (queso) items.push({ ...aAlimento(queso, (queso.unidad_g ?? queso.porcion_g) * 2), varia: true });
+    if (miel) items.push({ ...aAlimento(miel, miel.porcion_g), varia: true });
+    if (banano) items.push({ ...aAlimento(banano, banano.unidad_g ?? banano.porcion_g), varia: true });
+    if (items.length) return items;
+  }
   const pan = despensa.find((d) => normal(d.nombre).startsWith("pan de agua")) ?? despensa.find((d) => normal(d.nombre).startsWith("pan"));
   const miel = despensa.find((d) => normal(d.nombre).startsWith("miel"));
   if (pan) {
