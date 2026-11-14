@@ -13,9 +13,9 @@ secciones = [
    ("Comidas","2.4 · Comidas del día","Objetivo contra lo real, dónde ajustar y la semana.",False),
    ("Menu","2.5 · Menú semanal","Menú rotativo con la porción de carbohidrato según el día, cocina del domingo y cambios validados.",False)]),
  ("2d · Menú de la semana (etapa 5)", "Tu menú tipo fijo; por tipo de día cambian solo panes, arroz, fruta y tortillas. Se arma con el plan de TrainingPeaks y saca la lista de compras para 7 o 14 días.", [
-   ("MenuSemana","2d.1 · Menú de la semana","Cada día con su tipo (descanso, Z2, intenso, largo) y lo que cambia del menú tipo, en amarillo.",True),
-   ("MenuDia","2d.2 · Menú de un día","El menú tipo completo con las cantidades de ese día y si el arroz va integral o blanco.",True),
-   ("Compras","2d.3 · Lista de compras","Cantidades en crudo para 7 o 14 días, agrupadas, para marcar lo que ya tienes.",True)]),
+   ("MenuSemana","2d.1 · Menú de la semana","Cada día con su tipo (descanso, Z2, intenso, largo) y lo que cambia del menú tipo, en amarillo.",False),
+   ("MenuDia","2d.2 · Menú de un día","El menú tipo completo con las cantidades de ese día y si el arroz va integral o blanco.",False),
+   ("Compras","2d.3 · Lista de compras","Cantidades en crudo para 7 o 14 días, agrupadas, para marcar lo que ya tienes.",False)]),
  ("2b · Mi despensa y calculadora (etapa 3.1)", "Tus alimentos con marca y tus platos habituales: registrar sin IA, calcular cuánto servirte y recibir el ajuste en gramos de comida.", [
    ("Despensa","2b.1 · Mi despensa","Alimentos con marca (leídos de la etiqueta) y genéricos, más tus platos habituales.",False),
    ("Etiqueta","2b.2 · Leer etiqueta","La IA lee la tabla nutricional una sola vez; revisas y guardas. Registro por unidad o por gramos.",False),
@@ -25,6 +25,9 @@ secciones = [
  ("2c · Corregir días anteriores", "Hasta 7 días atrás: elegir el día con un toque, ver los registros con Editar y Borrar a la vista y editar completo.", [
    ("CorregirDia","2c.1 · Comidas de un día anterior","Franja con los últimos días arriba (también en Hoy). Cada registro muestra sus alimentos con Editar y Borrar visibles.",False),
    ("EditarComida","2c.2 · Editar comida","Cambiar la comida a la que pertenece, ajustar cantidades, quitar y agregar alimentos (IA o despensa) y borrar el registro.",False)]),
+ ("3b · Cómo vas e informe (etapa 6, v2)", "Con tus datos reales de Garmin: base física, cansancio y frescura, plan del coach contra lo hecho, intensidad y sueño. El informe lo arma Claude con los datos de la semana.", [
+   ("Entreno2","3b.1 · Cómo vas","Base 31 (tu TrainingPeaks marca 33), el hueco de la lesión en el gráfico, la semana del coach y si lo suave es suave.",True),
+   ("Informe2","3b.2 · Informe semanal","Lo que mejoró, lo que falta y 3 temas para tu coach. Se comparte por WhatsApp o correo.",True)]),
  ("3 · Entreno", "El análisis de entrenador en lenguaje simple y la comida de las salidas largas.", [
    ("Entreno","3.1 · Cómo vas","Base física, cansancio y frescura, la semana del coach y cuánto entrenas suave y fuerte.",False),
    ("SalidaLarga","3.2 · Salida larga","Carbohidrato y líquido por hora con tu test de sudoración, y validación de lo que llevas.",False),
