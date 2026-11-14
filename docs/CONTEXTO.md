@@ -410,3 +410,14 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
 - Salida de 2 h o más antes del desayuno: snack previo grande 84 C · 23 P · 15 G (`SNACK_PRE_LARGO`), sale del
   desayuno y, si no alcanza, de las demás comidas en proporción. Menú: 2 panes de agua, 2 tajadas de queso light,
   miel y banano.
+
+## Etapa 6 · Cómo vas e informe semanal (14-nov-2026)
+- Maquetas 3b v2 aprobadas (sin esfuerzo percibido: la app lee Garmin directo, no Intervals).
+- `lib/entreno/analisis.ts`: base física / cansancio / frescura con la carga diaria de Garmin (promedios de 42 y 7
+  días; al 13-nov dio 31 y TrainingPeaks marcaba 33), último hueco de 14+ días (lesión), intensidad por zonas de pulso
+  (suave z1-2, media z3, fuerte z4-5), semana del coach contra lo hecho, sueño y HRV. Pantalla /entreno.
+- Informe /entreno/informe (semana actual desde el sábado, si no la anterior; navegación por semanas): números de la
+  semana (`lib/entreno/informe.ts`) y texto de Claude (`lib/ia/informeSemanal.ts`: mejoró, falta, 3 temas para el coach),
+  guardado en `informes_semanales`; se comparte con la hoja del iPhone.
+- Hallazgo 13-nov: 4 semanas con 51 % suave / 42 % media / 7 % fuerte. Revisar con el coach cuestas y zonas de pulso de
+  Garmin (umbral correr 152).
