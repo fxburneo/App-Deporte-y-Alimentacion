@@ -5,6 +5,7 @@ import {
   carboDurante,
   COMIDAS,
   SNACK_PRE_G,
+  SNACK_PRE_LARGO,
   objetivoDelDia,
   pesoReferencia,
   repartirComidas,
@@ -83,8 +84,24 @@ export function planDelDia(args: {
   // temprano o cuando Francisco lo registró (el entreno suele llegar de Garmin
   // después de comerlo, así que no se puede esperar a verlo).
   const comioPre = args.comidas.some((f) => f.fecha === args.fecha && f.comida === "pre_entreno");
-  const objetivoPre: Macros | null = objetivo.snackPreEntreno || comioPre ? { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 } : null;
-  if (objetivoPre) reparto.desayuno = { ...reparto.desayuno, carboG: Math.max(0, reparto.desayuno.carboG - SNACK_PRE_G) };
+  // Salida de 2 h o más antes del desayuno: snack grande (con algo de proteína y grasa).
+  const salidaLarga = hoy.some((e) => e.hora != null && e.hora < perfil.horaDesayuno && e.deporte !== "descanso" && e.deporte !== "fuerza" && e.duracionMin >= 120);
+  const objetivoPre: Macros | null =
+    objetivo.snackPreEntreno || comioPre ? (salidaLarga ? { ...SNACK_PRE_LARGO } : { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 }) : null;
+  if (objetivoPre) {
+    // Si el snack es más que el carbohidrato del desayuno, lo que falta sale de
+    // las demás comidas en proporción (así el total del día no cambia).
+    const falta = Math.max(0, objetivoPre.carboG - reparto.desayuno.carboG);
+    reparto.desayuno = {
+      carboG: Math.max(0, reparto.desayuno.carboG - objetivoPre.carboG),
+      proteinaG: Math.max(0, reparto.desayuno.proteinaG - objetivoPre.proteinaG),
+      grasaG: Math.max(0, reparto.desayuno.grasaG - objetivoPre.grasaG),
+    };
+    const otras = COMIDAS.filter((c) => c !== "desayuno");
+    const totalOtras = otras.reduce((s, c) => s + reparto[c].carboG, 0);
+    if (falta > 0 && totalOtras > 0)
+      for (const c of otras) reparto[c] = { ...reparto[c], carboG: Math.max(0, Math.round(reparto[c].carboG - (falta * reparto[c].carboG) / totalOtras)) };
+  }
   const tm = tipoDia(manana);
   const mananaExigente = tm === "duro" || tm === "muy_largo";
 

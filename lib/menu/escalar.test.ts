@@ -101,6 +101,10 @@ describe("antes y durante", () => {
     expect(r[0].medida_casera).toBe("1 pan");
     expect(r[1].nombre).toBe("Miel de abeja");
   });
+  it("antes de una salida larga (84 C · 23 P): 2 panes de agua con 2 tajadas de queso light, miel y banano", () => {
+    const r = menuPre(84, despensa, 23);
+    expect(r.map((x) => `${x.nombre} ${x.medida_casera}`)).toEqual(["Pan de agua precocido 2 panes", "Queso light 2 tajadas", "Miel de abeja 1 cucharada", "Banano 1 banano"]);
+  });
   it("4 h a 60 g/h: 2 bebidas isotónicas y el resto en geles", () => {
     const r = menuDurante(240, 4, despensa);
     expect(r[0].medida_casera).toBe("2 botellas");

@@ -349,7 +349,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
           <span className="etiqueta text-marca!">Mañana</span>
           {manana.length === 0 ? (
             <p className="text-suave">
-              Sin entreno cargado. <Link href="/entreno/nuevo?dia=manana" className="font-bold">Cargar el plan de mañana ›</Link>
+              Sin entreno en el plan del coach: mañana cuenta como descanso.
             </p>
           ) : (
             <p className="text-suave">
