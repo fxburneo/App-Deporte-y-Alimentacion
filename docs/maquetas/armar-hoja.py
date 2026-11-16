@@ -3,6 +3,14 @@
 import re, sys, html
 src, out = sys.argv[1], sys.argv[2]
 secciones = [
+ ("0 · Rediseño (v2): por aprobar", "Propuesta para que la app se use como las mejores de la App Store: una cosa importante por pantalla, registrar en un toque, letra más grande y pestañas Hoy · Plan · ＋ · Entreno · Yo.", [
+   ("RHoy","R1 · Hoy","Anillos con lo que te queda, \"Ahora toca\" con tu plato de siempre en las cantidades de hoy y \"Lo comí\" en un toque. Recuperación y entreno en una franja compacta. Tu día como línea de tiempo.",True),
+   ("RHecho","R2 · Después de \"Lo comí\"","Los anillos se llenan al instante, pasa a la siguiente comida y puedes deshacer.",True),
+   ("RInfo","R3 · Detalle del día (i)","Gasto, objetivo y macros explicados en una hoja aparte: la pantalla principal queda limpia.",True),
+   ("RMas","R4 · Botón +","Lo que toca primero (tu plato de siempre en un toque), después foto, escribir, despensa, extra, peso y entreno.",True),
+   ("RPlan","R5 · Plan","Menú de la semana, lista de compras, platos, despensa y calculadora juntos, a una pestaña.",True),
+   ("REntreno","R6 · Entreno","Una frase de resumen arriba, números grandes y la semana del coach en una fila.",True),
+   ("RYo","R7 · Yo","Tu progreso primero (tendencia de peso hacia 72–73 kg, racha, semana, Petzl) y los ajustes ordenados abajo.",True)]),
  ("1 · Primer uso", "Lo que ves la primera vez que entras. Se completa una sola vez y se puede cambiar después en Más.", [
    ("Bienvenida1","1.1 · Tus datos","Datos para calcular tu gasto, peso objetivo y ritmo. Abajo ves el resultado al instante.",False),
    ("Bienvenida2","1.2 · Comidas y horarios","Alimentos excluidos, horas de comida y de entreno, y días de pesaje.",False)]),
