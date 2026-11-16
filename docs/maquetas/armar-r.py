@@ -116,24 +116,71 @@ hecho = "\n".join([
  f'<p style="margin:0;font-size:14px;color:{C["tenue"]}">Un toque registra tu plato de siempre con las cantidades de hoy, sin IA. Si comiste distinto, "Comí otra cosa" abre foto, texto o tu despensa.</p>',
 ])
 
-# ---------- R1c · Hoja de detalle (i) ----------
-def fila(n, v, sub=""):
-    s = f'<span style="font-size:13px;color:{C["tenue"]}">{sub}</span>' if sub else ""
-    return f'<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid {C["linea"]}"><span style="display:flex;flex-direction:column"><span>{n}</span>{s}</span><span style="{D};font-size:19px;font-weight:700">{v}</span></div>'
+pesos = [76.0, 75.9, 75.7, 75.8, 75.5, 75.6, 75.4, 75.3]
+def grafico_peso():
+    w, h = 340, 120
+    x = lambda i: 14 + i * (w - 28) / (len(pesos) - 1)
+    y = lambda v: 14 + (76.4 - v) * (h - 28) / (76.4 - 72.6)
+    pts = " ".join(f"{x(i):.0f},{y(v):.0f}" for i, v in enumerate(pesos))
+    meta = f'<rect x="0" y="{y(73):.0f}" width="{w}" height="{y(72) - y(73):.0f}" fill="{C["bien"]}" fill-opacity=".12"/><text x="{w-6}" y="{y(72.5)+4:.0f}" text-anchor="end" font-size="11" fill="{C["bien"]}">objetivo 72–73</text>'
+    return f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}">{meta}<polyline points="{pts}" fill="none" stroke="{C["texto"]}" stroke-width="3" stroke-linecap="round"/><circle cx="{x(len(pesos)-1):.0f}" cy="{y(pesos[-1]):.0f}" r="5" fill="{C["marca"]}"/></svg>'
+
+# ---------- R1c · Hoja de detalle (i): visual ----------
+def seg_barra(partes, total):
+    out = []
+    for n, v, col in partes:
+        etiqueta_v = f"{v:,}".replace(",", ".") if v / total > .15 else ""
+        out.append(f'<span style="width:{v/total*100:.1f}%;background:{col};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:{C["fondo"]}">{etiqueta_v}</span>')
+    return f'<div style="display:flex;height:30px;border-radius:9px;overflow:hidden;gap:2px">{"".join(out)}</div>'
+def leyenda(items):
+    return '<div style="display:flex;flex-wrap:wrap;gap:6px 14px">' + "".join(f'<span style="font-size:13px;color:{C["suave"]}"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:{col};margin-right:6px"></span>{n} <strong>{v}</strong></span>' for n, v, col in items) + "</div>"
+def macro(n, g, sub, col, pct):
+    return (f'<div style="background:{C["sup"]};border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;border-top:3px solid {col}">'
+            f'<span style="font-size:12px;font-weight:800;letter-spacing:.08em;color:{col}">{n.upper()}</span>'
+            f'<span style="{D};font-size:28px;font-weight:700;line-height:1">{g}<span style="font-size:15px;color:{C["tenue"]}"> g</span></span>'
+            f'<div style="height:6px;border-radius:3px;background:{col}33"><div style="width:{pct}%;height:100%;border-radius:3px;background:{col}"></div></div>'
+            f'<span style="font-size:12px;color:{C["tenue"]};line-height:1.3">{sub}</span></div>')
+comido_pct = 1310 / 2900 * 100
+queda_pct = (2550 - 1310) / 2900 * 100
+obj_pct = 2550 / 2900 * 100
+barra_comida = (
+    f'<div style="position:relative;height:30px;border-radius:9px;background:{C["sup"]};overflow:hidden">'
+    f'<div style="position:absolute;left:0;top:0;bottom:0;width:{comido_pct:.1f}%;background:{C["bien"]};display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:800;color:{C["fondo"]}">1.310 comido</div>'
+    f'<div style="position:absolute;left:{comido_pct:.1f}%;top:0;bottom:0;width:{queda_pct:.1f}%;background:repeating-linear-gradient(45deg,{C["bien"]}33,{C["bien"]}33 6px,transparent 6px,transparent 12px);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:{C["bien"]}">te quedan 1.240</div>'
+    f'<div style="position:absolute;left:{obj_pct:.1f}%;top:0;bottom:0;right:0;background:{C["mal"]}33;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:{C["mal"]}">−350</div></div>'
+)
 info = "\n".join([
  f'<div style="height:5px;width:44px;border-radius:3px;background:{C["borde"]};align-self:center"></div>',
- f'<h2 style="margin:0;{D};font-size:26px;font-weight:700">Tu día en números</h2>',
- '<section>',
- fila("Gastas hoy", "2.900 kcal", "reposo 1.680 + vida diaria 500 + entreno 720"),
- fila("Objetivo", "2.550 kcal", "día intenso: 350 kcal menos que lo que gastas"),
- fila("Comiste hasta ahora", "1.310 kcal"),
- fila("Proteína", "174 g", "2,3 g por kilo, igual todos los días"),
- fila("Grasa", "60 g", "0,8 g por kilo"),
- fila("Carbohidrato", "310 g", "lo que queda: sube y baja con el entreno"),
- '</section>',
- f'<p style="margin:0;font-size:14px;color:{C["suave"]}">Peso de referencia 75,5 kg (promedio de la semana). Plan de tu nutricionista.</p>',
+ f'<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;{D};font-size:26px;font-weight:700">Tu día en números</h2><span style="font-size:11px;font-weight:800;color:{C["marca"]};border:1px solid {C["marca"]};border-radius:99px;padding:2px 8px">DÍA INTENSO</span></div>',
+ '<section style="display:flex;flex-direction:column;gap:8px">' + etiqueta("LO QUE GASTAS", "2.900 kcal")
+ + seg_barra([("Reposo", 1680, "#5B6672"), ("Vida diaria", 500, "#8592A0"), ("Entreno", 720, C["marca"])], 2900)
+ + leyenda([("Reposo", "1.680", "#5B6672"), ("Vida diaria", "500", "#8592A0"), ("Entreno", "720", C["marca"])]) + '</section>',
+ '<section style="display:flex;flex-direction:column;gap:8px">' + etiqueta("LO QUE COMES", "objetivo 2.550") + barra_comida
+ + f'<span style="font-size:13px;color:{C["suave"]}">El rojo es tu déficit: lo que dejas de comer para bajar de peso. En días intensos es chico (350) para que rindas.</span></section>',
+ f'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">{macro("Proteína", 174, "fija: 2,3 g por kilo", C["prot"], 55)}{macro("Grasa", 60, "fija: 0,8 g por kilo", C["grasa"], 52)}{macro("Carbo", 310, "sube y baja con el entreno", C["carbo"], 46)}</div>',
+ f'<p style="margin:0;font-size:13px;color:{C["tenue"]}">Plan de tu nutricionista. Peso de referencia 75,5 kg (promedio de la semana).</p>',
  f'<div style="display:flex">{boton("Listo", href="RHoy.dc.html")}</div>',
 ])
+
+# ---------- R8 · Pesarme ----------
+def chip_peso(d, kg, ultimo=False):
+    borde = "" if ultimo else "border-bottom:1px solid " + C["linea"]
+    return f'<div style="display:flex;justify-content:space-between;padding:10px 0;{borde}"><span style="color:{C["suave"]}">{d}</span><span style="{D};font-size:18px;font-weight:700">{kg} kg</span></div>'
+circulo = f'width:52px;height:52px;border-radius:50%;border:1px solid {C["borde"]};display:flex;align-items:center;justify-content:center;font-size:26px'
+pesarme = "\n".join([
+ f'<header style="display:flex;justify-content:space-between;align-items:center"><a href="RYo.dc.html" style="color:{C["tenue"]};font-weight:600;text-decoration:none">‹ Yo</a><h1 style="margin:0;{D};font-size:24px;font-weight:700;letter-spacing:.04em">PESARME</h1><span style="width:30px"></span></header>',
+ f'<section style="background:{C["sup"]};border-radius:20px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:12px">'
+ f'<span style="font-size:13px;font-weight:700;letter-spacing:.1em;color:{C["tenue"]}">HOY · EN AYUNAS</span>'
+ f'<div style="display:flex;align-items:center;gap:18px"><span style="{circulo}">−</span><span style="{D};font-size:64px;font-weight:700;line-height:1">75,2<span style="font-size:22px;color:{C["tenue"]}"> kg</span></span><span style="{circulo}">+</span></div>'
+ f'<span style="font-size:13px;color:{C["tenue"]};text-align:center">Empieza en tu último peso: ajusta de a 100 g o toca el número para escribirlo.</span>'
+ f'<div style="display:flex;width:100%">{boton("GUARDAR PESO", href="RYo.dc.html")}</div></section>',
+ '<section style="display:flex;flex-direction:column;gap:6px">' + etiqueta("TENDENCIA · 6 SEMANAS", "−0,7 kg") + grafico_peso()
+ + f'<span style="font-size:14px;color:{C["suave"]}">Mira la tendencia, no el día: el peso sube y baja 0,5 a 1 kg por agua.</span></section>',
+ '<section style="display:flex;flex-direction:column">' + etiqueta("ÚLTIMOS PESAJES"),
+ chip_peso("Vie 13 nov", "75,3"), chip_peso("Mié 11 nov", "75,6"), chip_peso("Lun 9 nov", "75,5", ultimo=True),
+ '</section>',
+])
+
 
 # ---------- R2 · Menú del botón + ----------
 def opcion(icono, t, sub, destacado=False):
@@ -183,25 +230,17 @@ entreno = "\n".join([
 ])
 
 # ---------- R5 · Yo ----------
-pesos = [76.0, 75.9, 75.7, 75.8, 75.5, 75.6, 75.4, 75.3]
-def grafico_peso():
-    w, h = 340, 120
-    x = lambda i: 14 + i * (w - 28) / (len(pesos) - 1)
-    y = lambda v: 14 + (76.4 - v) * (h - 28) / (76.4 - 72.6)
-    pts = " ".join(f"{x(i):.0f},{y(v):.0f}" for i, v in enumerate(pesos))
-    meta = f'<rect x="0" y="{y(73):.0f}" width="{w}" height="{y(72) - y(73):.0f}" fill="{C["bien"]}" fill-opacity=".12"/><text x="{w-6}" y="{y(72.5)+4:.0f}" text-anchor="end" font-size="11" fill="{C["bien"]}">objetivo 72–73</text>'
-    return f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}">{meta}<polyline points="{pts}" fill="none" stroke="{C["texto"]}" stroke-width="3" stroke-linecap="round"/><circle cx="{x(len(pesos)-1):.0f}" cy="{y(pesos[-1]):.0f}" r="5" fill="{C["marca"]}"/></svg>'
 def ajuste(n, v):
     return f'<a href="#" style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid {C["linea"]};color:{C["texto"]};text-decoration:none"><span>{n}</span><span style="color:{C["tenue"]}">{v} ›</span></a>'
 yo = "\n".join([
- f'<header style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0;{D};font-size:30px;font-weight:700;letter-spacing:.03em">YO</h1><span style="font-size:14px;color:{C["tenue"]}">Francisco · 42 años</span></header>',
+ f'<header style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0;{D};font-size:30px;font-weight:700;letter-spacing:.03em">YO</h1><span style="font-size:14px;color:{C["tenue"]}">Francisco</span></header>',
  f'''<section style="background:{C["sup"]};border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px">
-<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:800;letter-spacing:.1em;color:{C["tenue"]}">PESO · TENDENCIA</span><a href="#" style="font-weight:700;font-size:14px">+ Pesarme</a></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:800;letter-spacing:.1em;color:{C["tenue"]}">PESO · TENDENCIA</span><a href="RPeso.dc.html" style="font-weight:700;font-size:14px">+ Pesarme</a></div>
 <div style="display:flex;align-items:baseline;gap:8px"><span style="{D};font-size:40px;font-weight:700">75,3</span><span style="color:{C["bien"]};font-weight:700">−0,7 kg en 4 semanas</span></div>
 {grafico_peso()}<span style="font-size:14px;color:{C["suave"]}">A este ritmo llegas a 73 kg a fines de enero, antes de cortar el déficit (13-mar).</span></section>''',
  f'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">{ind("RACHA","9","días registrando",C["marca"])}{ind("SEMANA","5/6","entrenos",C["bien"])}{ind("PETZL","20","semanas",C["prot"])}</div>',
  '<section style="display:flex;flex-direction:column">', etiqueta("AJUSTES"),
- ajuste("Avisos", "6 activos"), ajuste("Plan de la nutricionista", "déficit 300 en descanso"), ajuste("Carreras", "Petzl 50K"), ajuste("Modo pausa", "apagado"), ajuste("Conexiones", "Garmin · TrainingPeaks"), ajuste("Mis datos", "181 cm · 72–73 kg"),
+ ajuste("Avisos", "6 activos"), ajuste("Plan de la nutricionista", "déficit 300 en descanso"), ajuste("Carreras", "Petzl 50K"), ajuste("Modo pausa", "apagado"), ajuste("Conexiones", "Garmin · TrainingPeaks"), ajuste("Mis datos", "estatura, nacimiento, horarios"),
  '</section>',
 ])
 
@@ -209,8 +248,9 @@ hoja = lambda contenido, alto: f'<div style="position:absolute;inset:0;backgroun
 
 paginas = [
  ("RHoy", "Hoy", 1500, hoy, "hoy", ""),
+ ("RPeso", "Pesarme", 1000, pesarme, "yo", ""),
  ("RHecho", "Lo comí", 760, hecho, "hoy", hecho_extra),
- ("RInfo", "Detalle del día", 760, f'<div style="opacity:.25">{anillos(.46,.55,.52,"1.240","kcal te quedan")}</div>', "hoy", hoja(info, 620)),
+ ("RInfo", "Detalle del día", 820, f'<div style="opacity:.25">{anillos(.46,.55,.52,"1.240","kcal te quedan")}</div>', "hoy", hoja(info, 720)),
  ("RMas", "Registrar", 760, f'<div style="opacity:.25">{anillos(.46,.55,.52,"1.240","kcal te quedan")}</div>', "hoy", hoja(mas, 640)),
  ("RPlan", "Plan", 1060, plan, "plan", ""),
  ("REntreno", "Entreno", 900, entreno, "entreno", ""),
