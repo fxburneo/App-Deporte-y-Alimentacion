@@ -43,11 +43,12 @@ export default function FormRegistrar(props: {
   despensa?: AlimentoDespensa[];
   platos?: PlatoFila[];
   fecha?: string; // día anterior; sin fecha = hoy
+  modoInicial?: "foto" | "texto" | "repetir";
   fechaTexto?: string; // "Domingo 8 nov"
 }) {
   const router = useRouter();
   const [comida, setComida] = useState<Momento>(props.inicial);
-  const [modo, setModo] = useState<Modo>("foto");
+  const [modo, setModo] = useState<Modo>(props.modoInicial ?? "foto");
   const [foto, setFoto] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
   const [alimentos, setAlimentos] = useState<Alimento[] | null>(null);

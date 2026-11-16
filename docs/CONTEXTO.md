@@ -421,3 +421,11 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   guardado en `informes_semanales`; se comparte con la hoja del iPhone.
 - Hallazgo 13-nov: 4 semanas con 51 % suave / 42 % media / 7 % fuerte. Revisar con el coach cuestas y zonas de pulso de
   Garmin (umbral correr 152).
+
+## Rediseño v2 aprobado (16-nov-2026) · entrega 1
+- Maquetas R1-R8 (hoja, sección 0). Entrega 1: Hoy nueva (anillos `components/hoy/Anillos.tsx`, "Ahora toca" con
+  `comidaQueToca`, línea del día, recuperación y entreno compactos), "Lo comí" (`registrarLoDeSiempre`: el servidor
+  recalcula el plato con `lib/datos/loDeSiempre.ts` + `platoDeMomento` y lo guarda como "repetida"; "Deshacer" borra),
+  hoja "Tu día en números" (`DetalleDia`) y botón + como menú rápido (`BotonMas`, `siguienteLoDeSiempre`; Registrar
+  acepta `?modo=foto|texto|repetir`).
+- Pendiente: entrega 2 (pestañas Hoy · Plan · + · Entreno · Yo, Pesarme) y 3 (Entreno renovado, letra/contraste, carga).

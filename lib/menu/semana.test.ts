@@ -46,3 +46,15 @@ describe("menuDelDia", () => {
     expect(m.comidas.find((c) => c.momento === "almuerzo")!.items.find((i) => i.nombre.startsWith("Arroz"))!.nombre).toBe("Arroz integral cocido");
   });
 });
+
+import { platoDeMomento } from "./semana";
+describe("platoDeMomento (Lo comí)", () => {
+  it("almuerzo de día intenso: menú tipo escalado con arroz blanco", () => {
+    const r = platoDeMomento({ momento: "almuerzo", objetivo: { carboG: 72, proteinaG: 68, grasaG: 10 }, tipo: "duro", carga: false, menuTipo: { almuerzo }, despensa, horasLargas: 0, dia: 0 });
+    expect(r.find((i) => i.nombre.startsWith("Arroz"))!.nombre).toBe("Arroz blanco cocido");
+  });
+  it("antes de entrenar: pan de agua con miel; sin objetivo, nada", () => {
+    expect(platoDeMomento({ momento: "pre_entreno", objetivo: { carboG: 25, proteinaG: 0, grasaG: 0 }, tipo: "duro", carga: false, menuTipo: {}, despensa, horasLargas: 0, dia: 0 })[0].nombre).toBe("Pan de agua precocido");
+    expect(platoDeMomento({ momento: "durante", objetivo: null, tipo: "duro", carga: false, menuTipo: {}, despensa, horasLargas: 0, dia: 0 })).toEqual([]);
+  });
+});
