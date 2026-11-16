@@ -8,6 +8,8 @@ import { DIAS_EDITABLES, esEditable, hoyEcuador } from "@/lib/fecha";
 import { AlimentoSchema, alimentoValido, totales, type Analisis } from "@/lib/comidas/alimentos";
 import { analizarComida, ErrorIA } from "@/lib/ia/analizarComida";
 import { MOMENTOS } from "@/lib/nutricion/motor";
+import { loDeSiempreDelDia } from "@/lib/datos/loDeSiempre";
+import { textoMenu } from "@/lib/menu/escalar";
 
 export type ResultadoAnalisis = { ok: true; analisis: Analisis } | { ok: false; error: string };
 
@@ -105,4 +107,49 @@ export async function editarComida(id: number, alimentos: unknown, momento?: unk
   if (error) return { ok: false, error: "No se pudo guardar el cambio." };
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+// "Lo comí": registra en un toque el plato de siempre con las cantidades del
+// día (calculadas aquí, no en el teléfono). Devuelve el id para "Deshacer".
+export async function registrarLoDeSiempre(momento: string, fecha?: string): Promise<{ ok: true; id: number; kcal: number } | { ok: false; error: string }> {
+  const m = z.enum(MOMENTOS).safeParse(momento);
+  if (!m.success) return { ok: false, error: "Comida no válida." };
+  const hoy = hoyEcuador();
+  const dia = fecha ?? hoy;
+  if (!esEditable(dia, hoy)) return { ok: false, error: `Solo puedes registrar comidas de hasta ${DIAS_EDITABLES} días atrás.` };
+  const datos = await loDeSiempreDelDia(dia);
+  if (!datos) return { ok: false, error: "Falta tu perfil o tu peso para calcular el plato." };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- "varia" es solo para la pantalla
+  const items = datos.plato(m.data).map(({ varia, ...a }) => a);
+  if (items.length === 0) return { ok: false, error: "Esta comida no tiene plato de siempre: usa Comí otra cosa." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "La sesión expiró, vuelve a entrar." };
+  const t = totales(items);
+  const { data, error } = await supabase
+    .from("comidas")
+    .insert({ user_id: user.id, fecha: dia, comida: m.data, origen: "repetida", descripcion: "Lo de siempre", alimentos: items, carbo_g: t.carboG, proteina_g: t.proteinaG, grasa_g: t.grasaG, kcal: t.kcal })
+    .select("id")
+    .single();
+  if (error || !data) return { ok: false, error: "No se pudo guardar. Intenta de nuevo." };
+  revalidatePath("/", "layout");
+  return { ok: true, id: data.id, kcal: t.kcal };
+}
+
+// Deshacer "Lo comí" (o cualquier registro recién hecho).
+export async function deshacerRegistro(id: number) {
+  const fd = new FormData();
+  fd.set("id", String(id));
+  await borrarComida(fd);
+}
+
+// Para el botón +: qué comida toca ahora y su plato de siempre.
+export async function siguienteLoDeSiempre(): Promise<{ momento: string; texto: string; kcal: number } | null> {
+  const datos = await loDeSiempreDelDia(hoyEcuador());
+  if (!datos || datos.registradas.size === 5) return null;
+  const items = datos.plato(datos.siguiente);
+  if (!items.length) return null;
+  return { momento: datos.siguiente, texto: textoMenu(items), kcal: totales(items).kcal };
 }

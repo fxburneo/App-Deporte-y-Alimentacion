@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { leerDespensa } from "@/lib/datos/despensa";
 import FormRegistrar, { type Reciente } from "./FormRegistrar";
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string; fecha?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string; fecha?: string; modo?: string }> }) {
   const sp = await searchParams;
   // Día anterior: hasta 7 días atrás; si no, hoy.
   const hoyEc = hoyEcuador();
@@ -63,6 +63,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
       consumoDurante={plan.consumoDurante}
       consumoExtra={plan.consumoExtra}
       fecha={fecha ?? undefined}
+      modoInicial={sp.modo === "texto" || sp.modo === "repetir" || sp.modo === "foto" ? sp.modo : undefined}
       fechaTexto={fecha ? fechaLarga(fecha) : undefined}
     />
   );

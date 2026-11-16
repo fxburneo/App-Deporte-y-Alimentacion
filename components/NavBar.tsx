@@ -1,6 +1,7 @@
 // Barra inferior fija, como en las maquetas: Hoy, Comidas, + (registrar),
 // Entreno y Más. El naranja marca la sección activa.
 import Link from "next/link";
+import BotonMas from "./BotonMas";
 
 type Seccion = "hoy" | "comidas" | "entreno" | "mas";
 
@@ -53,15 +54,7 @@ export default function NavBar({ activa }: { activa: Seccion }) {
       <div className="mx-auto flex max-w-md items-start justify-around px-2">
         <Item href="/" nombre="Hoy" activo={activa === "hoy"}>{icono.hoy}</Item>
         <Item href="/comidas" nombre="Comidas" activo={activa === "comidas"}>{icono.comidas}</Item>
-        <Link
-          href="/registrar"
-          aria-label="Registrar comida"
-          className="-mt-2 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-marca text-fondo"
-        >
-          <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </Link>
+        <BotonMas />
         <Item href="/entreno" nombre="Entreno" activo={activa === "entreno"}>{icono.entreno}</Item>
         <Item href="/mas" nombre="Más" activo={activa === "mas"}>{icono.mas}</Item>
       </div>
