@@ -79,6 +79,7 @@ export default function BotonMas() {
             </div>
             <span className="text-[13px] font-bold tracking-[0.1em] text-tenue">OTROS</span>
             <div className="grid grid-cols-2 gap-2.5">
+              <Opcion cerrar={cerrar} href="/registrar?comida=pre_entreno" icono="extra" titulo="Antes de entrenar" sub="o durante el entreno" />
               <Opcion cerrar={cerrar} href="/peso" icono="peso" titulo="Peso" sub="pesarme" />
               <Opcion cerrar={cerrar} href="/entreno/nuevo?dia=hoy&estado=hecho" icono="entreno" titulo="Entreno a mano" sub="si no llegó de Garmin" />
             </div>
