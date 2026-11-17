@@ -127,3 +127,13 @@ describe("listaCompras", () => {
     expect(ver("Lechuga")).toMatchObject({ cantidad: "7 comidas" });
   });
 });
+
+import { nombreCorto } from "./escalar";
+describe("nombreCorto", () => {
+  it("quita paréntesis y cocido o precocido", () => {
+    expect(nombreCorto("Pan de agua precocido")).toBe("Pan de agua");
+    expect(nombreCorto("Arroz blanco cocido")).toBe("Arroz blanco");
+    expect(nombreCorto("Pechuga de pollo cocida")).toBe("Pechuga de pollo");
+    expect(nombreCorto("Ensalada verde (lechuga, tomate, pepino)")).toBe("Ensalada verde");
+  });
+});

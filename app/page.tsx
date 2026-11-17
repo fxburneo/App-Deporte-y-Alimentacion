@@ -14,7 +14,7 @@ import { leerDatosDia } from "@/lib/datos/dia";
 import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { platoDeMomento } from "@/lib/menu/semana";
-import { textoMenu, totalesItems } from "@/lib/menu/escalar";
+import { cantidadDe, nombreCorto, totalesItems } from "@/lib/menu/escalar";
 import { comidaQueToca } from "@/lib/comidas/queToca";
 import { aEntreno, NOMBRE_DEPORTE, NOMBRE_MOMENTO } from "@/lib/datos/tipos";
 import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
@@ -22,7 +22,7 @@ import { calcularRecuperacion, ETIQUETA_NIVEL } from "@/lib/recuperacion";
 import BotonActualizar from "./garmin/BotonActualizar";
 import { duracion, kg, miles } from "@/lib/formato";
 import { kcalDe, type Macros } from "@/lib/nutricion/ajuste";
-import { COMIDAS, entrenosQueCuentan, NEAT_KCAL, NOMBRE_TIPO, tipoDia, type Comida, type Momento } from "@/lib/nutricion/motor";
+import { COMIDAS, entrenosQueCuentan, NEAT_KCAL, NOMBRE_TIPO, SNACK_PRE_G, tipoDia, type Comida, type Momento } from "@/lib/nutricion/motor";
 import type { CarreraDelDia } from "@/lib/nutricion/carrera";
 import { borrarEntreno } from "./entreno/actions";
 
@@ -86,17 +86,19 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
   const menuTipo = Object.fromEntries(despensa.platos.filter((p) => p.menu_tipo).map((p) => [p.menu_tipo!, p.alimentos]));
   const horasLargas = entrenosQueCuentan(hoy).filter((e) => e.deporte !== "descanso" && e.deporte !== "fuerza" && e.duracionMin >= 90).reduce((s, e) => s + e.duracionMin / 60, 0);
   const dia = Math.floor(new Date(d.fecha + "T12:00:00Z").getTime() / 86400000);
-  const objetivoDe = (m: Momento): Macros | null => (m === "pre_entreno" ? objetivoPre : m === "durante" ? objetivoDurante : m === "extra" ? null : ajuste.objetivos[m as Comida]);
+  const hayEntreno = d.entrenosHoy.some((e) => e.deporte !== "descanso" && e.deporte !== "fuerza" && e.duracion_min > 0);
+  const objetivoDe = (m: Momento): Macros | null =>
+    m === "pre_entreno" ? (objetivoPre ?? (hayEntreno ? { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 } : null)) : m === "durante" ? objetivoDurante : m === "extra" ? null : ajuste.objetivos[m as Comida];
   const plato = (m: Momento) => (editable ? platoDeMomento({ momento: m, objetivo: objetivoDe(m), tipo: obj.tipo, carga: plan.carrera?.modo === "carga", menuTipo, despensa: despensa.alimentos, horasLargas, dia }) : []);
 
   // Lo registrado por momento (nombres de los alimentos).
   const registrado = (m: Momento) => d.comidas.filter((c) => c.comida === m);
-  const nombres = (m: Momento) => registrado(m).flatMap((c) => c.alimentos.map((a) => a.nombre.split(" (")[0].toLowerCase())).join(", ");
+  const nombres = (m: Momento) => registrado(m).flatMap((c) => c.alimentos.map((a) => nombreCorto(a.nombre).toLowerCase())).join(", ");
   const consumoDe = (m: Momento): Macros | null | undefined => (m === "pre_entreno" ? consumoPre : m === "durante" ? consumoDurante : m === "extra" ? consumoExtra : consumido[m as Comida]);
 
   const siguiente: Comida | null = esHoy && Object.keys(consumido).length < 5 ? comidaQueToca(d.perfil.horarios_comida, horaEcuador(new Date().toISOString()), new Set(Object.keys(consumido) as Comida[])) : null;
   const momentos: Momento[] = [
-    ...(objetivoPre || consumoPre ? (["pre_entreno"] as Momento[]) : []),
+    ...(objetivoPre || consumoPre || hayEntreno ? (["pre_entreno"] as Momento[]) : []),
     ...(objetivoDurante || consumoDurante ? (["durante"] as Momento[]) : []),
     ...COMIDAS,
     ...(consumoExtra ? (["extra"] as Momento[]) : []),
@@ -112,7 +114,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
       nombre: m === "desayuno" && plan.temprano ? "Desayuno de recuperación" : NOMBRE_MOMENTO[m],
       hora: horaDe(m),
       estado,
-      detalle: real ? nombres(m) : p.length ? textoMenu(p).toLowerCase() : meta ? `${Math.round(meta.carboG)} g C · ${Math.round(meta.proteinaG)} g P · ${Math.round(meta.grasaG)} g G` : "",
+      detalle: real ? nombres(m) : p.length ? p.map((a) => `${cantidadDe(a)} ${nombreCorto(a.nombre).toLowerCase()}`.replace(/^a gusto (.*)$/, "$1 a gusto")).join(" · ") : meta ? `${Math.round(meta.carboG)} g C · ${Math.round(meta.proteinaG)} g P · ${Math.round(meta.grasaG)} g G` : "",
       kcal: Math.round(real ? kcalDe(real) : p.length ? totalesItems(p).carboG * 4 + totalesItems(p).proteinaG * 4 + totalesItems(p).grasaG * 9 : meta ? kcalDe(meta) : 0),
     };
   });
@@ -231,10 +233,14 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
             </div>
             <strong className="text-xl">{siguiente === "desayuno" && plan.temprano ? "Desayuno de recuperación" : NOMBRE_MOMENTO[siguiente]}</strong>
             {ahora.length > 0 ? (
-              <span className="text-[15px] leading-relaxed">
-                {textoMenu(ahora.filter((i) => !i.varia))}
-                {ahora.some((i) => i.varia) && <span className="font-bold text-carbo">{ahora.some((i) => !i.varia) ? " · " : ""}{textoMenu(ahora.filter((i) => i.varia))}</span>}
-              </span>
+              <ul className="flex flex-col">
+                {ahora.map((i, k) => (
+                  <li key={k} className="flex items-baseline justify-between gap-3 border-b border-linea py-1.5 last:border-0">
+                    <span className="text-[15px]">{nombreCorto(i.nombre)}</span>
+                    <span className={`text-[15px] whitespace-nowrap ${i.varia ? "font-bold text-carbo" : "text-suave"}`}>{cantidadDe(i)}</span>
+                  </li>
+                ))}
+              </ul>
             ) : (
               <span className="text-[15px] text-suave">Guarda tu plato de siempre en Mi despensa › Platos para registrarlo en un toque.</span>
             )}
@@ -252,7 +258,20 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
             <span className="text-[13px] text-tenue">{registradas} de {filas.filter((f) => f.momento !== "extra").length} registradas</span>
           </div>
           {filas.map((f, i) => (
-            <FilaDia key={f.momento} f={f} ultimo={i === filas.length - 1} href={editable ? (f.estado === "hecha" ? verComidas : reg(f.momento)) : null} />
+            <FilaDia
+              key={f.momento}
+              f={f}
+              ultimo={i === filas.length - 1}
+              href={editable ? (f.estado === "hecha" ? verComidas : reg(f.momento)) : null}
+              accion={
+                editable && f.estado !== "hecha" && (f.momento === "pre_entreno" || f.momento === "durante") && plato(f.momento).length > 0 ? (
+                  <span className="flex items-center gap-3 pt-1.5">
+                    <LoComi momento={f.momento} nombre={NOMBRE_MOMENTO[f.momento]} fecha={esHoy ? undefined : d.fecha} compacto />
+                    <Link href={reg(f.momento)} className="text-[13px] font-bold text-tenue">Otra cosa</Link>
+                  </span>
+                ) : null
+              }
+            />
           ))}
         </section>
         {editable && <Link href={reg("extra")} className="-mt-2 text-sm font-bold text-tenue no-underline">+ Algo fuera de horario</Link>}
@@ -276,7 +295,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
 
 const COLOR_ESTADO: Record<Estado, string> = { hecha: "#3ddc84", ahora: "#FF6A1A", pend: "#323A42", ajustada: "#FFB020" };
 
-function FilaDia({ f, ultimo, href }: { f: Fila; ultimo: boolean; href: string | null }) {
+function FilaDia({ f, ultimo, href, accion }: { f: Fila; ultimo: boolean; href: string | null; accion?: React.ReactNode }) {
   const c = COLOR_ESTADO[f.estado];
   const contenido = (
     <>
@@ -291,12 +310,14 @@ function FilaDia({ f, ultimo, href }: { f: Fila; ultimo: boolean; href: string |
           </strong>
           <span className={`font-display text-[17px] font-semibold ${f.estado === "hecha" ? "text-bien" : "text-suave"}`}>{miles(f.kcal)}</span>
         </div>
-        <span className="truncate text-[13px] text-tenue">{f.hora} · {f.detalle}</span>
+        <span className="line-clamp-2 text-[13px] text-tenue">{f.hora} · {f.detalle}</span>
+        {accion}
       </div>
     </>
   );
   const cls = "relative flex gap-3 pb-3.5 text-texto no-underline";
-  return href ? <Link href={href} className={cls}>{contenido}</Link> : <div className={cls}>{contenido}</div>;
+  // Con botón propio ("Lo comí") la fila no es enlace: no se puede anidar un botón en un enlace.
+  return href && !accion ? <Link href={href} className={cls}>{contenido}</Link> : <div className={cls}>{contenido}</div>;
 }
 
 // Aviso de carrera: semanas sin déficit, días de carga y el día de la carrera.

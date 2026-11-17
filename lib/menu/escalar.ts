@@ -122,3 +122,11 @@ export const textoMenu = (items: Alimento[]) =>
 export const totalesItems = (items: Alimento[]): Macros =>
   items.reduce((s, a) => ({ carboG: s.carboG + a.carbo_g, proteinaG: s.proteinaG + a.proteina_g, grasaG: s.grasaG + a.grasa_g }), { carboG: 0, proteinaG: 0, grasaG: 0 });
 
+
+// Nombre corto para mostrar: sin lo que va entre paréntesis ni "cocido" o
+// "precocido" ("Pan de agua precocido" → "Pan de agua").
+export const nombreCorto = (nombre: string) =>
+  nombre.split(" (")[0].replace(/\s+(pre)?cocid[oa]s?$/i, "").replace(/\s+(pre)?cocid[oa]s?\s/i, " ").trim();
+
+// Cantidad para mostrar al lado del nombre: "2 tajadas", "1 ½ tazas", "a gusto".
+export const cantidadDe = (a: Alimento) => a.medida_casera || `${Math.round(a.gramos)} g`;

@@ -4,7 +4,7 @@
 import "server-only";
 import { comidaQueToca } from "@/lib/comidas/queToca";
 import { horaEcuador } from "@/lib/fecha";
-import { entrenosQueCuentan, type Comida, type Momento } from "@/lib/nutricion/motor";
+import { entrenosQueCuentan, SNACK_PRE_G, type Comida, type Momento } from "@/lib/nutricion/motor";
 import { platoDeMomento } from "@/lib/menu/semana";
 import type { ItemMenu } from "@/lib/menu/escalar";
 import type { Macros } from "@/lib/nutricion/ajuste";
@@ -23,8 +23,9 @@ export async function loDeSiempreDelDia(fecha: string) {
     .filter((e) => e.deporte !== "descanso" && e.deporte !== "fuerza" && e.duracionMin >= 90)
     .reduce((s, e) => s + e.duracionMin / 60, 0);
   const dia = Math.floor(new Date(fecha + "T12:00:00Z").getTime() / 86400000);
+  const hayEntreno = d.entrenosHoy.some((e) => e.deporte !== "descanso" && e.deporte !== "fuerza" && e.duracion_min > 0);
   const objetivoDe = (m: Momento): Macros | null =>
-    m === "pre_entreno" ? plan.objetivoPre : m === "durante" ? plan.objetivoDurante : m === "extra" ? null : plan.ajuste.objetivos[m as Comida];
+    m === "pre_entreno" ? (plan.objetivoPre ?? (hayEntreno ? { carboG: SNACK_PRE_G, proteinaG: 0, grasaG: 0 } : null)) : m === "durante" ? plan.objetivoDurante : m === "extra" ? null : plan.ajuste.objetivos[m as Comida];
   const plato = (m: Momento): ItemMenu[] =>
     platoDeMomento({ momento: m, objetivo: objetivoDe(m), tipo: plan.objetivo.tipo, carga: plan.carrera?.modo === "carga", menuTipo, despensa: despensa.alimentos, horasLargas, dia });
   const registradas = new Set(Object.keys(plan.consumido) as Comida[]);
