@@ -429,3 +429,14 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   hoja "Tu día en números" (`DetalleDia`) y botón + como menú rápido (`BotonMas`, `siguienteLoDeSiempre`; Registrar
   acepta `?modo=foto|texto|repetir`).
 - Pendiente: entrega 2 (pestañas Hoy · Plan · + · Entreno · Yo, Pesarme) y 3 (Entreno renovado, letra/contraste, carga).
+
+## Indicadores de cumplimiento (aprobados 18-nov-2026, van en la entrega 2)
+- Dos indicadores separados, con Día · Semana · Mes · Año, semáforo (verde ≥ 85 %, amarillo 70–84 %, rojo < 70 %) y
+  tendencia; en "Yo › Tu progreso" y un resumen chico de la semana en Hoy.
+- Entreno (bandas de TrainingPeaks): por sesión del coach, minutos hechos ÷ planificados: 80–120 % = 100; bajo 80 %
+  baja en proporción (60 % → 75); sobre 120 % también baja (150 % → 70); no hecha = 0. Cuentan todas las sesiones del
+  coach (fuerza y yoga incluidas). Periodos: ponderado por duración planificada. Días sin plan no cuentan.
+- Alimentación (puntaje diario): calorías 40 % (100 entre 90–110 % del objetivo, 0 a ±40 %), proteína 35 % (100 desde
+  el objetivo, proporcional por debajo), carbohidrato del día 25 % (100 entre 85–115 %, 0 a ±50 %). Grasa no puntúa.
+  Día sin registrar = 0 %. Periodos: promedio de los días.
+- Datos desde: comidas 3-nov, plan del coach 6-nov.
