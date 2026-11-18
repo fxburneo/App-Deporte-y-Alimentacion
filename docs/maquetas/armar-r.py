@@ -84,6 +84,7 @@ hoy = "\n".join([
  franja(),
  f'<div style="display:flex;gap:8px"><div style="flex:1;background:{C["sup"]};border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="{D};font-size:26px;font-weight:700;color:{C["bien"]}">82</span><span style="font-size:13px;line-height:1.25"><strong>Recuperado</strong><br><span style="color:{C["tenue"]}">7:40 h · HRV 55</span></span></div><div style="flex:1;background:{C["sup"]};border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center"><strong style="font-size:13px">Rodillo tempo 1:10</strong><span style="font-size:13px;color:{C["marca"]}">Día intenso · ✓ hecho</span></div></div>',
  anillos(.46, .55, .52, "1.240", "kcal te quedan"),
+ f'<a href="RCumple.dc.html" style="display:flex;justify-content:center;gap:14px;font-size:14px;color:{C["suave"]};text-decoration:none;margin-top:-6px">Esta semana: <span>entreno <strong style="color:{C["bien"]}">86 %</strong></span><span>comida <strong style="color:{C["carbo"]}">71 %</strong></span></a>',
  f'''<section style="background:{C["sup"]};border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;border:1px solid {C["marca"]}55">
 <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:800;letter-spacing:.1em;color:{C["marca"]}">AHORA TOCA · 13:00</span><span style="{D};font-size:18px;font-weight:700">720 kcal</span></div>
 <strong style="font-size:20px">Almuerzo</strong>
@@ -182,6 +183,89 @@ pesarme = "\n".join([
 ])
 
 
+# ---------- R9 · Cumplimiento ----------
+def semaforo(p):
+    return C["bien"] if p >= 85 else C["carbo"] if p >= 70 else C["mal"]
+def gauge(nombre, p, sub):
+    import math
+    r, cx = 52, 60
+    L = math.pi * r  # semicírculo
+    col = semaforo(p)
+    return (f'<div style="flex:1;background:{C["sup"]};border-radius:18px;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px">'
+            f'<span style="font-size:12px;font-weight:800;letter-spacing:.1em;color:{C["tenue"]}">{nombre}</span>'
+            f'<div style="position:relative;width:120px;height:66px"><svg width="120" height="66" viewBox="0 0 120 66">'
+            f'<path d="M8 60 A52 52 0 0 1 112 60" fill="none" stroke="{col}" stroke-opacity=".18" stroke-width="11" stroke-linecap="round"/>'
+            f'<path d="M8 60 A52 52 0 0 1 112 60" fill="none" stroke="{col}" stroke-width="11" stroke-linecap="round" stroke-dasharray="{L*p/100:.1f} {L:.1f}"/></svg>'
+            f'<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;{D};font-size:30px;font-weight:700;line-height:1;color:{col}">{p}%</span></div>'
+            f'<span style="font-size:13px;color:{C["suave"]};text-align:center">{sub}</span></div>')
+def selector(activo):
+    out = []
+    for t in ["Día", "Semana", "Mes", "Año"]:
+        st = f"background:{C['texto']};color:{C['fondo']};font-weight:800" if t == activo else f"color:{C['tenue']};font-weight:600"
+        out.append(f'<span style="flex:1;text-align:center;padding:8px 0;border-radius:10px;{st}">{t}</span>')
+    return f'<div style="display:flex;gap:4px;background:{C["sup"]};border-radius:12px;padding:4px">{"".join(out)}</div>'
+def barras(titulo, etiquetas, ent, ali):
+    w, h = 340, 120
+    n = len(etiquetas)
+    ancho = (w - 20) / n
+    out = []
+    for i, (e, a, lab) in enumerate(zip(ent, ali, etiquetas)):
+        x = 10 + i * ancho
+        bw = ancho * 0.32
+        for j, v in enumerate([e, a]):
+            if v is None: continue
+            hh = (h - 30) * v / 100
+            col = C["prot"] if j == 0 else C["carbo"]
+            out.append(f'<rect x="{x + ancho*0.16 + j*(bw+3):.0f}" y="{h-20-hh:.0f}" width="{bw:.0f}" height="{hh:.0f}" rx="3" fill="{col}"/>')
+        out.append(f'<text x="{x + ancho/2:.0f}" y="{h-5}" text-anchor="middle" font-size="11" fill="{C["tenue"]}">{lab}</text>')
+    linea = f'<line x1="10" x2="{w-10}" y1="{h-20-(h-30)*0.85:.0f}" y2="{h-20-(h-30)*0.85:.0f}" stroke="{C["bien"]}" stroke-dasharray="4 3" stroke-width="1"/><text x="{w-10}" y="{h-24-(h-30)*0.85:.0f}" text-anchor="end" font-size="10" fill="{C["bien"]}">meta 85 %</text>'
+    return (f'<section style="display:flex;flex-direction:column;gap:6px">' + etiqueta(titulo, "") +
+            f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}">{linea}{"".join(out)}</svg>'
+            f'<div style="display:flex;gap:14px;font-size:13px;color:{C["suave"]}"><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:{C["prot"]};margin-right:6px"></span>Entreno</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:{C["carbo"]};margin-right:6px"></span>Alimentación</span></div></section>')
+def fila_c(n, sub, p, ultimo=False):
+    borde = "" if ultimo else "border-bottom:1px solid " + C["linea"]
+    txt = "—" if p is None else f"{p}%"
+    col = C["tenue"] if p is None else semaforo(p)
+    return f'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;{borde}"><span style="display:flex;flex-direction:column"><span style="font-size:14px">{n}</span><span style="font-size:12px;color:{C["tenue"]}">{sub}</span></span><span style="{D};font-size:18px;font-weight:700;color:{col}">{txt}</span></div>'
+
+cumple = "\n".join([
+ f'<header style="display:flex;justify-content:space-between;align-items:center"><a href="RYo.dc.html" style="color:{C["tenue"]};font-weight:600;text-decoration:none">‹ Yo</a><h1 style="margin:0;{D};font-size:24px;font-weight:700;letter-spacing:.04em">CUMPLIMIENTO</h1><span style="width:30px"></span></header>',
+ selector("Semana"),
+ f'<span style="font-size:14px;color:{C["tenue"]};text-align:center;margin-top:-6px">‹ &nbsp; Semana 16 – 22 nov &nbsp; ›</span>',
+ f'<div style="display:flex;gap:10px">{gauge("ENTRENO", 86, "4 de 5 sesiones del coach")}{gauge("ALIMENTACIÓN", 71, "proteína corta 3 días")}</div>',
+ barras("DÍA POR DÍA", ["L", "M", "M", "J", "V", "S", "D"], [100, 79, None, 100, 0, 92, None], [82, 64, 75, 88, 41, 70, 76]),
+ '<section style="display:flex;flex-direction:column">' + etiqueta("ENTRENO · SESIONES", "ponderado por duración"),
+ fila_c("Mar · rodillo tempo 5×7", "70 de 70 min", 100),
+ fila_c("Jue · trail cuestas 1:20", "1:28 de 1:20 (110 %)", 100),
+ fila_c("Vie · trote aeróbico 1:00", "no hecho", 0),
+ fila_c("Sáb · bici fondo 3:30", "4:16 de 3:30 (122 %)", 92, ultimo=True),
+ '</section>',
+ '<section style="display:flex;flex-direction:column">' + etiqueta("ALIMENTACIÓN · PROMEDIO", ""),
+ fila_c("Calorías", "en objetivo (90–110 %) 4 de 7 días · pesa 40 %", 76),
+ fila_c("Proteína", "promedio 148 de 174 g · pesa 35 %", 85),
+ fila_c("Carbohidrato del día", "bajo en días intensos · pesa 25 %", 58, ultimo=True),
+ '</section>',
+ f'<p style="margin:0;font-size:13px;color:{C["tenue"]}">Verde desde 85 %, amarillo 70–84 %, rojo bajo 70 %. Un día sin registrar cuenta 0 % en alimentación.</p>',
+])
+
+def mini_mes(m, e, a):
+    return f'<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="display:flex;gap:3px;align-items:flex-end;height:70px"><span style="width:10px;height:{0.7*e:.0f}px;background:{C["prot"]};border-radius:2px"></span><span style="width:10px;height:{0.7*a:.0f}px;background:{C["carbo"]};border-radius:2px"></span></div><span style="font-size:11px;color:{C["tenue"]}">{m}</span></div>'
+anio = "\n".join([
+ f'<header style="display:flex;justify-content:space-between;align-items:center"><a href="RYo.dc.html" style="color:{C["tenue"]};font-weight:600;text-decoration:none">‹ Yo</a><h1 style="margin:0;{D};font-size:24px;font-weight:700;letter-spacing:.04em">CUMPLIMIENTO</h1><span style="width:30px"></span></header>',
+ selector("Año"),
+ f'<span style="font-size:14px;color:{C["tenue"]};text-align:center;margin-top:-6px">‹ &nbsp; 2027 &nbsp; ›</span>',
+ f'<div style="display:flex;gap:10px">{gauge("ENTRENO", 88, "212 de 236 sesiones")}{gauge("ALIMENTACIÓN", 79, "subiendo desde marzo")}</div>',
+ '<section style="display:flex;flex-direction:column;gap:6px">' + etiqueta("MES A MES", "") +
+ '<div style="display:flex;justify-content:space-between">' + "".join(mini_mes(m, e, a) for m, e, a in [("E", 84, 70), ("F", 86, 74), ("M", 90, 78), ("A", 93, 82), ("M", 85, 80), ("J", 88, 79), ("J", 82, 76), ("A", 89, 81), ("S", 91, 83), ("O", 87, 80), ("N", 90, 84), ("D", 86, 77)]) + '</div></section>',
+ '<section style="display:flex;flex-direction:column">' + etiqueta("MEJOR Y PEOR", ""),
+ fila_c("Mejor mes de entreno", "abril · antes de Petzl", 93),
+ fila_c("Mejor mes de alimentación", "noviembre", 84),
+ fila_c("Mes más bajo", "julio · vacaciones", 76, ultimo=True),
+ '</section>',
+ f'<p style="margin:0;font-size:13px;color:{C["tenue"]}">Ejemplo de cómo se verá a fin de 2027. Tus datos empiezan en noviembre de 2026.</p>',
+])
+
+
 # ---------- R2 · Menú del botón + ----------
 def opcion(icono, t, sub, destacado=False):
     b = f"background:{C['marca']}22;border:1px solid {C['marca']}" if destacado else f"background:{C['sup']}"
@@ -238,7 +322,8 @@ yo = "\n".join([
 <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:800;letter-spacing:.1em;color:{C["tenue"]}">PESO · TENDENCIA</span><a href="RPeso.dc.html" style="font-weight:700;font-size:14px">+ Pesarme</a></div>
 <div style="display:flex;align-items:baseline;gap:8px"><span style="{D};font-size:40px;font-weight:700">75,3</span><span style="color:{C["bien"]};font-weight:700">−0,7 kg en 4 semanas</span></div>
 {grafico_peso()}<span style="font-size:14px;color:{C["suave"]}">A este ritmo llegas a 73 kg a fines de enero, antes de cortar el déficit (13-mar).</span></section>''',
- f'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">{ind("RACHA","9","días registrando",C["marca"])}{ind("SEMANA","5/6","entrenos",C["bien"])}{ind("PETZL","20","semanas",C["prot"])}</div>',
+ f'<a href="RCumple.dc.html" style="display:flex;flex-direction:column;gap:8px;text-decoration:none;color:{C["texto"]}"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:800;letter-spacing:.1em;color:{C["tenue"]}">CUMPLIMIENTO · ESTA SEMANA</span><span style="font-size:14px;font-weight:700;color:{C["marca"]}">Ver más ›</span></div><div style="display:flex;gap:10px">{gauge("ENTRENO", 86, "4 de 5 sesiones")}{gauge("ALIMENTACIÓN", 71, "proteína corta 3 días")}</div></a>',
+ f'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">{ind("RACHA","9","días registrando",C["marca"])}{ind("PETZL","20","semanas",C["prot"])}</div>',
  '<section style="display:flex;flex-direction:column">', etiqueta("AJUSTES"),
  ajuste("Avisos", "6 activos"), ajuste("Plan de la nutricionista", "déficit 300 en descanso"), ajuste("Carreras", "Petzl 50K"), ajuste("Modo pausa", "apagado"), ajuste("Conexiones", "Garmin · TrainingPeaks"), ajuste("Mis datos", "estatura, nacimiento, horarios"),
  '</section>',
@@ -254,7 +339,9 @@ paginas = [
  ("RMas", "Registrar", 760, f'<div style="opacity:.25">{anillos(.46,.55,.52,"1.240","kcal te quedan")}</div>', "hoy", hoja(mas, 640)),
  ("RPlan", "Plan", 1060, plan, "plan", ""),
  ("REntreno", "Entreno", 900, entreno, "entreno", ""),
- ("RYo", "Yo", 1060, yo, "yo", ""),
+ ("RYo", "Yo", 1120, yo, "yo", ""),
+ ("RCumple", "Cumplimiento", 1400, cumple, "yo", ""),
+ ("RCumpleAnio", "Cumplimiento anual", 1000, anio, "yo", ""),
 ]
 for k, t, h, cuerpo, act, extra in paginas:
     open(f"{k}.dc.html", "w", encoding="utf-8").write(pagina(t, h, cuerpo, act, extra))
