@@ -53,7 +53,7 @@ export default function ListaDespensa(props: { alimentos: AlimentoDespensa[]; pl
   return (
     <>
       <header className="flex items-center justify-between">
-        <Link href="/comidas" className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Comidas</Link>
+        <Link href="/menu" className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Plan</Link>
         <h1 className="font-display text-2xl font-bold tracking-[0.04em]">MI DESPENSA</h1>
         <Link href="/despensa/nuevo" className="min-w-[70px] text-right font-bold text-marca">+ Agregar</Link>
       </header>

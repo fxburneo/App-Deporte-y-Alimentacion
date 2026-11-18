@@ -428,7 +428,12 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   recalcula el plato con `lib/datos/loDeSiempre.ts` + `platoDeMomento` y lo guarda como "repetida"; "Deshacer" borra),
   hoja "Tu día en números" (`DetalleDia`) y botón + como menú rápido (`BotonMas`, `siguienteLoDeSiempre`; Registrar
   acepta `?modo=foto|texto|repetir`).
-- Pendiente: entrega 2 (pestañas Hoy · Plan · + · Entreno · Yo, Pesarme) y 3 (Entreno renovado, letra/contraste, carga).
+- Entrega 2 (18-nov): pestañas Hoy · Plan (/menu) · + · Entreno · Yo (/yo). Plan con accesos (compras, mis platos,
+  despensa, calculadora) y la semana. Yo con peso y tendencia, cumplimiento de la semana, racha (días seguidos con
+  comida registrada, hasta ayer si hoy aún no registra) y semanas a la carrera A; ajustes abajo. La antigua "Más" es
+  ahora Ajustes (/mas, con anclas #avisos #deficit #pausa #conexiones); Mis datos = /bienvenida. Pesarme (/peso) con
+  − y + de a 100 g desde el último peso. Cumplimiento en /cumplimiento?p=semana|mes|anio&f=AAAA-MM-DD.
+- Pendiente: entrega 3 (Entreno renovado, letra/contraste, carga).
 
 ## Indicadores de cumplimiento (aprobados 18-nov-2026, van en la entrega 2)
 - Dos indicadores separados, con Semana · Mes · Año (la vista Día se quitó el 18-nov: un día solo da 0 o 100 y ya está en Hoy), semáforo (verde ≥ 85 %, amarillo 70–84 %, rojo < 70 %) y
@@ -440,3 +445,7 @@ Hoja de pantallas (formato de presentación, como en finanzas): https://claude.a
   el objetivo, proporcional por debajo), carbohidrato del día 25 % (100 entre 85–115 %, 0 a ±50 %). Grasa no puntúa.
   Día sin registrar = 0 %. Periodos: promedio de los días.
 - Datos desde: comidas 3-nov, plan del coach 6-nov.
+- Detalles de cálculo (lib/cumplimiento.ts, lib/datos/cumplimientoPeriodo.ts): el objetivo de cada día sale del
+  mismo motor que Hoy (planDelDia). Hoy no cuenta en alimentación (el día no terminó); en entreno cuenta solo si ya
+  hay algo hecho. Fuerza se compara con fuerza y lo aeróbico entre sí; dos sesiones de la misma familia el mismo día
+  se reparten lo hecho en proporción. Sesión sin duración planificada pesa como 30 min.

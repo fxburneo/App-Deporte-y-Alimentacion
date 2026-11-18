@@ -77,3 +77,95 @@ export const semaforo = (p: number): Semaforo => (p >= 85 ? "verde" : p >= 70 ? 
 // Fechas desde las que hay datos: antes de esto no se cuenta.
 export const DATOS_COMIDAS_DESDE = "2026-11-03";
 export const DATOS_PLAN_DESDE = "2026-11-06";
+
+// ---------- Sesiones del coach contra lo hecho ----------
+export interface EntrenoCumplimiento {
+  fecha: string;
+  estado: "planificado" | "hecho";
+  deporte: string;
+  duracion_min: number;
+  nombre?: string | null;
+  origen: string;
+}
+
+export interface SesionCoach extends Sesion {
+  nombre: string;
+  puntaje: number;
+}
+
+// Fuerza se compara con fuerza; todo lo demás (rodillo, bici, trote) entre sí.
+const familia = (deporte: string) => (deporte === "fuerza" ? "fuerza" : "aerobico");
+const limpio = (n: string | null | undefined) => (n ?? "").replace(/^[^:]+:\s*/, "");
+
+// Cada sesión planificada en TrainingPeaks contra lo hecho ese día en Garmin
+// (o a mano). Si el coach puso dos sesiones de la misma familia el mismo día,
+// lo hecho se reparte en proporción a lo planificado. Hoy solo cuenta si ya
+// hay algo hecho (si no, todavía está pendiente); el futuro no cuenta.
+export function sesionesDelCoach(entrenos: EntrenoCumplimiento[], desde: string, hasta: string, hoy: string): SesionCoach[] {
+  const inicio = desde > DATOS_PLAN_DESDE ? desde : DATOS_PLAN_DESDE;
+  const plan = entrenos
+    .filter((e) => e.estado === "planificado" && e.origen === "trainingpeaks" && e.deporte !== "descanso")
+    .filter((e) => e.fecha >= inicio && e.fecha <= hasta && e.fecha <= hoy)
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const salida: SesionCoach[] = [];
+  const grupos = new Map<string, EntrenoCumplimiento[]>();
+  for (const p of plan) {
+    const k = `${p.fecha}|${familia(p.deporte)}`;
+    grupos.set(k, [...(grupos.get(k) ?? []), p]);
+  }
+  for (const [k, sesiones] of grupos) {
+    const [fecha, fam] = k.split("|");
+    const hecho = entrenos.filter((e) => e.estado === "hecho" && e.fecha === fecha && familia(e.deporte) === fam).reduce((a, e) => a + e.duracion_min, 0);
+    if (fecha === hoy && hecho === 0) continue;
+    const planTotal = sesiones.reduce((a, s) => a + s.duracion_min, 0);
+    for (const s of sesiones) {
+      const hechoMin = planTotal > 0 ? Math.round((hecho * s.duracion_min) / planTotal) : hecho;
+      salida.push({ fecha, nombre: limpio(s.nombre) || s.deporte, planMin: s.duracion_min, hechoMin, puntaje: Math.round(puntajeSesion(s.duracion_min, hechoMin)) });
+    }
+  }
+  return salida.sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+// ---------- Periodos ----------
+export type Periodo = "semana" | "mes" | "anio";
+
+const dia = (f: string) => new Date(f + "T12:00:00Z");
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+// Rango del periodo que contiene la fecha: semana de lunes a domingo, mes
+// calendario o año calendario.
+export function rangoPeriodo(periodo: Periodo, fecha: string): { desde: string; hasta: string } {
+  const d = dia(fecha);
+  if (periodo === "semana") {
+    const lunes = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 86400000);
+    return { desde: iso(lunes), hasta: iso(new Date(lunes.getTime() + 6 * 86400000)) };
+  }
+  if (periodo === "mes") {
+    const desde = `${fecha.slice(0, 7)}-01`;
+    const fin = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0, 12));
+    return { desde, hasta: iso(fin) };
+  }
+  return { desde: `${fecha.slice(0, 4)}-01-01`, hasta: `${fecha.slice(0, 4)}-12-31` };
+}
+
+// Fecha dentro del periodo anterior o siguiente (para las flechas).
+export function moverPeriodo(periodo: Periodo, fecha: string, paso: 1 | -1): string {
+  const { desde } = rangoPeriodo(periodo, fecha);
+  const d = dia(desde);
+  if (periodo === "semana") return iso(new Date(d.getTime() + paso * 7 * 86400000));
+  if (periodo === "mes") return iso(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + paso, 1, 12)));
+  return `${d.getUTCFullYear() + paso}-01-01`;
+}
+
+// Racha: días seguidos con al menos una comida registrada, terminando hoy (o
+// ayer, si hoy todavía no registra nada: la racha no se corta a media mañana).
+export function racha(fechasConRegistro: Iterable<string>, hoy: string): number {
+  const set = new Set(fechasConRegistro);
+  let f = set.has(hoy) ? hoy : iso(new Date(dia(hoy).getTime() - 86400000));
+  let n = 0;
+  while (set.has(f)) {
+    n++;
+    f = iso(new Date(dia(f).getTime() - 86400000));
+  }
+  return n;
+}

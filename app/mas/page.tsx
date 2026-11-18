@@ -1,5 +1,6 @@
-// Más (maqueta 4.1): perfil, modo pausa y accesos. Test de sudoración,
-// avisos y conexiones se activan en sus etapas.
+// Ajustes (antes "Más"; desde el rediseño se entra por Yo › Ajustes): déficit
+// de la nutricionista, modo pausa, avisos y conexiones. Los datos fijos están
+// en Mis datos (/bienvenida) y el peso en Pesarme.
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/NavBar";
@@ -10,7 +11,6 @@ import { estimarRitmo } from "@/lib/nutricion/estimacion";
 import { DEFICIT_DESCANSO_BASE, DEFICIT_DESCANSO_MAX } from "@/lib/nutricion/motor";
 import { kg } from "@/lib/formato";
 import { pesoReferencia } from "@/lib/nutricion/motor";
-import { edadEnAnios } from "@/lib/perfil/edad";
 import { fechaConAnio, fechaLarga, horaEcuador, hoyEcuador, sumarDias } from "@/lib/fecha";
 import BotonActualizar from "../garmin/BotonActualizar";
 import { signOut } from "../login/actions";
@@ -43,27 +43,10 @@ export default async function Page() {
   return (
     <>
       <Pantalla>
-        <header className="flex items-center justify-between">
-          <h1 className="font-display text-[34px] font-bold uppercase leading-none tracking-[0.02em]">Más</h1>
-          <span className="font-display text-[15px] font-extrabold tracking-[0.12em] text-marca">FXB PERFORMANCE</span>
+        <header className="flex flex-col gap-1">
+          <Link href="/yo" className="py-1.5 text-[13px] font-semibold text-tenue">‹ Yo</Link>
+          <h1 className="font-display text-[34px] font-bold uppercase leading-none tracking-[0.02em]">Ajustes</h1>
         </header>
-
-        <section className="flex flex-col gap-2.5">
-          <div className="flex items-baseline justify-between">
-            <strong className="text-lg">{p.nombre}</strong>
-            <Link href="/bienvenida" className="text-[13px] font-bold">Editar</Link>
-          </div>
-          <div className="grid grid-cols-4 border-y border-linea">
-            <Celda valor={String(edadEnAnios(p.fecha_nacimiento))} nombre="Años" />
-            <Celda valor={String(Number(p.estatura_cm))} nombre="Cm" borde />
-            <Celda valor={peso != null ? kg(peso) : "—"} nombre="Kg prom." borde />
-            <Celda valor={`${Number(p.objetivo_min_kg)}–${Number(p.objetivo_max_kg)}`} nombre="Objetivo" borde />
-          </div>
-          <span className="text-[13px] text-tenue">
-            {p.no_incluir.length > 0 ? `Sin ${p.no_incluir.join(", ").toLowerCase()}` : "Sin restricciones"} · {p.ciudad}, {p.altitud_m.toLocaleString("de-DE")} m
-          </span>
-          <Link href="/peso" className="font-bold">Peso y tendencia ›</Link>
-        </section>
 
         <Link href="/carreras" className="flex items-center justify-between border-t border-linea pt-3.5 text-texto no-underline">
           <span className="flex flex-col">
@@ -75,7 +58,7 @@ export default async function Page() {
           <span className="font-bold text-marca">›</span>
         </Link>
 
-        <section className="flex flex-col gap-2.5 border-t border-linea pt-3.5">
+        <section id="deficit" className="flex scroll-mt-6 flex-col gap-2.5 border-t border-linea pt-3.5">
           <div className="flex flex-col">
             <strong className="text-base">Déficit en días de descanso</strong>
             <span className="text-[13px] text-tenue">Plan de la nutricionista: descanso 300, día intenso 350, salida media 400, Z2 y salida larga 500. Si cambias el de descanso, los demás se mueven en la misma proporción.</span>
@@ -109,7 +92,7 @@ export default async function Page() {
           )}
         </section>
 
-        <form action={cambiarPausa} className="flex items-center gap-3.5 border-y border-linea py-3.5">
+        <form id="pausa" action={cambiarPausa} className="flex scroll-mt-6 items-center gap-3.5 border-y border-linea py-3.5">
           <input type="hidden" name="activar" value={p.pausa ? "0" : "1"} />
           <div className="flex flex-1 flex-col">
             <strong className="text-base">Modo pausa</strong>
@@ -126,9 +109,10 @@ export default async function Page() {
           </button>
         </form>
 
+        <div id="avisos" className="scroll-mt-6" />
         <Avisos preferencias={(p.avisos as Record<string, boolean> | null) ?? {}} clavePublica={clavePublica} />
 
-        <section className="flex flex-col gap-1">
+        <section id="conexiones" className="flex scroll-mt-6 flex-col gap-1">
           <span className="etiqueta pb-1">Conexiones</span>
           <div className="flex items-start gap-3 py-2">
             <span className={`mt-1.5 h-2 w-2 flex-none rounded-full ${d.ultimaSync?.ok === false ? "bg-mal" : d.ultimaSyncOk ? "bg-bien" : "bg-tenue"}`} />
@@ -169,17 +153,8 @@ export default async function Page() {
           <button type="submit" className="w-full rounded-xl border border-borde py-3.5 font-bold text-suave">Salir</button>
         </form>
       </Pantalla>
-      <NavBar activa="mas" />
+      <NavBar activa="yo" />
     </>
-  );
-}
-
-function Celda({ valor, nombre, borde }: { valor: string; nombre: string; borde?: boolean }) {
-  return (
-    <div className={`flex flex-col py-2.5 ${borde ? "border-l border-linea pl-2.5" : ""}`}>
-      <span className="font-display text-[22px] font-semibold leading-tight">{valor}</span>
-      <span className="text-[11px] uppercase text-tenue">{nombre}</span>
-    </div>
   );
 }
 

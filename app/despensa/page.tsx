@@ -13,7 +13,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ t
       <Pantalla>
         <ListaDespensa alimentos={alimentos} platos={platos} tabInicial={tab} />
       </Pantalla>
-      <NavBar activa="comidas" />
+      <NavBar activa="plan" />
     </>
   );
 }

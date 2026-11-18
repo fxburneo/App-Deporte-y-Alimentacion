@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { cumplimientoAlimentacion, cumplimientoEntreno, puntajeAlimentacion, puntajeSesion, semaforo } from "./cumplimiento";
+import {
+  cumplimientoAlimentacion,
+  cumplimientoEntreno,
+  moverPeriodo,
+  puntajeAlimentacion,
+  puntajeSesion,
+  racha,
+  rangoPeriodo,
+  semaforo,
+  sesionesDelCoach,
+  type EntrenoCumplimiento,
+} from "./cumplimiento";
 
 describe("puntaje por sesión del coach", () => {
   it("entre 80 y 120 % de lo planificado es 100", () => {
@@ -64,5 +75,43 @@ describe("semáforo", () => {
     expect(semaforo(84)).toBe("amarillo");
     expect(semaforo(70)).toBe("amarillo");
     expect(semaforo(69)).toBe("rojo");
+  });
+});
+
+describe("sesiones del coach contra lo hecho", () => {
+  const p = (fecha: string, deporte: string, min: number, nombre = "Bike: Tempo"): EntrenoCumplimiento => ({ fecha, estado: "planificado", deporte, duracion_min: min, nombre, origen: "trainingpeaks" });
+  const h = (fecha: string, deporte: string, min: number): EntrenoCumplimiento => ({ fecha, estado: "hecho", deporte, duracion_min: min, origen: "garmin" });
+  it("compara cada sesión con lo hecho ese día y limpia el nombre", () => {
+    const s = sesionesDelCoach([p("2026-11-17", "rodillo", 70), h("2026-11-17", "rodillo", 70), p("2026-11-20", "trail_correr", 60)], "2026-11-16", "2026-11-22", "2026-11-22");
+    expect(s.map((x) => [x.nombre, x.puntaje])).toEqual([["Tempo", 100], ["Tempo", 0]]);
+  });
+  it("hoy sin nada hecho está pendiente y el futuro no cuenta", () => {
+    expect(sesionesDelCoach([p("2026-11-18", "rodillo", 60), p("2026-11-19", "rodillo", 60)], "2026-11-16", "2026-11-22", "2026-11-18")).toEqual([]);
+  });
+  it("fuerza no se cruza con la bici y el descanso no es sesión", () => {
+    const s = sesionesDelCoach([p("2026-11-17", "fuerza", 0), h("2026-11-17", "rodillo", 60), p("2026-11-18", "descanso", 0)], "2026-11-16", "2026-11-22", "2026-11-22");
+    expect(s).toHaveLength(1);
+    expect(s[0].puntaje).toBe(0);
+  });
+  it("antes del 6-nov no hay plan del coach que medir", () => {
+    expect(sesionesDelCoach([p("2026-11-04", "rodillo", 60)], "2026-11-01", "2026-11-30", "2026-11-30")).toEqual([]);
+  });
+});
+
+describe("periodos y racha", () => {
+  it("semana de lunes a domingo, mes y año calendario", () => {
+    expect(rangoPeriodo("semana", "2026-11-18")).toEqual({ desde: "2026-11-16", hasta: "2026-11-22" });
+    expect(rangoPeriodo("mes", "2027-02-10")).toEqual({ desde: "2027-02-01", hasta: "2027-02-28" });
+    expect(rangoPeriodo("anio", "2027-05-05")).toEqual({ desde: "2027-01-01", hasta: "2027-12-31" });
+  });
+  it("las flechas mueven un periodo", () => {
+    expect(moverPeriodo("semana", "2026-11-18", -1)).toBe("2026-11-09");
+    expect(moverPeriodo("mes", "2026-12-15", 1)).toBe("2027-01-01");
+    expect(moverPeriodo("anio", "2026-12-15", 1)).toBe("2027-01-01");
+  });
+  it("la racha cuenta hasta ayer si hoy todavía no registra", () => {
+    expect(racha(["2026-11-15", "2026-11-16", "2026-11-17"], "2026-11-18")).toBe(3);
+    expect(racha(["2026-11-15", "2026-11-17", "2026-11-18"], "2026-11-18")).toBe(2);
+    expect(racha([], "2026-11-18")).toBe(0);
   });
 });

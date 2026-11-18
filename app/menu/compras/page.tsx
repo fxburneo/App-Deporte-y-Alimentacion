@@ -28,7 +28,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
     <>
       <Pantalla>
         <header className="flex items-center justify-between">
-          <Link href={dias === 14 ? "/menu?dias=14" : "/menu"} className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Semana</Link>
+          <Link href={dias === 14 ? "/menu?dias=14" : "/menu"} className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Plan</Link>
           <h1 className="font-display text-2xl font-bold tracking-[0.04em]">COMPRAS</h1>
           <span className="min-w-[70px]" />
         </header>
@@ -45,7 +45,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
         <ListaCompras items={lista} clave={`compras-${hoy}-${dias}`} />
         <span className="text-xs text-tenue">Marca lo que ya tienes en casa (se recuerda en este celular). La lista sale de tu menú tipo y del plan del coach.</span>
       </Pantalla>
-      <NavBar activa="comidas" />
+      <NavBar activa="plan" />
     </>
   );
 }

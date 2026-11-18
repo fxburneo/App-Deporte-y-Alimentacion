@@ -11,6 +11,9 @@ import Anillos from "@/components/hoy/Anillos";
 import DetalleDia from "@/components/hoy/DetalleDia";
 import LoComi from "@/components/hoy/LoComi";
 import { leerDatosDia } from "@/lib/datos/dia";
+import { leerCumplimiento } from "@/lib/datos/cumplimiento";
+import { rangoPeriodo } from "@/lib/cumplimiento";
+import { colorDe } from "@/components/cumplimiento/Medidor";
 import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { platoDeMomento } from "@/lib/menu/semana";
@@ -48,9 +51,12 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
   const fq = esHoy ? "" : `fecha=${fecha}`;
   const reg = (m: string) => `/registrar?comida=${m}${fq ? `&${fq}` : ""}`;
   const verComidas = esHoy ? "/comidas" : `/comidas?${fq}`;
+  // Resumen chico del cumplimiento de la semana (solo en el día de hoy).
+  const semanaP = esHoy ? leerCumplimiento(rangoPeriodo("semana", hoyEc).desde, rangoPeriodo("semana", hoyEc).hasta, hoyEc).catch(() => null) : Promise.resolve(null);
   const d = await leerDatosDia(fecha);
   if (!d.perfil) redirect("/bienvenida");
   const plan = planDelDia({ ...d, perfil: d.perfil });
+  const semana = await semanaP;
   const pesaHoy = esHoy && d.perfil.dias_pesaje.includes(diaSemana(d.fecha)) && !d.pesos.some((p) => p.fecha === d.fecha);
 
   if (plan == null) {
@@ -224,6 +230,13 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
           grasa={{ real: totalConsumido.grasaG, obj: obj.grasaG }}
           quedanKcal={Math.round(obj.kcal - comidoKcal)}
         />
+        {semana && (semana.entreno != null || semana.alimentacion != null) && (
+          <Link href="/cumplimiento" className="-mt-2 flex justify-center gap-3.5 text-sm text-suave no-underline">
+            Esta semana:
+            <span>entreno <strong className={colorDe(semana.entreno)}>{semana.entreno == null ? "—" : `${semana.entreno} %`}</strong></span>
+            <span>comida <strong className={colorDe(semana.alimentacion)}>{semana.alimentacion == null ? "—" : `${semana.alimentacion} %`}</strong></span>
+          </Link>
+        )}
 
         {siguiente && (
           <section className="flex flex-col gap-2.5 rounded-[18px] border border-marca/35 bg-superficie p-4">
