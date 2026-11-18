@@ -200,7 +200,7 @@ def gauge(nombre, p, sub):
             f'<span style="font-size:13px;color:{C["suave"]};text-align:center">{sub}</span></div>')
 def selector(activo):
     out = []
-    for t in ["Día", "Semana", "Mes", "Año"]:
+    for t in ["Semana", "Mes", "Año"]:
         st = f"background:{C['texto']};color:{C['fondo']};font-weight:800" if t == activo else f"color:{C['tenue']};font-weight:600"
         out.append(f'<span style="flex:1;text-align:center;padding:8px 0;border-radius:10px;{st}">{t}</span>')
     return f'<div style="display:flex;gap:4px;background:{C["sup"]};border-radius:12px;padding:4px">{"".join(out)}</div>'
@@ -233,12 +233,12 @@ cumple = "\n".join([
  selector("Semana"),
  f'<span style="font-size:14px;color:{C["tenue"]};text-align:center;margin-top:-6px">‹ &nbsp; Semana 16 – 22 nov &nbsp; ›</span>',
  f'<div style="display:flex;gap:10px">{gauge("ENTRENO", 86, "4 de 5 sesiones del coach")}{gauge("ALIMENTACIÓN", 71, "proteína corta 3 días")}</div>',
- barras("DÍA POR DÍA", ["L", "M", "M", "J", "V", "S", "D"], [100, 79, None, 100, 0, 92, None], [82, 64, 75, 88, 41, 70, 76]),
+ barras("DÍA POR DÍA", ["L", "M", "M", "J", "V", "S", "D"], [100, 79, None, 100, 0, 98, None], [82, 64, 75, 88, 41, 70, 76]),
  '<section style="display:flex;flex-direction:column">' + etiqueta("ENTRENO · SESIONES", "ponderado por duración"),
  fila_c("Mar · rodillo tempo 5×7", "70 de 70 min", 100),
  fila_c("Jue · trail cuestas 1:20", "1:28 de 1:20 (110 %)", 100),
  fila_c("Vie · trote aeróbico 1:00", "no hecho", 0),
- fila_c("Sáb · bici fondo 3:30", "4:16 de 3:30 (122 %)", 92, ultimo=True),
+ fila_c("Sáb · bici fondo 3:30", "4:16 de 3:30 (122 %)", 98, ultimo=True),
  '</section>',
  '<section style="display:flex;flex-direction:column">' + etiqueta("ALIMENTACIÓN · PROMEDIO", ""),
  fila_c("Calorías", "en objetivo (90–110 %) 4 de 7 días · pesa 40 %", 76),
