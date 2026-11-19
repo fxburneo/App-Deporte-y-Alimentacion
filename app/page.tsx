@@ -17,7 +17,7 @@ import { colorDe } from "@/components/cumplimiento/Medidor";
 import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { platoDeMomento } from "@/lib/menu/semana";
-import { cantidadDe, nombreCorto, totalesItems } from "@/lib/menu/escalar";
+import { cantidadDe, nombreCorto, totalesItems, type ItemMenu } from "@/lib/menu/escalar";
 import { comidaQueToca, comidasDesfasadas } from "@/lib/comidas/queToca";
 import { aEntreno, NOMBRE_DEPORTE, NOMBRE_MOMENTO } from "@/lib/datos/tipos";
 import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
@@ -130,10 +130,9 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
   const atrasadas = new Set(esHoy ? comidasDesfasadas(d.perfil.horarios_comida, horaEcuador(new Date().toISOString()), new Set(Object.keys(consumido) as Comida[]), siguiente) : []);
   const desfasada = (f: Fila) =>
     f.estado !== "hecha" && f.estado !== "ahora" &&
-    (f.momento === "pre_entreno" || f.momento === "durante" || (f.momento !== "extra" && (!esHoy || atrasadas.has(f.momento as Comida))));
+    (f.momento === "pre_entreno" || f.momento === "durante" || (f.momento !== "extra" && !esHoy));
   const pendientes = filas.filter((f) => atrasadas.has(f.momento as Comida) && f.estado !== "hecha");
   const ahora = siguiente ? plato(siguiente) : [];
-  const ahoraKcal = ahora.length ? Math.round(kcalDe(totalesItems(ahora))) : 0;
   const entrenoHoy = d.entrenosHoy.filter((e) => e.deporte !== "descanso");
   const hechos = entrenoHoy.filter((e) => e.estado === "hecho");
   const mostrar = (hechos.length ? hechos : entrenoHoy).filter((e) => e.deporte !== "fuerza" || entrenoHoy.every((x) => x.deporte === "fuerza"));
@@ -246,45 +245,31 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
         )}
 
         {siguiente && (
-          <section className="flex flex-col gap-2.5 rounded-[18px] border border-marca/35 bg-superficie p-4">
-            <div className="flex items-baseline justify-between">
-              <span className="text-[13px] font-extrabold tracking-[0.1em] text-marca">AHORA TOCA · {d.perfil.horarios_comida[siguiente]}</span>
-              {ahoraKcal > 0 && <span className="font-display text-lg font-bold">{miles(ahoraKcal)} kcal</span>}
-            </div>
-            <strong className="text-xl">{siguiente === "desayuno" && plan.temprano ? "Desayuno de recuperación" : NOMBRE_MOMENTO[siguiente]}</strong>
-            {ahora.length > 0 ? (
-              <ul className="flex flex-col">
-                {ahora.map((i, k) => (
-                  <li key={k} className="flex items-baseline justify-between gap-3 border-b border-linea py-1.5 last:border-0">
-                    <span className="text-[15px]">{nombreCorto(i.nombre)}</span>
-                    <span className={`text-[15px] whitespace-nowrap ${i.varia ? "font-bold text-carbo" : "text-suave"}`}>{cantidadDe(i)}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <span className="text-[15px] text-suave">Guarda tu plato de siempre en Mi despensa › Platos para registrarlo en un toque.</span>
-            )}
-            {obj.tipo !== "descanso" && ahora.some((i) => i.nombre.startsWith("Arroz blanco")) && <span className="text-[13px] text-tenue">{NOMBRE_TIPO[obj.tipo]}: arroz blanco y un poco más de cantidad.</span>}
-            <div className="flex gap-2.5">
-              {ahora.length > 0 && <LoComi momento={siguiente} nombre={NOMBRE_MOMENTO[siguiente]} />}
-              <Link href={reg(siguiente)} className="flex-1 rounded-[14px] border border-borde py-3.5 text-center font-bold text-texto no-underline">Comí otra cosa</Link>
-            </div>
-            {pendientes.length > 0 && (
-              <div className="flex flex-col gap-2 border-t border-linea pt-2.5">
-                <span className="text-[13px] font-bold text-carbo">Te quedó sin registrar</span>
-                {pendientes.map((f) => (
-                  <div key={f.momento} className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate text-[15px]">{f.nombre} <span className="text-[13px] text-tenue">· {f.hora}</span></span>
-                    <span className="flex flex-none items-center gap-3">
-                      {plato(f.momento).length > 0 && <LoComi momento={f.momento} nombre={f.nombre} compacto />}
-                      <Link href={reg(f.momento)} className="text-[13px] font-bold text-tenue">Otra cosa</Link>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <TarjetaComida
+            titulo={`AHORA TOCA · ${d.perfil.horarios_comida[siguiente]}`}
+            atrasada={false}
+            momento={siguiente}
+            nombre={siguiente === "desayuno" && plan.temprano ? "Desayuno de recuperación" : NOMBRE_MOMENTO[siguiente]}
+            items={ahora}
+            nota={obj.tipo !== "descanso" && ahora.some((i) => i.nombre.startsWith("Arroz blanco")) ? `${NOMBRE_TIPO[obj.tipo]}: arroz blanco y un poco más de cantidad.` : null}
+            otraCosa={reg(siguiente)}
+            editar={`${reg(siguiente)}&editar=1`}
+          />
         )}
+        {/* Comidas que pasaron de hora sin registro: la misma tarjeta (pedido 19-nov). */}
+        {pendientes.map((f) => (
+          <TarjetaComida
+            key={f.momento}
+            titulo={`SIN REGISTRAR · ${f.hora}`}
+            atrasada
+            momento={f.momento}
+            nombre={f.nombre}
+            items={plato(f.momento)}
+            nota={null}
+            otraCosa={reg(f.momento)}
+            editar={`${reg(f.momento)}&editar=1`}
+          />
+        ))}
 
         <section id="tu-dia" className="flex scroll-mt-4 flex-col">
           <div className="flex items-baseline justify-between pb-2">
@@ -324,6 +309,41 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
       </Pantalla>
       <NavBar activa="hoy" />
     </>
+  );
+}
+
+// Tarjeta de una comida con su plato de siempre: "Lo comí" (en un toque),
+// "Editar" (abre Registrar con la sugerencia cargada para cambiar cantidades o
+// quitar algo) y "Otra cosa". Sirve para la que toca ahora y las atrasadas.
+function TarjetaComida(p: { titulo: string; atrasada: boolean; momento: Momento; nombre: string; items: ItemMenu[]; nota: string | null; otraCosa: string; editar: string }) {
+  const kcal = p.items.length ? Math.round(kcalDe(totalesItems(p.items))) : 0;
+  const boton = "flex-1 rounded-[14px] border border-borde py-3.5 text-center text-[15px] font-bold text-texto no-underline";
+  return (
+    <section className={`flex flex-col gap-2.5 rounded-[18px] border bg-superficie p-4 ${p.atrasada ? "border-carbo/40" : "border-marca/35"}`}>
+      <div className="flex items-baseline justify-between">
+        <span className={`text-[13px] font-extrabold tracking-[0.1em] ${p.atrasada ? "text-carbo" : "text-marca"}`}>{p.titulo}</span>
+        {kcal > 0 && <span className="font-display text-lg font-bold">{miles(kcal)} kcal</span>}
+      </div>
+      <strong className="text-xl">{p.nombre}</strong>
+      {p.items.length > 0 ? (
+        <ul className="flex flex-col">
+          {p.items.map((i, k) => (
+            <li key={k} className="flex items-baseline justify-between gap-3 border-b border-linea py-1.5 last:border-0">
+              <span className="text-[15px]">{nombreCorto(i.nombre)}</span>
+              <span className={`text-[15px] whitespace-nowrap ${i.varia ? "font-bold text-carbo" : "text-suave"}`}>{cantidadDe(i)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <span className="text-[15px] text-suave">Guarda tu plato de siempre en Mi despensa › Platos para registrarlo en un toque.</span>
+      )}
+      {p.nota && <span className="text-[13px] text-tenue">{p.nota}</span>}
+      <div className="flex gap-2">
+        {p.items.length > 0 && <LoComi momento={p.momento} nombre={p.nombre} />}
+        {p.items.length > 0 && <Link href={p.editar} className={boton}>Editar</Link>}
+        <Link href={p.otraCosa} className={boton}>Otra cosa</Link>
+      </div>
+    </section>
   );
 }
 
