@@ -10,3 +10,9 @@ export function comidaQueToca(horarios: Record<Comida, string>, ahora: string, r
   const llegadas = pendientes.filter((c) => aMin(horarios[c]) <= aMin(ahora) + 60);
   return llegadas.at(-1) ?? pendientes[0] ?? "cena";
 }
+
+// Comidas que ya pasaron de hora y siguen sin registro, sin contar la que
+// "toca ahora" (esa tiene su tarjeta). Llevan "Lo comí" en Hoy (19-nov).
+export function comidasDesfasadas(horarios: Record<Comida, string>, ahora: string, registradas: Set<Comida>, siguiente: Comida | null): Comida[] {
+  return COMIDAS.filter((c) => !registradas.has(c) && c !== siguiente && aMin(horarios[c]) <= aMin(ahora));
+}

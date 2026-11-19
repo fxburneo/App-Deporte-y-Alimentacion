@@ -18,7 +18,7 @@ import { planDelDia } from "@/lib/datos/planDia";
 import { leerDespensa } from "@/lib/datos/despensa";
 import { platoDeMomento } from "@/lib/menu/semana";
 import { cantidadDe, nombreCorto, totalesItems } from "@/lib/menu/escalar";
-import { comidaQueToca } from "@/lib/comidas/queToca";
+import { comidaQueToca, comidasDesfasadas } from "@/lib/comidas/queToca";
 import { aEntreno, NOMBRE_DEPORTE, NOMBRE_MOMENTO } from "@/lib/datos/tipos";
 import { diaSemana, esEditable, fechaHistorial, fechaLarga, horaEcuador, horasDesde, hoyEcuador, sumarDias } from "@/lib/fecha";
 import { calcularRecuperacion, ETIQUETA_NIVEL } from "@/lib/recuperacion";
@@ -125,6 +125,13 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
     };
   });
   const registradas = filas.filter((f) => f.estado === "hecha" && f.momento !== "extra").length;
+  // Comidas sin registrar cuya hora ya pasó (o de un día anterior), además del
+  // snack antes y lo de durante: llevan "Lo comí" en la fila (pedido 19-nov).
+  const atrasadas = new Set(esHoy ? comidasDesfasadas(d.perfil.horarios_comida, horaEcuador(new Date().toISOString()), new Set(Object.keys(consumido) as Comida[]), siguiente) : []);
+  const desfasada = (f: Fila) =>
+    f.estado !== "hecha" && f.estado !== "ahora" &&
+    (f.momento === "pre_entreno" || f.momento === "durante" || (f.momento !== "extra" && (!esHoy || atrasadas.has(f.momento as Comida))));
+  const pendientes = filas.filter((f) => atrasadas.has(f.momento as Comida) && f.estado !== "hecha");
   const ahora = siguiente ? plato(siguiente) : [];
   const ahoraKcal = ahora.length ? Math.round(kcalDe(totalesItems(ahora))) : 0;
   const entrenoHoy = d.entrenosHoy.filter((e) => e.deporte !== "descanso");
@@ -262,10 +269,24 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               {ahora.length > 0 && <LoComi momento={siguiente} nombre={NOMBRE_MOMENTO[siguiente]} />}
               <Link href={reg(siguiente)} className="flex-1 rounded-[14px] border border-borde py-3.5 text-center font-bold text-texto no-underline">Comí otra cosa</Link>
             </div>
+            {pendientes.length > 0 && (
+              <div className="flex flex-col gap-2 border-t border-linea pt-2.5">
+                <span className="text-[13px] font-bold text-carbo">Te quedó sin registrar</span>
+                {pendientes.map((f) => (
+                  <div key={f.momento} className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 truncate text-[15px]">{f.nombre} <span className="text-[13px] text-tenue">· {f.hora}</span></span>
+                    <span className="flex flex-none items-center gap-3">
+                      {plato(f.momento).length > 0 && <LoComi momento={f.momento} nombre={f.nombre} compacto />}
+                      <Link href={reg(f.momento)} className="text-[13px] font-bold text-tenue">Otra cosa</Link>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
-        <section className="flex flex-col">
+        <section id="tu-dia" className="flex scroll-mt-4 flex-col">
           <div className="flex items-baseline justify-between pb-2">
             <span className="etiqueta">{esHoy ? "Tu día" : "Ese día"}</span>
             <span className="text-[13px] text-tenue">{registradas} de {filas.filter((f) => f.momento !== "extra").length} registradas</span>
@@ -277,7 +298,7 @@ export default async function Hoy({ searchParams }: { searchParams: Promise<{ fe
               ultimo={i === filas.length - 1}
               href={editable ? (f.estado === "hecha" ? verComidas : reg(f.momento)) : null}
               accion={
-                editable && f.estado !== "hecha" && (f.momento === "pre_entreno" || f.momento === "durante") && plato(f.momento).length > 0 ? (
+                editable && desfasada(f) && plato(f.momento).length > 0 ? (
                   <span className="flex items-center gap-3 pt-1.5">
                     <LoComi momento={f.momento} nombre={NOMBRE_MOMENTO[f.momento]} fecha={esHoy ? undefined : d.fecha} compacto />
                     <Link href={reg(f.momento)} className="text-[13px] font-bold text-tenue">Otra cosa</Link>
