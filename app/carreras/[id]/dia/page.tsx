@@ -67,7 +67,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <p className="text-sm text-suave">Líquido y sodio son estimados hasta el test de sudoración. El carbohidrato parte de tus 70 g/h del año pasado.</p>
         </section>
       </Pantalla>
-      <NavBar activa="mas" />
+      <NavBar activa="yo" />
     </>
   );
 }

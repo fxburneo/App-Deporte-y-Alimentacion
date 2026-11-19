@@ -184,7 +184,7 @@ export default async function Comidas({ searchParams }: { searchParams: Promise<
           )}
         </section>
       </Pantalla>
-      <NavBar activa="comidas" />
+      <NavBar activa="plan" />
     </>
   );
 }

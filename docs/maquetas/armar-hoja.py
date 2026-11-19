@@ -11,7 +11,9 @@ secciones = [
    ("RPlan","R5 · Plan","Menú de la semana, lista de compras, platos, despensa y calculadora juntos, a una pestaña.",True),
    ("REntreno","R6 · Entreno","Una frase de resumen arriba, números grandes y la semana del coach en una fila.",True),
    ("RPeso","R8 · Pesarme","El número del día en grande, con − y + desde tu último peso; tendencia y últimos pesajes. Estatura y nacimiento quedan en Yo › Mis datos.",True),
-   ("RYo","R7 · Yo","Tu progreso primero (tendencia de peso hacia 72–73 kg, racha, semana, Petzl) y los ajustes ordenados abajo.",True)]),
+   ("RCumple","R9 · Cumplimiento (semana)","Dos indicadores: entreno (bandas de TrainingPeaks, ponderado por duración) y alimentación (calorías 40 %, proteína 35 %, carbohidrato 25 %). Semana · Mes · Año, día por día, sesiones y componentes.",True),
+   ("RCumpleAnio","R10 · Cumplimiento (año)","La misma vista por año: mes a mes y el mejor y peor mes. Números de ejemplo.",True),
+   ("RYo","R7 · Yo","Tu progreso primero: tendencia de peso, cumplimiento de la semana (entreno y alimentación), racha y Petzl; ajustes abajo.",True)]),
  ("1 · Primer uso", "Lo que ves la primera vez que entras. Se completa una sola vez y se puede cambiar después en Más.", [
    ("Bienvenida1","1.1 · Tus datos","Datos para calcular tu gasto, peso objetivo y ritmo. Abajo ves el resultado al instante.",False),
    ("Bienvenida2","1.2 · Comidas y horarios","Alimentos excluidos, horas de comida y de entreno, y días de pesaje.",False)]),

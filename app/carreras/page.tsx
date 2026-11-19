@@ -29,7 +29,7 @@ export default async function Page() {
     <>
       <Pantalla>
         <header className="flex items-center justify-between">
-          <Link href="/mas" className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Más</Link>
+          <Link href="/yo" className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Yo</Link>
           <h1 className="font-display text-2xl font-bold tracking-[0.04em]">MIS CARRERAS</h1>
           <Link href="/carreras/nueva" className="min-w-[70px] text-right font-bold text-marca">+ Agregar</Link>
         </header>
@@ -89,7 +89,7 @@ export default async function Page() {
           </section>
         )}
       </Pantalla>
-      <NavBar activa="mas" />
+      <NavBar activa="yo" />
     </>
   );
 }

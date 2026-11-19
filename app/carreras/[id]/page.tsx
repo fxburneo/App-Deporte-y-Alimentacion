@@ -139,7 +139,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </Link>
         <span className="text-xs text-tenue">Las fechas se mueven solas si cambias la carrera. El test de sudoración afina líquido y sodio.</span>
       </Pantalla>
-      <NavBar activa="mas" />
+      <NavBar activa="yo" />
     </>
   );
 }

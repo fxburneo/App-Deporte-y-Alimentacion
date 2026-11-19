@@ -29,7 +29,7 @@ export default async function Page({ params }: { params: Promise<{ fecha: string
     <>
       <Pantalla>
         <header className="flex items-center justify-between">
-          <Link href="/menu" className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Semana</Link>
+          <Link href="/menu" className="min-w-[70px] py-2.5 font-semibold text-tenue">‹ Plan</Link>
           <h1 className="font-display text-2xl font-bold tracking-[0.04em]">{fecha === hoy ? "HOY" : fechaLarga(fecha).toUpperCase()}</h1>
           <span className="min-w-[70px]" />
         </header>
@@ -85,7 +85,7 @@ export default async function Page({ params }: { params: Promise<{ fecha: string
           </p>
         </section>
       </Pantalla>
-      <NavBar activa="comidas" />
+      <NavBar activa="plan" />
     </>
   );
 }

@@ -28,8 +28,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`h-full antialiased ${display.variable} ${body.variable}`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    // Sin altura fija en html (h-full): en el iPhone, con la app instalada en la
+    // pantalla de inicio, eso a veces dejaba Hoy sin poder desplazarse (19-nov).
+    <html lang="es" className={`antialiased ${display.variable} ${body.variable}`}>
+      <body className="flex min-h-dvh flex-col font-sans">{children}</body>
     </html>
   );
 }

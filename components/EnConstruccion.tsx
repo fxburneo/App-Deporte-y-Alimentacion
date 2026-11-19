@@ -12,7 +12,7 @@ export default function EnConstruccion({
   titulo: string;
   etapa: number;
   descripcion: string;
-  seccion: "hoy" | "comidas" | "entreno" | "mas";
+  seccion: "hoy" | "plan" | "entreno" | "yo";
   children?: React.ReactNode;
 }) {
   return (

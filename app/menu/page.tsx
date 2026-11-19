@@ -1,5 +1,6 @@
-// Menú de la semana (maqueta 2d.1): el menú tipo con las cantidades de cada
-// día según el plan de TrainingPeaks. En amarillo lo que cambia ese día.
+// Plan (maqueta R3, antes "Menú de la semana"): accesos a compras, platos,
+// despensa y calculadora, y la semana con lo que cambia cada día según el
+// plan de TrainingPeaks (en amarillo). Toca un día para ver su menú.
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/NavBar";
@@ -11,7 +12,7 @@ import { duracion, miles } from "@/lib/formato";
 import { TIPO_MENU } from "./estilo";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ dias?: string }> }) {
-  const dias = (await searchParams).dias === "14" ? 14 : 7;
+  const dias = (await searchParams).dias === "14" ? 14 : 7; // ?dias=14 sigue funcionando desde Compras
   const hoy = hoyEcuador();
   const datos = await leerMenuSemana(dias, hoy);
   if (!datos) redirect("/");
@@ -20,26 +21,25 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
   return (
     <>
       <Pantalla>
-        <header className="flex flex-col">
-          <span className="text-[13px] text-tenue">
-            {fechaLarga(hoy)} → {fechaCorta(sumarDias(hoy, dias - 1))} · plan de TrainingPeaks
-          </span>
-          <h1 className="font-display text-[28px] font-bold leading-tight tracking-[0.04em]">MENÚ DE LA SEMANA</h1>
+        <header className="flex items-end justify-between">
+          <h1 className="font-display text-[30px] font-bold leading-none tracking-[0.03em]">PLAN</h1>
+          <span className="text-sm text-tenue">{fechaCorta(hoy)} – {fechaCorta(sumarDias(hoy, dias - 1))}</span>
         </header>
-        <div role="tablist" className="grid grid-cols-2 overflow-hidden rounded-[10px] border border-borde">
-          {[7, 14].map((n) => (
-            <Link key={n} href={n === 7 ? "/menu" : "/menu?dias=14"} role="tab" aria-selected={dias === n} className={`py-2.5 text-center no-underline ${dias === n ? "bg-texto font-bold text-fondo" : "bg-superficie font-semibold text-suave"}`}>
-              {n} días
-            </Link>
-          ))}
+        <div className="grid grid-cols-2 gap-2.5">
+          <Acceso href="/menu/compras" titulo="Lista de compras" sub="7 o 14 días" destacado icono={<path d="M3 4h2l2.5 11h11L21 7H6.2M9 20h.01M18 20h.01" />} />
+          <Acceso href="/despensa?tab=platos" titulo="Mis platos" sub="tu plato de siempre" icono={<><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4.5" /></>} />
+          <Acceso href="/despensa" titulo="Despensa" sub="tus alimentos" icono={<><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M4 12h16M10 8h4M10 16h4" /></>} />
+          <Acceso href="/calculadora" titulo="¿Cuánto me sirvo?" sub="calculadora" icono={<path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0zM17 7l-3 7a3 3 0 0 0 6 0z" />} />
         </div>
-        <p className="-mt-2 text-xs text-tenue">
-          {sinMenuTipo
-            ? "Todavía no tienes menú tipo: se muestran sugerencias con tu despensa. Guarda tus platos habituales en Mi despensa › Platos."
-            : "Tu menú tipo es fijo. Cada día cambia solo lo que está en amarillo."}
-        </p>
+        <div className="-mb-2 flex items-baseline justify-between">
+          <span className="etiqueta">Esta semana</span>
+          <span className="text-xs text-tenue">toca un día para ver el menú</span>
+        </div>
+        {sinMenuTipo && (
+          <p className="-mb-2 text-xs text-tenue">Todavía no tienes menú tipo: se muestran sugerencias con tu despensa. Guarda tus platos habituales en Mis platos.</p>
+        )}
 
-        <section className="flex flex-col">
+        <section className="flex flex-col gap-2">
           {datos.dias.map((x) => {
             const t = TIPO_MENU[x.plan.objetivo.tipo];
             const entreno = x.entrenos.filter((e) => e.deporte !== "fuerza" && e.deporte !== "descanso" && e.duracion_min > 0);
@@ -48,7 +48,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
               .filter(({ v }) => v.length > 0)
               .map(({ c, v }) => `${NOMBRE_MOMENTO[c.momento]}: ${v.map((i) => `${i.medida_casera} ${i.nombre.split(" (")[0].replace(/ cocid[oa]$/i, "").toLowerCase()}`).join(", ")}`);
             return (
-              <Link key={x.fecha} href={`/menu/${x.fecha}`} className="flex flex-col gap-1 border-b border-linea py-3 text-texto no-underline last:border-0">
+              <Link key={x.fecha} href={`/menu/${x.fecha}`} className={`flex flex-col gap-1 rounded-[14px] border p-3 text-texto no-underline ${x.fecha === hoy ? "border-marca bg-superficie" : "border-linea"}`}>
                 <div className="flex items-center justify-between gap-2">
                   <strong>
                     {x.fecha === hoy ? "Hoy" : fechaLarga(x.fecha)}{" "}
@@ -60,7 +60,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
                     {x.plan.carrera?.modo === "carga" ? "CARGA" : t.nombre.toUpperCase()}
                   </span>
                 </div>
-                <span className="text-[13px] text-carbo">{cambios.join(" · ")}</span>
+                <span className="line-clamp-2 text-sm text-carbo">{cambios.join(" · ")}</span>
                 <span className="text-xs text-tenue">
                   {miles(x.plan.objetivo.kcal)} kcal · {x.plan.objetivo.carboG} g C
                 </span>
@@ -69,12 +69,21 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
           })}
         </section>
 
-        <Link href={dias === 14 ? "/menu/compras?dias=14" : "/menu/compras"} className="rounded-xl bg-marca py-4 text-center font-extrabold tracking-[0.04em] text-fondo no-underline">
-          LISTA DE COMPRAS
-        </Link>
         <span className="text-xs text-tenue">Si el coach cambia un entreno, el menú del día se recalcula solo. TrainingPeaks comparte unas 2 semanas: más allá, los días salen como descanso.</span>
       </Pantalla>
-      <NavBar activa="comidas" />
+      <NavBar activa="plan" />
     </>
+  );
+}
+
+function Acceso({ href, titulo, sub, icono, destacado }: { href: string; titulo: string; sub: string; icono: React.ReactNode; destacado?: boolean }) {
+  return (
+    <Link href={href} className={`flex flex-col gap-1.5 rounded-[14px] p-3 text-texto no-underline ${destacado ? "border border-marca/50 bg-superficie" : "bg-superficie"}`}>
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={destacado ? "text-marca" : "text-tenue"}>
+        {icono}
+      </svg>
+      <strong className="text-[15px]">{titulo}</strong>
+      <span className="text-[13px] text-tenue">{sub}</span>
+    </Link>
   );
 }
