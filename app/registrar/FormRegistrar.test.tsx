@@ -247,4 +247,28 @@ describe("FormRegistrar · día anterior", () => {
     expect(guardarComida).toHaveBeenCalledWith(expect.objectContaining({ comida: "cena", fecha: "2026-11-08" }));
     expect(push).toHaveBeenCalledWith("/comidas?fecha=2026-11-08");
   });
+
+  it("Editar desde Hoy: la sugerencia llega cargada, se quita un alimento y se guarda como lo de siempre editado", async () => {
+    guardarComida.mockResolvedValue({ ok: true });
+    render(
+      <FormRegistrar
+        inicial="almuerzo"
+        horarios={horarios}
+        reparto={reparto}
+        consumido={{}}
+        mananaExigente={false}
+        temprano={false}
+        recientes={[]}
+        sugerencia={[almuerzoIA.alimentos[0], almuerzoIA.alimentos[1]]}
+      />
+    );
+    expect(screen.getByRole("tab", { name: /Mis comidas/ }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByText("Pollo a la plancha")).toBeTruthy();
+    fireEvent.click(screen.getByText("Arroz blanco"));
+    fireEvent.click(screen.getByRole("button", { name: "Quitar" }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Guardar Almuerzo/i })));
+    expect(guardarComida).toHaveBeenCalledWith(
+      expect.objectContaining({ comida: "almuerzo", origen: "repetida", descripcion: "Lo de siempre (editado)", alimentos: [almuerzoIA.alimentos[0]] }),
+    );
+  });
 });

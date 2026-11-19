@@ -45,13 +45,14 @@ export default function FormRegistrar(props: {
   fecha?: string; // día anterior; sin fecha = hoy
   modoInicial?: "foto" | "texto" | "repetir";
   fechaTexto?: string; // "Domingo 8 nov"
+  sugerencia?: Alimento[]; // "Editar" desde Hoy: el plato de siempre ya cargado
 }) {
   const router = useRouter();
   const [comida, setComida] = useState<Momento>(props.inicial);
-  const [modo, setModo] = useState<Modo>(props.modoInicial ?? "foto");
+  const [modo, setModo] = useState<Modo>(props.sugerencia ? "repetir" : (props.modoInicial ?? "foto"));
   const [foto, setFoto] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
-  const [alimentos, setAlimentos] = useState<Alimento[] | null>(null);
+  const [alimentos, setAlimentos] = useState<Alimento[] | null>(props.sugerencia ?? null);
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [nota, setNota] = useState("");
@@ -59,7 +60,9 @@ export default function FormRegistrar(props: {
   const [extra, setExtra] = useState("");
   const [q, setQ] = useState("");
   // Alimento de la despensa de donde salió cada fila (para cambiar por unidades).
-  const [fuentes, setFuentes] = useState<(AlimentoDespensa | null)[]>([]);
+  const [fuentes, setFuentes] = useState<(AlimentoDespensa | null)[]>(() =>
+    (props.sugerencia ?? []).map((a) => (props.despensa ?? []).find((d) => d.nombre.toLowerCase() === a.nombre.toLowerCase()) ?? null),
+  );
   const [error, setError] = useState<string | null>(null);
   const [analizando, startAnalizar] = useTransition();
   const [guardando, startGuardar] = useTransition();
@@ -205,7 +208,7 @@ export default function FormRegistrar(props: {
       const r = await guardarComida({
         comida,
         origen: modo === "repetir" ? "repetida" : modo,
-        descripcion: texto.trim(),
+        descripcion: modo === "repetir" && props.sugerencia ? "Lo de siempre (editado)" : texto.trim(),
         alimentos,
         ...(props.fecha ? { fecha: props.fecha } : {}),
       });

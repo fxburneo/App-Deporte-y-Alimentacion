@@ -10,8 +10,10 @@ import { COMIDAS, MOMENTOS, type Comida, type Momento } from "@/lib/nutricion/mo
 import { createClient } from "@/lib/supabase/server";
 import { leerDespensa } from "@/lib/datos/despensa";
 import FormRegistrar, { type Reciente } from "./FormRegistrar";
+import { loDeSiempreDelDia } from "@/lib/datos/loDeSiempre";
+import type { Alimento } from "@/lib/comidas/alimentos";
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string; fecha?: string; modo?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ comida?: string; fecha?: string; modo?: string; editar?: string }> }) {
   const sp = await searchParams;
   // Día anterior: hasta 7 días atrás; si no, hoy.
   const hoyEc = hoyEcuador();
@@ -45,6 +47,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
   }
 
   const { alimentos: despensa, platos } = await leerDespensa();
+  // "Editar" desde Hoy: la sugerencia del día (lo de siempre con las cantidades
+  // de hoy) cargada para cambiar cantidades o quitar algo antes de guardar.
+  let sugerencia: Alimento[] | undefined;
+  if (sp.editar === "1" && pedida) {
+    const datos = await loDeSiempreDelDia(d.fecha);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- "varia" es solo para la pantalla
+    const items = datos?.plato(pedida).map(({ varia, ...a }) => a) ?? [];
+    if (items.length) sugerencia = items;
+  }
 
   return (
     <FormRegistrar
@@ -63,6 +74,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
       consumoDurante={plan.consumoDurante}
       consumoExtra={plan.consumoExtra}
       fecha={fecha ?? undefined}
+      sugerencia={sugerencia}
       modoInicial={sp.modo === "texto" || sp.modo === "repetir" || sp.modo === "foto" ? sp.modo : undefined}
       fechaTexto={fecha ? fechaLarga(fecha) : undefined}
     />
